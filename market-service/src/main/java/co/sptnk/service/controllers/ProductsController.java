@@ -1,23 +1,24 @@
 package co.sptnk.service.controllers;
 
+import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.model.Product;
-import co.sptnk.service.repositories.ProductsRepo;
-import co.sptnk.service.services.ProductsService;
+import co.sptnk.service.services.IProductsService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("products")
 public class ProductsController {
 
     @Autowired
-    ProductsRepo productsRepo;
-
-    @Autowired
-    ProductsService productsService;
+    IProductsService productsService;
 
     /**
      * Получение списка продуктов для пользователя
@@ -26,7 +27,11 @@ public class ProductsController {
      * @throws Exception
      */
     @GetMapping("/list/{userId}")
-    public ResponseEntity<Set<Product>> getAllForUser(@PathVariable("userId") Long userId) throws Exception{
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Получен список объектов"),
+    }
+    )
+    public ResponseEntity<List<Product>> getAllForUser(@PathVariable("userId") Long userId) throws Exception{
         return ResponseEntity.ok(productsService.getAllForUser(userId));
     }
 
@@ -36,17 +41,31 @@ public class ProductsController {
      * @throws Exception
      */
     @PutMapping("/add")
-    public void update(@RequestBody Product product) throws Exception{
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Объект успешно сохранен")
+    }
+    )
+    public void save(@RequestBody Product product) throws Exception{
         productsService.save(product);
     }
 
     /**
      * Удаление продукта по идентификатору
      * @param id - идетификатор продукта
-     * @throws Exception
+     * @throws MarketServiceException - если удаляемый объект не найден
      */
     @DeleteMapping("/delete/{productId}")
-    public void delete(@PathVariable("productId") Long id) throws Exception{
-        productsService.delete(id);
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Объект успешно удален"),
+            @ApiResponse(responseCode = "404", description = "Объект не найден")
+    }
+    )
+    public ResponseEntity delete(@PathVariable("productId") Long id) {
+        try {
+            productsService.delete(id);
+        } catch (MarketServiceException e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.accepted().build();
     }
 }
