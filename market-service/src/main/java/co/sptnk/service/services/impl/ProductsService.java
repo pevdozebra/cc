@@ -29,7 +29,9 @@ public class ProductsService implements IProductsService {
     public void delete(Long id) throws MarketServiceException{
         Product product = productsRepo.findById(id).orElse(null);
         if (product == null || (product.getDeleted() != null && product.getDeleted())) {
-            throw new MarketServiceException("Не найден удаляемый продукт с id " + id);
+            String error = "Не найден удаляемый продукт с id " + id;
+            log.error(error);
+            throw new MarketServiceException(error);
         }
         product.setDeleted(true);
         productsRepo.save(product);

@@ -37,7 +37,9 @@ public class OrdersService implements IOrdersService {
     public void delete(Long id) throws MarketServiceException{
         Order order = ordersRepo.findById(id).orElse(null);
         if (order == null || (order.getDeleted() != null && order.getDeleted())) {
-            throw new MarketServiceException("Не найден удаляемый заказ с id " + id);
+            String error = "Не найден удаляемый заказ с id " + id;
+            log.error(error);
+            throw new MarketServiceException(error);
         }
         order.setDeleted(true);
         ordersRepo.save(order);
