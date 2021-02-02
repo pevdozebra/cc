@@ -2,6 +2,7 @@ package co.sptnk.service.services;
 
 import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.model.Product;
+import co.sptnk.service.transfers.ProductPageTO;
 
 import java.util.List;
 
@@ -26,4 +27,6 @@ public interface IProductsService {
      * @throws MarketServiceException - если продукта нет в БД
      */
     void delete(Long id) throws MarketServiceException;
+
+    ProductPageTO getAll(Integer page, Integer size);
 }

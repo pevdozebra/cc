@@ -21,21 +21,6 @@ public class ProductsController {
     IProductsService productsService;
 
     /**
-     * Получение списка продуктов для пользователя
-     * @param userId - идентификатор пользователя
-     * @return список продуктов для пользователя
-     * @throws Exception
-     */
-    @GetMapping("/list/{userId}")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Получен список объектов"),
-    }
-    )
-    public ResponseEntity<List<Product>> getAllForUser(@PathVariable("userId") Long userId) throws Exception{
-        return ResponseEntity.ok(productsService.getAllForUser(userId));
-    }
-
-    /**
      * Добавление/обновление продукта
      * @param product - продукт
      * @throws Exception

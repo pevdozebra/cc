@@ -1,6 +1,8 @@
 package co.sptnk.service.repositories;
 
 import co.sptnk.service.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +14,6 @@ public interface ProductsRepo extends JpaRepository<Product, Long> {
     Collection<Product> findAllByUserIdAndActiveTrueAndDeletedFalse(Long userId);
 
     Product findProductByIdAndDeletedFalse(Long id);
+
+    Page<Product> findAllByDeletedFalse(Pageable pageable);
 }
