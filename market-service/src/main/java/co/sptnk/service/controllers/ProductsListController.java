@@ -36,7 +36,7 @@ public class ProductsListController {
      * @return список продуктов для пользователя
      * @throws Exception
      */
-    @GetMapping("")
+    @GetMapping
     @Operation(parameters = {
             @Parameter(name = "userId", description = "Идентификатор пользователя"),
     })
