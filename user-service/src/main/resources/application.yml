@@ -1,0 +1,16 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: 'user-service'
+  liquibase:
+    change-log: classpath:/db/changelog/changelog-master.xml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/users
+    username: sa
+    password: sa
+    driver-class-name: org.postgresql.Driver
+jpa:
+  database: postgresql
+  database-platform: org.hibernate.dialect.PostgreSQL10Dialect
