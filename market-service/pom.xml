@@ -108,11 +108,26 @@
             </properties>
         </profile>
         <profile>
-            <id>work</id>
+            <id>staging</id>
             <activation>
                 <property>
                     <name>profile</name>
-                    <value>work</value>
+                    <value>staging</value>
+                </property>
+            </activation>
+            <properties>
+                <profile.propertyFile>src/main/resources/db/${profile}.properties</profile.propertyFile>
+                <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
+                <profile.verbose>false</profile.verbose>
+                <profile.logging>debug</profile.logging>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <activation>
+                <property>
+                    <name>profile</name>
+                    <value>prod</value>
                 </property>
             </activation>
             <properties>
