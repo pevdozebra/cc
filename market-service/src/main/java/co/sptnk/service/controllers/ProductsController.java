@@ -39,13 +39,13 @@ public class ProductsController {
      * @param id - идетификатор продукта
      * @throws MarketServiceException - если удаляемый объект не найден
      */
-    @DeleteMapping("/delete/{productId}")
+    @DeleteMapping("/delete")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Объект успешно удален"),
             @ApiResponse(responseCode = "404", description = "Объект не найден")
     }
     )
-    public ResponseEntity delete(@PathVariable("productId") Long id) {
+    public ResponseEntity delete(@RequestParam("productId") Long id) {
         try {
             productsService.delete(id);
         } catch (MarketServiceException e) {

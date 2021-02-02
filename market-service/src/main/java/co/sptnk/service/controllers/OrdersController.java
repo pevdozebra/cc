@@ -36,13 +36,13 @@ public class OrdersController {
      * @param id - идентификатор заказа
      * @throws MarketServiceException - исключение, если удаляемый объект не найден
      */
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Объект успешно удален"),
             @ApiResponse(responseCode = "404", description = "Объект не найден")
     }
     )
-    public ResponseEntity delete(@PathVariable("id") Long id) {
+    public ResponseEntity delete(@RequestParam("orderId") Long id) {
         try {
             ordersService.delete(id);
         } catch (MarketServiceException e) {
