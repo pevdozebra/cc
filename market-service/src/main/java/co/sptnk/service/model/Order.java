@@ -1,5 +1,6 @@
 package co.sptnk.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,7 +39,9 @@ public class Order {
 
     /**
      * Признак удаленного заказа
+     * Исключено из трансфера
      */
+    @JsonIgnore
     private Boolean deleted = false;
 
 

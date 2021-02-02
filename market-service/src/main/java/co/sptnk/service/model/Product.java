@@ -1,9 +1,9 @@
 package co.sptnk.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,11 +33,15 @@ public class Product {
 
     /**
      * Признак удаленного продукта
+     * Исключено из трансфера
      */
+    @JsonIgnore
     private Boolean deleted = false;
 
     /**
      * Признак активного продукта
+     * Исключено из трансфера
      */
+    @JsonIgnore
     private Boolean active = true;
 }
