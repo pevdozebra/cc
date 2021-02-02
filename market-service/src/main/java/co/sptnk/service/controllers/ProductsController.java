@@ -25,7 +25,7 @@ public class ProductsController {
      * @param product - продукт
      * @throws Exception
      */
-    @PutMapping("/add")
+    @PutMapping("/save")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Объект успешно сохранен")
     }

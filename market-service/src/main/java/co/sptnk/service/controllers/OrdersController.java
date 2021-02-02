@@ -21,7 +21,7 @@ public class OrdersController {
      * Добавление нового заказа
      * @param order - объект заказа
      */
-    @PutMapping("/add")
+    @PutMapping("/save")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Объект успешно сохранен"),
     }
