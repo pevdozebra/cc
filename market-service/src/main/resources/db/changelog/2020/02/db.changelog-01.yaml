@@ -1,0 +1,84 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: tsydenov_ia
+      changes:
+        - createSequence:
+            dataType: bigint
+            schemaName: public
+            sequenceName: products_id_seq
+            startValue: 1
+        - createTable:
+            tableName: products
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                  defaultValue: nextval('products_id_seq')
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValue: false
+              - column:
+                  name: active
+                  type: boolean
+                  defaultValue: true
+        - createIndex:
+            columns:
+              - column:
+                  descending: true
+                  name: id
+            indexName: idx_id_products
+            schemaName: public
+            tableName: products
+            unique: true
+
+  - changeSet:
+      id: 2
+      author: tsydenov_ia
+      changes:
+        - createSequence:
+            dataType: bigint
+            schemaName: public
+            sequenceName: orders_id_seq
+            startValue: 1
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                  defaultValue: nextval('orders_id_seq')
+              - column:
+                  name: customer_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: performer_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValue: false
+        - createIndex:
+            columns:
+              - column:
+                  descending: true
+                  name: id
+            indexName: idx_id_orders
+            schemaName: public
+            tableName: orders
+            unique: true
+
