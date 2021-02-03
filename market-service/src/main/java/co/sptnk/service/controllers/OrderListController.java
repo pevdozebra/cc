@@ -2,15 +2,17 @@ package co.sptnk.service.controllers;
 
 import co.sptnk.service.model.Order;
 import co.sptnk.service.services.IOrdersService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -25,6 +27,11 @@ public class OrderListController {
      * @return - Возвращает список всех заказов
      * @throws Exception
      */
+    @Operation(description = "Метод отдает объекты постранично. Возвращает ссылку на следующую страницу")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Получен список объектов")
+    }
+    )
     @GetMapping("/all")
     public ResponseEntity<List<Order>> getAll() throws Exception{
         return ResponseEntity.ok(ordersService.getAllNotDeleted());
@@ -32,21 +39,35 @@ public class OrderListController {
 
     /**
      * Получение списка заказов для заказчика
-     * @param customerId - идентификатор заказчика
+     * @param customer - идентификатор заказчика
      * @return список заказов для заказчика
      */
-    @GetMapping("/customer/{id}")
-    public ResponseEntity<List<Order>> getCustomerOrderList(@PathVariable("id") Long customerId) {
-        return ResponseEntity.ok(ordersService.getCustomerList(customerId));
+    @Operation(parameters = {
+            @Parameter(name = "uuid", description = "UUID заказчика"),
+    }, description = "Список заказов для заказчика")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Получен список объектов")
+    }
+    )
+    @GetMapping("/customer")
+    public ResponseEntity<List<Order>> getCustomerOrderList(@RequestParam("uuid") UUID customer) {
+        return ResponseEntity.ok(ordersService.getCustomerList(customer));
     }
 
     /**
      * Получение списка заказов для исполнителя
-     * @param performerId - идентификатор исполнителя
+     * @param performer - идентификатор исполнителя
      * @return список заказов для исполнителя
      */
-    @GetMapping("/performer/{id}")
-    public ResponseEntity<List<Order>> getPerformerOrderList(@PathVariable("id") Long performerId) {
-        return ResponseEntity.ok(ordersService.getPerformerList(performerId));
+    @Operation(parameters = {
+            @Parameter(name = "uuid", description = "UUID исполнителя"),
+    }, description = "Список заказов для исполнителя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Получен список объектов")
+    }
+    )
+    @GetMapping("/performer")
+    public ResponseEntity<List<Order>> getPerformerOrderList(@RequestParam("uuid") UUID performer) {
+        return ResponseEntity.ok(ordersService.getPerformerList(performer));
     }
 }

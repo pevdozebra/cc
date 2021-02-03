@@ -4,6 +4,7 @@ import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.model.Order;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IOrdersService {
 
@@ -21,17 +22,17 @@ public interface IOrdersService {
 
     /**
      * Получение списка заказов для заказчика
-     * @param id - идентификатор заказчика
+     * @param uuid - идентификатор заказчика
      * @return - список заказов для заказчика
      */
-    List<Order> getCustomerList(Long id);
+    List<Order> getCustomerList(UUID uuid);
 
     /**
      * Получение списка заказов для исполнителя
-     * @param id - идентификатор исполнителя
+     * @param uuid - идентификатор исполнителя
      * @return - список заказов для исполнителя
      */
-    List<Order> getPerformerList(Long id);
+    List<Order> getPerformerList(UUID uuid);
 
     /**
      * Удаление заказа (помечает заказ признаком удаления

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -26,12 +27,12 @@ public class OrdersService implements IOrdersService {
         ordersRepo.save(order);
     }
 
-    public List<Order> getCustomerList(Long id) {
-        return new ArrayList<>(ordersRepo.findAllByCustomerIdAndDeletedFalse(id));
+    public List<Order> getCustomerList(UUID uuid) {
+        return new ArrayList<>(ordersRepo.findAllByCustomerIdAndDeletedFalse(uuid));
     }
 
-    public List<Order> getPerformerList(Long id) {
-        return new ArrayList<>(ordersRepo.findAllByPerformerIdAndDeletedFalse(id));
+    public List<Order> getPerformerList(UUID uuid) {
+        return new ArrayList<>(ordersRepo.findAllByPerformerIdAndDeletedFalse(uuid));
     }
 
     public void delete(Long id) throws MarketServiceException{

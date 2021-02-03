@@ -2,7 +2,6 @@ package co.sptnk.service.controllers;
 
 import co.sptnk.service.keys.PageableDefaultKeys;
 import co.sptnk.service.model.Product;
-import co.sptnk.service.repositories.ProductsRepo;
 import co.sptnk.service.services.IProductsService;
 import co.sptnk.service.transfers.ProductPageTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -27,26 +27,23 @@ public class ProductsListController {
     @Autowired
     IProductsService productsService;
 
-    @Autowired
-    ProductsRepo productsRepo;
-
     /**
      * Получение списка продуктов для пользователя
-     * @param userId - идентификатор пользователя
+     * @param performerUuid - идентификатор пользователя
      * @return список продуктов для пользователя
      * @throws Exception
      */
     @GetMapping
     @Operation(parameters = {
-            @Parameter(name = "userId", description = "Идентификатор пользователя"),
+            @Parameter(name = "performerUuid", description = "Идентификатор пользователя"),
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Получен список объектов")
     }
     )
-    public ResponseEntity<List<Product>> getAllForUser(@RequestParam(value = "userId") Long userId) throws Exception{
+    public ResponseEntity<List<Product>> getAllForUser(@RequestParam(value = "performerUuid") UUID performerUuid) throws Exception{
 
-        return ResponseEntity.ok(productsService.getAllForUser(userId));
+        return ResponseEntity.ok(productsService.getAllForUser(performerUuid));
     }
 
     /**

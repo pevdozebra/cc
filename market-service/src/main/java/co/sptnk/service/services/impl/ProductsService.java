@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -24,8 +25,8 @@ public class ProductsService implements IProductsService {
     @Autowired
     ProductsRepo productsRepo;
 
-    public List<Product> getAllForUser(Long userId) {
-        return new ArrayList<>(productsRepo.findAllByUserIdAndActiveTrueAndDeletedFalse(userId));
+    public List<Product> getAllForUser(UUID uuid) {
+        return new ArrayList<>(productsRepo.findAllByPerformerIdAndActiveTrueAndDeletedFalse(uuid));
     }
 
     public ProductPageTO getAll(Integer page, Integer size) {

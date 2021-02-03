@@ -5,15 +5,16 @@ import co.sptnk.service.model.Product;
 import co.sptnk.service.transfers.ProductPageTO;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IProductsService {
 
     /**
      * Получение всех продуктов для пользователя
-     * @param userId - идентификатор пользователя
+     * @param performerUuid - идентификатор пользователя
      * @return - список продуктов для пользователя
      */
-    List<Product> getAllForUser(Long userId);
+    List<Product> getAllForUser(UUID performerUuid);
 
     /**
      * Сохранение продукта

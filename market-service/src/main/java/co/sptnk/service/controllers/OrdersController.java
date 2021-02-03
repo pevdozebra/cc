@@ -3,6 +3,8 @@ package co.sptnk.service.controllers;
 import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.model.Order;
 import co.sptnk.service.services.IOrdersService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ public class OrdersController {
      * @param order - объект заказа
      */
     @PutMapping("/save")
+    @Operation(description = "Сохранения или обновление объекта Order (Заказ)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Объект успешно сохранен"),
     }
@@ -34,9 +37,13 @@ public class OrdersController {
     /**
      * Установление deleted=true для заказа
      * @param id - идентификатор заказа
-     * @throws MarketServiceException - исключение, если удаляемый объект не найден
+     * @return - ResponseEntity с кодом ошибки или успеха
      */
     @DeleteMapping("/delete")
+    @Operation(parameters = {
+            @Parameter(name = "orderId", description = "Идентификатор заказа")
+    },
+    description = "Удаление заказа по идентификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Объект успешно удален"),
             @ApiResponse(responseCode = "404", description = "Объект не найден")
