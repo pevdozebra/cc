@@ -2,15 +2,16 @@ package co.sptnk.service.model;
 
 import co.sptnk.service.keys.ProductStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javafx.util.Duration;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name="products")
-public class Product {
+public class Product extends RepresentationModel<Product>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Product")
@@ -40,14 +41,14 @@ public class Product {
     /**
      * Длительность
      */
-    Duration duration;
+    @Column(name = "duration")
+    Long duration;
 
     /**
      * Тип продукта
      */
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @Column(name = "type_id")
+    @ManyToOne
+    @JoinColumn(name = "type_id")
     ProductType type;
 
     /**
@@ -81,6 +82,7 @@ public class Product {
     /**
      * Статус (DRAFT, ACTIVE, ARCHIVED)
      */
+    @Enumerated(EnumType.STRING)
     ProductStatus status;
 
     /**
@@ -96,4 +98,8 @@ public class Product {
      */
     @JsonIgnore
     Boolean active = true;
+
+    @Version
+    @JsonIgnore
+    Long version;
 }

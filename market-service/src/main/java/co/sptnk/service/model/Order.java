@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name="orders")
-public class Order {
+public class Order extends RepresentationModel<Order> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Order")
@@ -40,8 +41,8 @@ public class Order {
     /**
      * Продукт для заказа
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "product_id")
+    @ManyToOne
+    @JoinColumn(name = "product_id")
     Product productId;
 
     /**
@@ -74,6 +75,10 @@ public class Order {
      */
     @JsonIgnore
     Boolean deleted = false;
+
+    @Version
+    @JsonIgnore
+    Long version;
 
 
 }

@@ -2,11 +2,13 @@ package co.sptnk.service.model;
 
 import co.sptnk.service.keys.PaymentStatus;
 import co.sptnk.service.keys.PaymentType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -19,7 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "payments")
-public class Payment {
+public class Payment extends RepresentationModel<Payment> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Payment")
@@ -64,8 +66,8 @@ public class Payment {
     /**
      * Связь с заказом
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "order_id")
+    @ManyToOne
+    @JoinColumn(name = "order_id")
     Order orderId;
 
     /**
@@ -73,4 +75,11 @@ public class Payment {
      */
     @Column(name = "user_id")
     UUID userId;
+
+    @JsonIgnore
+    Boolean deleted;
+
+    @Version
+    @JsonIgnore
+    Long version;
 }
