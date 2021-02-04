@@ -25,7 +25,13 @@ databaseChangeLog:
                   type: numeric(4,3)
               - column:
                   name: default_duration
-                  type: interval
+                  type: bigint
+              - column:
+                  name: deprecated
+                  type: boolean
+              - column:
+                  name: version
+                  type: bigint
         - createIndex:
             columns:
               - column:
@@ -57,7 +63,7 @@ databaseChangeLog:
                   type: numeric(4,3)
               - column:
                   name: duration
-                  type: interval
+                  type: bigint
               - column:
                   name: type_id
                   type: bigint
@@ -92,6 +98,9 @@ databaseChangeLog:
                   name: active
                   type: boolean
                   defaultValue: true
+              - column:
+                  name: version
+                  type: bigint
         - createIndex:
             columns:
               - column:
@@ -152,6 +161,9 @@ databaseChangeLog:
                   name: deleted
                   type: boolean
                   defaultValue: false
+              - column:
+                  name: version
+                  type: bigint
         - createIndex:
             columns:
               - column:
@@ -181,37 +193,38 @@ databaseChangeLog:
                     primaryKey: true
                   defaultValue: nextval('payments_id_seq')
               - column:
-                  name: customer_id
-                  type: uuid
-                  constraints:
-                    nullable: false
-              - column:
-                  name: performer_id
-                  type: uuid
-                  constraints:
-                    nullable: false
-              - column:
-                  name: product_id
-                  type: bigint
-                  constraints:
-                    foreignKeyName: fk_order_product
-                    references: products(id)
-              - column:
-                  name: order_date
+                  name: pay_date
                   type: timestamptz
               - column:
-                  name: perform_date
+                  name: process_date
                   type: timestamptz
               - column:
                   name: status
                   type: text
               - column:
-                  name: status_update
-                  type: timestamptz
+                  name: amount
+                  type: numeric(9,2)
+              - column:
+                  name: type
+                  type: text
+              - column:
+                  name: transaction_id
+                  type: text
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_payment_order
+                    references: orders(id)
+              - column:
+                  name: user_id
+                  type: uuid
               - column:
                   name: deleted
                   type: boolean
-                  defaultValue: false
+              - column:
+                  name: version
+                  type: bigint
         - createIndex:
             columns:
               - column:
