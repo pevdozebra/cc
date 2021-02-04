@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -14,7 +15,7 @@ public interface ProductsRepo extends JpaRepository<Product, Long> {
 
     Collection<Product> findAllByPerformerIdAndActiveTrueAndDeletedFalse(UUID uuid);
 
-    Product findProductByIdAndDeletedFalse(Long id);
+    Optional<Product> findProductByIdAndDeletedFalse(Long id);
 
     Page<Product> findAllByDeletedFalse(Pageable pageable);
 }

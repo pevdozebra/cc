@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -23,16 +24,32 @@ public class OrdersService implements IOrdersService {
         return new ArrayList<>(ordersRepo.findAllByDeletedFalse());
     }
 
-    public void save(Order order) {
-        ordersRepo.save(order);
-    }
-
     public List<Order> getCustomerList(UUID uuid) {
         return new ArrayList<>(ordersRepo.findAllByCustomerIdAndDeletedFalse(uuid));
     }
 
     public List<Order> getPerformerList(UUID uuid) {
         return new ArrayList<>(ordersRepo.findAllByPerformerIdAndDeletedFalse(uuid));
+    }
+
+    @Override
+    public Order add(Order order) throws MarketServiceException {
+        if (order.getId() != null) {
+            throw new MarketServiceException("Объект с таким ID уже существует");
+        }
+        return ordersRepo.save(order);
+    }
+
+    @Override
+    public Order update(Order order) throws MarketServiceException {
+        if (order.getId() == null) {
+            throw new MarketServiceException("Невозможно идентифицировать сохраняемый объект");
+        }
+        Order exist = ordersRepo.findOrderByIdAndDeletedFalse(order.getId()).orElse(null);
+        if (exist == null) {
+            throw new MarketServiceException("Объект для сохранения не найден");
+        }
+        return ordersRepo.save(order);
     }
 
     public void delete(Long id) throws MarketServiceException{
@@ -44,5 +61,19 @@ public class OrdersService implements IOrdersService {
         }
         order.setDeleted(true);
         ordersRepo.save(order);
+    }
+
+    @Override
+    public Order getOneById(Long orderId) throws MarketServiceException {
+        Order order = ordersRepo.findOrderByIdAndDeletedFalse(orderId).orElse(null);
+        if (order == null) {
+            throw new MarketServiceException("Объект не найден");
+        }
+        return order;
+    }
+
+    @Override
+    public List<Order> getAll(Map<String, String> params) {
+        return ordersRepo.findAll();
     }
 }
