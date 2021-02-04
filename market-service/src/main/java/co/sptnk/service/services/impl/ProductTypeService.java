@@ -1,7 +1,6 @@
 package co.sptnk.service.services.impl;
 
 import co.sptnk.service.exceptions.MarketServiceException;
-import co.sptnk.service.model.Payment;
 import co.sptnk.service.model.ProductType;
 import co.sptnk.service.repositories.ProductTypeRepo;
 import co.sptnk.service.services.IProductTypeService;

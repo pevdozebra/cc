@@ -2,7 +2,6 @@ package co.sptnk.service.model;
 
 import co.sptnk.service.keys.ProductStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javafx.util.Duration;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -2,7 +2,6 @@ package co.sptnk.service.services.impl;
 
 import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.model.Payment;
-import co.sptnk.service.model.Product;
 import co.sptnk.service.repositories.PaymentsRepo;
 import co.sptnk.service.services.IPaymentsService;
 import lombok.extern.slf4j.Slf4j;
