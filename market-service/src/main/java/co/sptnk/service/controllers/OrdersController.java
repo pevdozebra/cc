@@ -4,7 +4,6 @@ import co.sptnk.service.base.AbstractCHController;
 import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.keys.AllowedLinksMethods;
 import co.sptnk.service.model.Order;
-import co.sptnk.service.model.Product;
 import co.sptnk.service.services.IOrdersService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
