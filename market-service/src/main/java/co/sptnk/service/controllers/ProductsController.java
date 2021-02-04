@@ -1,58 +1,104 @@
 package co.sptnk.service.controllers;
 
+import co.sptnk.service.base.AbstractCHController;
 import co.sptnk.service.exceptions.MarketServiceException;
+import co.sptnk.service.keys.AllowedLinksMethods;
 import co.sptnk.service.model.Product;
 import co.sptnk.service.services.IProductsService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 
 @Slf4j
+@Tag(name = "ProductController", description = "API объекта Product (Продукт/Услуга)")
 @RestController
 @RequestMapping("products")
-public class ProductsController {
+public class ProductsController extends AbstractCHController<Product, Long> {
 
     @Autowired
-    IProductsService productsService;
+    IProductsService service;
 
-    /**
-     * Добавление/обновление продукта
-     * @param product - продукт
-     * @throws Exception
-     */
-    @PutMapping("/save")
-    @Operation(description = "Сохранения или обновление объекта Product (Продукт/Услуга)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Объект успешно сохранен")
-    }
-    )
-    public void save(@RequestBody Product product) throws Exception{
-        productsService.save(product);
+    public ProductsController() {
+        init(this);
     }
 
-    /**
-     * Удаление продукта по идентификатору
-     * @param id - идетификатор продукта
-     * @return ResponseEntity с кодом ошибки или успеха
-     */
-    @DeleteMapping("/delete")
-    @Operation(description = "Удаление продукта по идентификатору")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Объект успешно удален"),
-            @ApiResponse(responseCode = "404", description = "Объект не найден")
-    }
-    )
-    public ResponseEntity delete(@RequestParam("productId") Long id) {
+    @Override
+    public ResponseEntity<Product> add(@RequestBody Product product) {
+        Product result;
         try {
-            productsService.delete(id);
+            result = service.add(product);
+            result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
+        } catch (MarketServiceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<Product> update(@RequestBody Product product) {
+        Product result;
+        try {
+            result = createLinks(service.update(product), product.getId(), AllowedLinksMethods.PUT);
+        } catch (MarketServiceException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Product> getOneById(@PathVariable("id") Long id) {
+        Product entity;
+        try {
+            entity = createLinks(service.getOneById(id), id, AllowedLinksMethods.GET);
+        } catch (MarketServiceException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entity, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Product> delete(@RequestParam("id") Long id) {
+        try {
+            service.delete(id);
         } catch (MarketServiceException e) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.accepted().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Получение списка продуктов
+     * @param params - параметры запроса
+     * @return список продуктов
+     */
+    @Operation(parameters = {
+            @Parameter(name = "userId", description = "Идентификатор пользователя"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Получен список объектов"),
+            @ApiResponse(responseCode = "400", description = "Неверные параметры")
+    }
+    )
+    public ResponseEntity<List<Product>> getAll(@RequestParam Map<String, String> params) {
+        List<Product> products;
+        try {
+            products = service.getAllForUser(UUID.fromString(params.get("userId")));
+            products.forEach(p -> createLinks(p, p.getId(), AllowedLinksMethods.GET_ALL));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(products, HttpStatus.ACCEPTED);
     }
 }

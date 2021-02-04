@@ -3,9 +3,8 @@ package co.sptnk.service.controllers;
 import co.sptnk.service.base.AbstractCHController;
 import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.keys.AllowedLinksMethods;
-import co.sptnk.service.model.Order;
-import co.sptnk.service.model.Product;
-import co.sptnk.service.services.IOrdersService;
+import co.sptnk.service.model.ProductType;
+import co.sptnk.service.services.IProductTypeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,23 +13,23 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@Tag(name = "OrdersController", description = "API объекта Order (Заказ)")
+@Tag(name = "ProductTypeController", description = "API для объекта ProductType")
 @RestController
-@RequestMapping("orders")
-public class OrdersController extends AbstractCHController<Order, Long> {
+@RequestMapping("producttype")
+public class ProductTypeController extends AbstractCHController<ProductType, Long> {
 
     @Autowired
-    private IOrdersService service;
+    IProductTypeService service;
 
-    public OrdersController() {
+    public ProductTypeController() {
         init(this);
     }
 
     @Override
-    public ResponseEntity<Order> add(Order order) {
-        Order result;
+    public ResponseEntity<ProductType> add(ProductType productType) {
+        ProductType result;
         try {
-            result = service.add(order);
+            result = service.add(productType);
             result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
         } catch (MarketServiceException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -38,9 +37,9 @@ public class OrdersController extends AbstractCHController<Order, Long> {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Order> getOneById(@PathVariable("id") Long id) {
-        Order entity;
+    @Override
+    public ResponseEntity<ProductType> getOneById(@PathVariable("id") Long id) {
+        ProductType entity;
         try {
             entity = createLinks(service.getOneById(id), id, AllowedLinksMethods.GET);
         } catch (MarketServiceException e) {
@@ -50,7 +49,7 @@ public class OrdersController extends AbstractCHController<Order, Long> {
     }
 
     @Override
-    public ResponseEntity<Order> delete(@RequestParam("id") Long id) {
+    public ResponseEntity<ProductType> delete(@RequestParam("id") Long id) {
         try {
             service.delete(id);
         } catch (MarketServiceException e) {
@@ -60,10 +59,10 @@ public class OrdersController extends AbstractCHController<Order, Long> {
     }
 
     @Override
-    public ResponseEntity<Order> update(Order order) {
-        Order result;
+    public ResponseEntity<ProductType> update(ProductType productType) {
+        ProductType result;
         try {
-            result = createLinks(service.update(order), order.getId(), AllowedLinksMethods.PUT);
+            result = createLinks(service.update(productType), productType.getId(), AllowedLinksMethods.PUT);
         } catch (MarketServiceException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
