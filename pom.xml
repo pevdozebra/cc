@@ -8,6 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>user-service</module>
+        <module>spring-microservice-abstract</module>
     </modules>
     <packaging>pom</packaging>
 
