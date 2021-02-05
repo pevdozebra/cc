@@ -2,7 +2,6 @@ package co.sptnk.service.controllers;
 
 import co.sptnk.service.base.AbstractCHController;
 import co.sptnk.service.exceptions.MarketServiceException;
-import co.sptnk.service.keys.AllowedLinksMethods;
 import co.sptnk.service.model.Product;
 import co.sptnk.service.services.IProductsService;
 import io.swagger.v3.oas.annotations.Operation;
