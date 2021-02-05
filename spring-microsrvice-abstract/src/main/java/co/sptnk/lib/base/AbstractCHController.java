@@ -83,9 +83,8 @@ public abstract class AbstractCHController<Entity extends RepresentationModel<En
     )
     public abstract ResponseEntity<Entity> delete(ID id);
 
-    @SuppressWarnings("rawtypes")
     @GetMapping
-    public abstract ResponseEntity getAll(Map<String, String> map);
+    public abstract ResponseEntity<?> getAll(Map<String, String> map);
 
     public abstract Class<? extends AbstractCHController<Entity, ID>> getSelfClass();
 
