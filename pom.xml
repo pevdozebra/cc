@@ -10,7 +10,7 @@
 
     <modules>
         <module>market-service</module>
-        <module>spring-microsrvice-abstract</module>
+        <module>spring-microservice-abstract</module>
     </modules>
 
     <properties>
