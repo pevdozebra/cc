@@ -3,6 +3,7 @@ package co.sptnk.service.model;
 
 import co.sptnk.service.keys.EventCode;
 import co.sptnk.service.keys.EventType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,11 +31,11 @@ public class EventLog extends RepresentationModel<EventLog> {
     @Column(name = "user_id")
     UUID userId;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name = "event_type")
     EventType type;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name = "event_code")
     EventCode code;
 
@@ -51,4 +52,8 @@ public class EventLog extends RepresentationModel<EventLog> {
     String userAgent;
 
     String description;
+
+    @Version
+    @JsonIgnore
+    Long version;
 }
