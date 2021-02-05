@@ -1,7 +1,8 @@
 package co.sptnk.service.controllers;
 
-import co.sptnk.service.base.AbstractCHController;
-import co.sptnk.service.exceptions.MarketServiceException;
+import co.sptnk.lib.base.AbstractCHController;
+import co.sptnk.lib.exceptions.ServiceException;
+import co.sptnk.lib.keys.AllowedLinksMethods;
 import co.sptnk.service.model.Order;
 import co.sptnk.service.services.IOrdersService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +28,7 @@ public class OrdersController extends AbstractCHController<Order, Long> {
         try {
             result = service.add(order);
             result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
-        } catch (MarketServiceException e) {
+        } catch (ServiceException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(result, HttpStatus.CREATED);
@@ -38,7 +39,7 @@ public class OrdersController extends AbstractCHController<Order, Long> {
         Order entity;
         try {
             entity = createLinks(service.getOneById(id), id, AllowedLinksMethods.GET);
-        } catch (MarketServiceException e) {
+        } catch (ServiceException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(entity, HttpStatus.OK);
@@ -48,7 +49,7 @@ public class OrdersController extends AbstractCHController<Order, Long> {
     public ResponseEntity<Order> delete(@PathVariable("id") Long id) {
         try {
             service.delete(id);
-        } catch (MarketServiceException e) {
+        } catch (ServiceException e) {
             return ResponseEntity.notFound().build();
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -64,14 +65,14 @@ public class OrdersController extends AbstractCHController<Order, Long> {
         Order result;
         try {
             result = createLinks(service.update(order), order.getId(), AllowedLinksMethods.PUT);
-        } catch (MarketServiceException e) {
+        } catch (ServiceException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity getAll(Map<String, String> map) {
-        return new ResponseEntity(service.getAll(map), HttpStatus.OK);
+    public ResponseEntity<?> getAll(Map<String, String> map) {
+        return new ResponseEntity<>(service.getAll(map), HttpStatus.OK);
     }
 }

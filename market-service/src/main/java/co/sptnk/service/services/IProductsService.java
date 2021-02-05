@@ -1,12 +1,12 @@
 package co.sptnk.service.services;
 
-import co.sptnk.service.base.AbstractCHService;
+import co.sptnk.lib.base.AbstractCHService;
 import co.sptnk.service.model.Product;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface IProductsService extends AbstractCHService<Product, Long>{
+public interface IProductsService extends AbstractCHService<Product, Long> {
 
     /**
      * Все продукты для исполнителя
