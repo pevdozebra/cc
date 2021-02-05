@@ -1,10 +1,8 @@
 package co.sptnk.lib.base;
 
 import co.sptnk.lib.keys.AllowedLinksMethods;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.hateoas.Link;
@@ -27,12 +25,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @param <Entity> - сущность БД
  */
 public abstract class AbstractCHController<Entity extends RepresentationModel<Entity>, ID> {
-
-    private AbstractCHController<Entity, ID> controller ;
-
-    protected void init(AbstractCHController<Entity, ID> controller) {
-        this.controller = controller;
-    }
 
     /**
      * Получение продукта по идентификатору
@@ -95,16 +87,18 @@ public abstract class AbstractCHController<Entity extends RepresentationModel<En
     @GetMapping
     public abstract ResponseEntity getAll(Map<String, String> map);
 
-    public Entity createLinks(Entity entity, ID id, AllowedLinksMethods method) {
+    public abstract Class<? extends AbstractCHController<Entity, ID>> getSelfClass();
+
+    protected Entity createLinks(Entity entity, ID id, AllowedLinksMethods method) {
         Map<AllowedLinksMethods, Link> links = new HashMap<AllowedLinksMethods, Link>(){{
             put(AllowedLinksMethods.POST,
-                    linkTo(methodOn(controller.getClass()).add(entity)).withSelfRel().withName("add").withType(HttpMethod.POST.name()));
+                    linkTo(methodOn(getSelfClass()).add(entity)).withSelfRel().withName("add").withType(HttpMethod.POST.name()));
             put(AllowedLinksMethods.PUT,
-                    linkTo(methodOn(controller.getClass()).update(entity)).withSelfRel().withName("update").withType(HttpMethod.PUT.name()));
+                    linkTo(methodOn(getSelfClass()).update(entity)).withSelfRel().withName("update").withType(HttpMethod.PUT.name()));
             put(AllowedLinksMethods.DELETE,
-                    linkTo(methodOn(controller.getClass()).delete(id)).withSelfRel().withName("delete").withType(HttpMethod.DELETE.name()));
+                    linkTo(methodOn(getSelfClass()).delete(id)).withSelfRel().withName("delete").withType(HttpMethod.DELETE.name()));
             put(AllowedLinksMethods.GET,
-                    linkTo(methodOn(controller.getClass()).getOneById(id)).withSelfRel().withName("get").withType(HttpMethod.GET.name()));
+                    linkTo(methodOn(getSelfClass()).getOneById(id)).withSelfRel().withName("get").withType(HttpMethod.GET.name()));
         }};
         links.keySet().forEach(key -> {
             if (key != method) {
