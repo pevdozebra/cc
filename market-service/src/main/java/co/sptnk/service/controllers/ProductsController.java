@@ -30,10 +30,6 @@ public class ProductsController extends AbstractCHController<Product, Long> {
     @Autowired
     IProductsService service;
 
-    public ProductsController() {
-        init(this);
-    }
-
     @Override
     public ResponseEntity<Product> add(@RequestBody Product product) {
         Product result;
@@ -69,13 +65,18 @@ public class ProductsController extends AbstractCHController<Product, Long> {
     }
 
     @Override
-    public ResponseEntity<Product> delete(@RequestParam("id") Long id) {
+    public ResponseEntity<Product> delete(@PathVariable("id") Long id) {
         try {
             service.delete(id);
         } catch (MarketServiceException e) {
             return ResponseEntity.notFound().build();
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Override
+    public Class<? extends AbstractCHController<Product, Long>> getSelfClass() {
+        return ProductsController.class;
     }
 
     /**

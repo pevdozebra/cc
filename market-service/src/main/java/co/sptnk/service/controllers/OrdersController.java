@@ -21,9 +21,6 @@ public class OrdersController extends AbstractCHController<Order, Long> {
     @Autowired
     private IOrdersService service;
 
-    public OrdersController() {
-        init(this);
-    }
 
     @Override
     public ResponseEntity<Order> add(Order order) {
@@ -49,13 +46,18 @@ public class OrdersController extends AbstractCHController<Order, Long> {
     }
 
     @Override
-    public ResponseEntity<Order> delete(@RequestParam("id") Long id) {
+    public ResponseEntity<Order> delete(@PathVariable("id") Long id) {
         try {
             service.delete(id);
         } catch (MarketServiceException e) {
             return ResponseEntity.notFound().build();
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Override
+    public Class<? extends AbstractCHController<Order, Long>> getSelfClass() {
+        return this.getClass();
     }
 
     @Override

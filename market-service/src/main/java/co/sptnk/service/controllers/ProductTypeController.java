@@ -21,9 +21,6 @@ public class ProductTypeController extends AbstractCHController<ProductType, Lon
     @Autowired
     IProductTypeService service;
 
-    public ProductTypeController() {
-        init(this);
-    }
 
     @Override
     public ResponseEntity<ProductType> add(ProductType productType) {
@@ -49,13 +46,18 @@ public class ProductTypeController extends AbstractCHController<ProductType, Lon
     }
 
     @Override
-    public ResponseEntity<ProductType> delete(@RequestParam("id") Long id) {
+    public ResponseEntity<ProductType> delete(@PathVariable("id") Long id) {
         try {
             service.delete(id);
         } catch (MarketServiceException e) {
             return ResponseEntity.notFound().build();
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Override
+    public Class<? extends AbstractCHController<ProductType, Long>> getSelfClass() {
+        return this.getClass();
     }
 
     @Override
@@ -70,7 +72,7 @@ public class ProductTypeController extends AbstractCHController<ProductType, Lon
     }
 
     @Override
-    public ResponseEntity getAll(Map<String, String> map) {
-        return new ResponseEntity(service.getAll(map), HttpStatus.OK);
+    public ResponseEntity<?> getAll(Map<String, String> map) {
+        return new ResponseEntity<>(service.getAll(map), HttpStatus.OK);
     }
 }

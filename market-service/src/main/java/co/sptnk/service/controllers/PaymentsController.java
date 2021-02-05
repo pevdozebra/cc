@@ -22,9 +22,6 @@ public class PaymentsController extends AbstractCHController<Payment, Long> {
     @Autowired
     IPaymentsService service;
 
-    public PaymentsController() {
-        init(this);
-    }
 
     @Override
     public ResponseEntity<Payment> add(Payment payment) {
@@ -50,13 +47,18 @@ public class PaymentsController extends AbstractCHController<Payment, Long> {
     }
 
     @Override
-    public ResponseEntity<Payment> delete(@RequestParam("id") Long id) {
+    public ResponseEntity<Payment> delete(@PathVariable("id") Long id) {
         try {
             service.delete(id);
         } catch (MarketServiceException e) {
             return ResponseEntity.notFound().build();
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Override
+    public Class<? extends AbstractCHController<Payment, Long>> getSelfClass() {
+        return this.getClass();
     }
 
     @Override
