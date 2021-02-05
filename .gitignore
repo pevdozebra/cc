@@ -16,4 +16,4 @@ log/
 target/
 
 # Project
-resource/db/dev.properties
+dev.properties
