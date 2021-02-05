@@ -74,7 +74,7 @@ public abstract class AbstractCHController<Entity extends RepresentationModel<En
      * @param id - идетификатор объекта
      * @return ResponseEntity с кодом ошибки или успеха
      */
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @Operation(description = "Удаление объекта по идентификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Объект успешно удален"),
@@ -83,9 +83,9 @@ public abstract class AbstractCHController<Entity extends RepresentationModel<En
     )
     public abstract ResponseEntity<Entity> delete(ID id);
 
-    @SuppressWarnings("rawtypes")
+
     @GetMapping
-    public abstract ResponseEntity getAll(Map<String, String> map);
+    public abstract ResponseEntity<?> getAll(Map<String, String> map);
 
     /**
      * В реализации вернуть this.getClass()
