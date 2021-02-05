@@ -4,5 +4,118 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
 
+    <changeSet id="1" author="Sidorenko Sergey">
+        <sql>
+            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+            CREATE TABLE public.users
+            (
+            id uuid NOT NULL DEFAULT uuid_generate_v1(),
+            firstname text,
+            lastname text,
+            username text,
+            password text,
+            birth_date date,
+            blocked boolean,
+            deleted boolean,
+            CONSTRAINT pk_users PRIMARY KEY (id)
+            );
 
+
+            CREATE TABLE public.interest
+            (
+            id bigserial NOT NULL,
+            title text,
+            parent_id bigint,
+            CONSTRAINT pk_interest PRIMARY KEY (id)
+            );
+
+            CREATE TABLE public.rel_user_interest
+            (
+            user_id uuid,
+            interest_id bigint,
+            CONSTRAINT pk_rel_user_interest PRIMARY KEY (user_id, interest_id),
+            CONSTRAINT fk_user_rel_user_interest FOREIGN KEY (user_id)
+            REFERENCES public.users (id) MATCH SIMPLE
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE,
+            CONSTRAINT fk_interest_rel_user_interest FOREIGN KEY (interest_id)
+            REFERENCES public.interest (id) MATCH SIMPLE
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE
+            );
+
+
+            CREATE TABLE public.performer_rating
+            (
+            id bigserial NOT NULL,
+            performer_id uuid NOT NULL,
+            customer_id uuid NOT NULL,
+            reason_id bigint,
+            rating integer,
+            comment text,
+            rating_timestamp timestamp,
+            deleted boolean,
+
+            CONSTRAINT pk_performer_rating PRIMARY KEY (id),
+            CONSTRAINT fk_performer_rating_performer FOREIGN KEY (performer_id)
+            REFERENCES public.users (id) MATCH SIMPLE
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE,
+            CONSTRAINT fk_performer_rating_customer FOREIGN KEY (customer_id)
+            REFERENCES public.users (id) MATCH SIMPLE
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE
+            );
+
+
+            CREATE TABLE public.card
+            (
+            id bigserial NOT NULL,
+            user_id uuid NOT NULL,
+            bind_date timestamp,
+            masked_number text,
+            aquire_url text,
+            archived boolean,
+            deleted boolean,
+
+            CONSTRAINT pk_card PRIMARY KEY (id),
+            CONSTRAINT fk_card_user FOREIGN KEY (user_id)
+            REFERENCES public.users (id) MATCH SIMPLE
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE
+            );
+
+
+            CREATE TABLE public.performer_verification
+            (
+            id bigserial NOT NULL,
+            user_id uuid NOT NULL,
+            manager_id uuid NOT NULL,
+            create_date timestamp,
+            decision_date timestamp,
+            success_decision boolean,
+            comment text,
+            deleted boolean,
+
+            CONSTRAINT pk_performer_verification PRIMARY KEY (id),
+            CONSTRAINT fk_performer_verification_user FOREIGN KEY (user_id)
+            REFERENCES public.users (id) MATCH SIMPLE
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE,
+            CONSTRAINT fk_performer_verification_manager FOREIGN KEY (manager_id)
+            REFERENCES public.users (id) MATCH SIMPLE
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE
+            );
+        </sql>
+        <rollback>
+            DROP TABLE rel_user_interest;
+            DROP TABLE performer_verification;
+            DROP TABLE card;
+            DROP TABLE performer_rating;
+            DROP TABLE interest;
+            DROP TABLE users;
+        </rollback>
+
+    </changeSet>
 </databaseChangeLog>
