@@ -6,6 +6,9 @@
     <groupId>co.sptnk</groupId>
     <artifactId>service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <modules>
+        <module>spring-microsrvice-abstract</module>
+    </modules>
     <packaging>pom</packaging>
 
     <properties>
