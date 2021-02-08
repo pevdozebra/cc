@@ -12,7 +12,7 @@ public class LogUtils {
 
     private static final String URL = "";
 
-    public static ResponseEntity<EventLog> logger(EventLog eventLog) {
+    public static ResponseEntity<EventLog> log(EventLog eventLog) {
         if (eventLog.getEventDate() == null)
             eventLog.setEventDate(LocalDateTime.now());
         return new RestTemplate().postForEntity(URL, eventLog, EventLog.class);
