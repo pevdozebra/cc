@@ -1,6 +1,8 @@
 package co.sptnk.service.model;
 
 
+import co.sptnk.lib.keys.EventCode;
+import co.sptnk.lib.keys.EventType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
