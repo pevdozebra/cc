@@ -3,11 +3,6 @@ databaseChangeLog:
       id: 4
       author: tsydenov_ia
       changes:
-        - createSequence:
-            dataType: bigint
-            schemaName: public
-            sequenceName: event_log_id_seq
-            startValue: 1
         - createTable:
             tableName: event_log
             columns:

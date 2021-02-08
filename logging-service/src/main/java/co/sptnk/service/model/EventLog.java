@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -24,8 +25,12 @@ import java.util.UUID;
 public class EventLog extends RepresentationModel<EventLog> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EventLog")
-    @SequenceGenerator(name = "EventLog", sequenceName = "event_log_id_seq")
+    @GeneratedValue(generator = "EventLogUUID")
+    @GenericGenerator(
+            name = "EventLogUUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(name = "id", updatable = false)
     UUID id;
 
     @Column(name = "user_id")
