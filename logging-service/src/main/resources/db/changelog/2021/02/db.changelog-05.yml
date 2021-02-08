@@ -22,6 +22,9 @@ databaseChangeLog:
                   name: event_code
                   type: text
               - column:
+                  name: event_date
+                  type: timestamptz
+              - column:
                   name: client_type
                   type: text
               - column:
