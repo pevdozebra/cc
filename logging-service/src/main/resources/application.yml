@@ -16,5 +16,5 @@ spring:
     platform: postgres
     username: sa
     password: sa
-    url: jdbc:postgresql://localhost:5432/markets
+    url: jdbc:postgresql://localhost:5432/event_log
     driver-class-name: org.postgresql.Driver
