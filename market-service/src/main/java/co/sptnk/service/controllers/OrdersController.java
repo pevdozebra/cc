@@ -23,7 +23,7 @@ public class OrdersController extends AbstractCHController<Order, Long> {
 
 
     @Override
-    public ResponseEntity<Order> add(Order order) {
+    public ResponseEntity<Order> add(@RequestBody Order order) {
         Order result;
         try {
             result = service.add(order);
@@ -61,7 +61,7 @@ public class OrdersController extends AbstractCHController<Order, Long> {
     }
 
     @Override
-    public ResponseEntity<Order> update(Order order) {
+    public ResponseEntity<Order> update(@RequestBody Order order) {
         Order result;
         try {
             result = createLinks(service.update(order), order.getId(), AllowedLinksMethods.PUT);

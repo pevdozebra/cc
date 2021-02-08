@@ -23,7 +23,7 @@ public class ProductTypeController extends AbstractCHController<ProductType, Lon
 
 
     @Override
-    public ResponseEntity<ProductType> add(ProductType productType) {
+    public ResponseEntity<ProductType> add(@RequestBody ProductType productType) {
         ProductType result;
         try {
             result = service.add(productType);
@@ -61,7 +61,7 @@ public class ProductTypeController extends AbstractCHController<ProductType, Lon
     }
 
     @Override
-    public ResponseEntity<ProductType> update(ProductType productType) {
+    public ResponseEntity<ProductType> update(@RequestBody ProductType productType) {
         ProductType result;
         try {
             result = createLinks(service.update(productType), productType.getId(), AllowedLinksMethods.PUT);

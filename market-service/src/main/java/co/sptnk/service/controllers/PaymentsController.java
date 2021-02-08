@@ -24,7 +24,7 @@ public class PaymentsController extends AbstractCHController<Payment, Long> {
 
 
     @Override
-    public ResponseEntity<Payment> add(Payment payment) {
+    public ResponseEntity<Payment> add(@RequestBody Payment payment) {
         Payment result;
         try {
             result = service.add(payment);
@@ -62,7 +62,7 @@ public class PaymentsController extends AbstractCHController<Payment, Long> {
     }
 
     @Override
-    public ResponseEntity<Payment> update(Payment payment) {
+    public ResponseEntity<Payment> update(@RequestBody Payment payment) {
         Payment result;
         try {
             result = createLinks(service.update(payment), payment.getId(), AllowedLinksMethods.PUT);
