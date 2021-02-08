@@ -106,7 +106,7 @@
             <properties>
                 <skipLiquibaseRun>true</skipLiquibaseRun>
                 <profile.propertyFile>src/main/resources/db/${profile}.properties</profile.propertyFile>
-                <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
+                <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yml</profile.changeLogFile>
                 <profile.verbose>true</profile.verbose>
                 <profile.logging>debug</profile.logging>
             </properties>
