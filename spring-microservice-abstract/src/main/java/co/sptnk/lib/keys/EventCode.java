@@ -1,6 +1,8 @@
 package co.sptnk.lib.keys;
 
-public enum EventCode {
+import java.io.Serializable;
+
+public enum EventCode implements Serializable {
     UNKNOWN("Код не определен"),
     // События пользователя
     USER_REGISTRATION("Регистрация пользователя"),

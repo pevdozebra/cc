@@ -1,6 +1,8 @@
 package co.sptnk.lib.keys;
 
-public enum EventType {
+import java.io.Serializable;
+
+public enum EventType implements Serializable {
     INFO,
     WARNING,
     ERROR
