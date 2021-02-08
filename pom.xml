@@ -10,9 +10,9 @@
 
     <modules>
         <module>logging-service</module>
+        <module>market-service</module>
         <module>spring-microservice-abstract</module>
     </modules>
-
     <properties>
         <java.version>1.8</java.version>
     </properties>

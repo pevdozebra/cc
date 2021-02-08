@@ -1,0 +1,237 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: tsydenov_ia
+      changes:
+        - createSequence:
+            dataType: bigint
+            schemaName: public
+            sequenceName: product_type_id_seq
+            startValue: 1
+        - createTable:
+            tableName: product_type
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                  defaultValue: nextval('product_type_id_seq')
+              - column:
+                  name: title
+                  type: text
+              - column:
+                  name: default_commission
+                  type: numeric(4,3)
+              - column:
+                  name: default_duration
+                  type: bigint
+              - column:
+                  name: deprecated
+                  type: boolean
+              - column:
+                  name: version
+                  type: bigint
+        - createIndex:
+            columns:
+              - column:
+                  descending: true
+                  name: id
+            indexName: idx_id_product_type
+            schemaName: public
+            tableName: product_type
+            unique: true
+        - createSequence:
+            dataType: bigint
+            schemaName: public
+            sequenceName: products_id_seq
+            startValue: 1
+        - createTable:
+            tableName: products
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                  defaultValue: nextval('products_id_seq')
+              - column:
+                  name: title
+                  type: text
+              - column:
+                  name: commission
+                  type: numeric(4,3)
+              - column:
+                  name: duration
+                  type: bigint
+              - column:
+                  name: type_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_product_type
+                    references: product_type(id)
+              - column:
+                  name: performer_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: price
+                  type: numeric(7)
+              - column:
+                  name: start_time
+                  type: time
+              - column:
+                  name: end_time
+                  type: time
+              - column:
+                  name: status
+                  type: text
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValue: false
+              - column:
+                  name: active
+                  type: boolean
+                  defaultValue: true
+              - column:
+                  name: version
+                  type: bigint
+        - createIndex:
+            columns:
+              - column:
+                  descending: true
+                  name: id
+            indexName: idx_id_products
+            schemaName: public
+            tableName: products
+            unique: true
+
+  - changeSet:
+      id: 2
+      author: tsydenov_ia
+      changes:
+        - createSequence:
+            dataType: bigint
+            schemaName: public
+            sequenceName: orders_id_seq
+            startValue: 1
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                  defaultValue: nextval('orders_id_seq')
+              - column:
+                  name: customer_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: performer_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_product
+                    references: products(id)
+              - column:
+                  name: order_date
+                  type: timestamptz
+              - column:
+                  name: perform_date
+                  type: timestamptz
+              - column:
+                  name: status
+                  type: text
+              - column:
+                  name: status_update
+                  type: timestamptz
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValue: false
+              - column:
+                  name: version
+                  type: bigint
+        - createIndex:
+            columns:
+              - column:
+                  descending: true
+                  name: id
+            indexName: idx_id_orders
+            schemaName: public
+            tableName: orders
+            unique: true
+
+  - changeSet:
+      id: 3
+      author: tsydenov_ia
+      changes:
+        - createSequence:
+            dataType: bigint
+            schemaName: public
+            sequenceName: payments_id_seq
+            startValue: 1
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                  defaultValue: nextval('payments_id_seq')
+              - column:
+                  name: pay_date
+                  type: timestamptz
+              - column:
+                  name: process_date
+                  type: timestamptz
+              - column:
+                  name: status
+                  type: text
+              - column:
+                  name: amount
+                  type: numeric(9,2)
+              - column:
+                  name: type
+                  type: text
+              - column:
+                  name: transaction_id
+                  type: text
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_payment_order
+                    references: orders(id)
+              - column:
+                  name: user_id
+                  type: uuid
+              - column:
+                  name: deleted
+                  type: boolean
+              - column:
+                  name: version
+                  type: bigint
+        - createIndex:
+            columns:
+              - column:
+                  descending: true
+                  name: id
+            indexName: idx_id_payments
+            schemaName: public
+            tableName: payments
+            unique: true
+

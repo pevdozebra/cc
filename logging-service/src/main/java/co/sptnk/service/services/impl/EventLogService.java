@@ -1,5 +1,6 @@
 package co.sptnk.service.services.impl;
 
+import co.sptnk.lib.keys.EventType;
 import co.sptnk.service.exceptions.LoggingServiceException;
 import co.sptnk.service.model.EventLog;
 import co.sptnk.service.repositories.EventLogRepo;
@@ -7,6 +8,7 @@ import co.sptnk.service.services.IEventLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,6 +56,6 @@ public class EventLogService implements IEventLogService {
 
     @Override
     public List<EventLog> getAll(Map<String, String> params) {
-        return eventLogRepo.findAll();
+        return new ArrayList<>(eventLogRepo.findAllByTypeAndCodeAndEventDate(EventType.INFO, null, null));
     }
 }
