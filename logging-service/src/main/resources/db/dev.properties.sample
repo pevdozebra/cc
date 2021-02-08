@@ -1,5 +1,5 @@
 changeLogFile= @project.basedir@/src/main/resources/db/changelog/db.changelog-master.yaml
-url= jdbc:postgresql://localhost:5432/markets?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+url= jdbc:postgresql://localhost:5432/event_log?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
 username= sa
 password= sa
 ignoreClasspathPrefix= true
