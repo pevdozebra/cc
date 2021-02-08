@@ -3,5 +3,9 @@ package co.sptnk.service.keys;
 public enum ProductStatus {
     DRAFT,
     ACTIVE,
-    ARCHIVED
+    ARCHIVED;
+
+    public String getName() {
+        return this.name();
+    }
 }

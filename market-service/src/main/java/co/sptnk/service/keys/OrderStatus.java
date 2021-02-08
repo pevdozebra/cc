@@ -5,5 +5,9 @@ public enum OrderStatus {
     CONFIRMED,
     DECLINED,
     CANCELED,
-    FINISHED
+    FINISHED;
+
+    public String getName() {
+        return this.name();
+    }
 }

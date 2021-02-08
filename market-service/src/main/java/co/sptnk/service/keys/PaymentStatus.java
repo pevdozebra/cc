@@ -5,5 +5,9 @@ public enum PaymentStatus {
     PROCESSING,
     FINISHED,
     FAILED,
-    CANCELED
+    CANCELED;
+
+    public String getName() {
+        return this.name();
+    }
 }
