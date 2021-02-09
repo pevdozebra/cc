@@ -1,20 +1,12 @@
-package co.sptnk.service.userservice.model;
+package co.sptnk.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.FetchType;
-import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table(name="performer_verification")
-public class PerformerVerification {
+public class PerformerVerification extends RepresentationModel<PerformerVerification> {
     /**
      * Индектификатор верификации
      */
@@ -35,14 +27,14 @@ public class PerformerVerification {
      * Пользователь(только для исполнителей)
      */
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User performer;
 
     /**
      * Проверяющий
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "manager_id")
     private User verifier;
 
@@ -74,5 +66,6 @@ public class PerformerVerification {
      * Флаг удаления записи (фактическое удаление не происходит)
      */
     @Column(name = "deleted")
-    private Boolean deleted;
+    @JsonIgnore
+    private Boolean deleted = false;
 }

@@ -1,8 +1,10 @@
-package co.sptnk.service.userservice.model;
+package co.sptnk.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,7 +27,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name="users")
-public class User {
+public class User extends RepresentationModel<User> {
 
     /**
      * Индектификатор пользователя
@@ -68,15 +70,14 @@ public class User {
      * Флаг блокировки
      */
     @Column(name = "blocked")
-    private Boolean blocked;
+    private Boolean blocked = false;
 
     /**
      * Флаг удаления записи (фактическое удаление не происходит)
      */
     @Column(name = "deleted")
-    private Boolean deleted;
-
-
+    @JsonIgnore
+    private Boolean deleted = false;
 
 
     @ManyToMany
@@ -85,19 +86,19 @@ public class User {
             inverseJoinColumns=@JoinColumn(name="interest_id"))
     private List<Interest> interests;
 
-    @OneToMany(mappedBy = "rated", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-    public List<PerformerRating> ratings;
-
-    @OneToMany(mappedBy = "rater", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-    public List<PerformerRating> postedRatings;
-
-    @OneToMany(mappedBy = "user", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-    public List<Card> cards;
-
-    @OneToOne(mappedBy = "performer", cascade = CascadeType.ALL, optional = false, fetch = FetchType.LAZY)
-    private PerformerVerification verification;
-
-    @OneToMany(mappedBy = "verifier", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-    public List<PerformerVerification> postedVerifications;
+//    @OneToMany(mappedBy = "rated", fetch=FetchType.LAZY)
+//    public List<PerformerRating> ratings;
+//
+//    @OneToMany(mappedBy = "rater", fetch=FetchType.LAZY)
+//    public List<PerformerRating> postedRatings;
+//
+//    @OneToMany(mappedBy = "user", fetch=FetchType.LAZY)
+//    public List<Card> cards;
+//
+//    @OneToOne(mappedBy = "performer", fetch = FetchType.LAZY)
+//    private PerformerVerification verification;
+//
+//    @OneToMany(mappedBy = "verifier", fetch=FetchType.LAZY)
+//    public List<PerformerVerification> postedVerifications;
 
 }

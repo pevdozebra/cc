@@ -1,8 +1,10 @@
-package co.sptnk.service.userservice.model;
+package co.sptnk.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,7 +23,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table(name="card")
-public class Card {
+public class Card extends RepresentationModel<Card> {
     /**
      * Индектификатор карты
      */
@@ -33,7 +35,7 @@ public class Card {
     /**
      * пользователь
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -59,12 +61,13 @@ public class Card {
      * Флаг архивной карты
      */
     @Column(name = "archived")
-    private Boolean archived;
+    private Boolean archived = false;
 
     /**
      * Флаг удаления записи (фактическое удаление не происходит)
      */
     @Column(name = "deleted")
-    private Boolean deleted;
+    @JsonIgnore
+    private Boolean deleted = false;
 
 }

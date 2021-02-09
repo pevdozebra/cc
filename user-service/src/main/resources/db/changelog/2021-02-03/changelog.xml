@@ -16,7 +16,7 @@
             password text,
             birth_date date,
             blocked boolean,
-            deleted boolean,
+            deleted boolean DEFAULT false,
             CONSTRAINT pk_users PRIMARY KEY (id)
             );
 
@@ -26,6 +26,7 @@
             id bigserial NOT NULL,
             title text,
             parent_id bigint,
+            deleted boolean DEFAULT false,
             CONSTRAINT pk_interest PRIMARY KEY (id)
             );
 
@@ -54,7 +55,7 @@
             rating integer,
             comment text,
             rating_timestamp timestamp,
-            deleted boolean,
+            deleted boolean DEFAULT false,
 
             CONSTRAINT pk_performer_rating PRIMARY KEY (id),
             CONSTRAINT fk_performer_rating_performer FOREIGN KEY (performer_id)
@@ -76,7 +77,7 @@
             masked_number text,
             aquire_url text,
             archived boolean,
-            deleted boolean,
+            deleted boolean DEFAULT false,
 
             CONSTRAINT pk_card PRIMARY KEY (id),
             CONSTRAINT fk_card_user FOREIGN KEY (user_id)
@@ -95,7 +96,7 @@
             decision_date timestamp,
             success_decision boolean,
             comment text,
-            deleted boolean,
+            deleted boolean DEFAULT false,
 
             CONSTRAINT pk_performer_verification PRIMARY KEY (id),
             CONSTRAINT fk_performer_verification_user FOREIGN KEY (user_id)

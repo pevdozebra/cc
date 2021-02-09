@@ -7,8 +7,8 @@
     <artifactId>service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>user-service</module>
         <module>spring-microservice-abstract</module>
+        <module>user-service</module>
     </modules>
     <packaging>pom</packaging>
 

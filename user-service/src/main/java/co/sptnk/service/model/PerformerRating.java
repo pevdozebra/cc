@@ -1,8 +1,10 @@
-package co.sptnk.service.userservice.model;
+package co.sptnk.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +24,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table(name="performer_rating")
-public class PerformerRating {
+public class PerformerRating extends RepresentationModel<PerformerRating> {
 
     /**
      * Индектификатор оценки исполнителя
@@ -36,14 +38,14 @@ public class PerformerRating {
      * Исполнитель
      */
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "performer_id")
     private User rated;
 
     /**
      * заказчик
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id")
     private User rater;
 
@@ -75,6 +77,7 @@ public class PerformerRating {
      * Флаг удаления записи (фактическое удаление не происходит)
      */
     @Column(name = "deleted")
-    private Boolean deleted;
+    @JsonIgnore
+    private Boolean deleted = false;
 
 }

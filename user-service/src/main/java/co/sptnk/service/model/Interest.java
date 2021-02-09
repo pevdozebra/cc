@@ -1,8 +1,10 @@
-package co.sptnk.service.userservice.model;
+package co.sptnk.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,7 +25,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name="interest")
-public class Interest {
+public class Interest extends RepresentationModel<Interest> {
 
     /**
      * Индектификатор интереса
@@ -46,13 +48,17 @@ public class Interest {
     @JoinColumn(name = "parent_id")
     private Interest parent;
 
-    @OneToMany
-    private List<Interest> subInterests;
-
+    /**
+     * Флаг удаления записи (фактическое удаление не происходит)
+     */
+    @Column(name = "deleted")
+    @JsonIgnore
+    private Boolean deleted = false;
 
     @ManyToMany
     @JoinTable (name="rel_user_interest",
             joinColumns=@JoinColumn (name="interest_id"),
             inverseJoinColumns=@JoinColumn(name="user_id"))
+    @JsonIgnore
     private List<User> users;
 }
