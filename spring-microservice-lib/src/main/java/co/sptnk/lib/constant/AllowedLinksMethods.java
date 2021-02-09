@@ -1,4 +1,4 @@
-package co.sptnk.lib.keys;
+package co.sptnk.lib.constant;
 
 public enum AllowedLinksMethods {
     POST,

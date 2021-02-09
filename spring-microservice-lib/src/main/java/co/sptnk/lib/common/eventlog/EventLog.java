@@ -1,8 +1,8 @@
-package co.sptnk.lib.model;
+package co.sptnk.lib.common.eventlog;
 
 
-import co.sptnk.lib.keys.EventCode;
-import co.sptnk.lib.keys.EventType;
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
 
 import lombok.AccessLevel;
 import lombok.Getter;
