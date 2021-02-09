@@ -1,0 +1,21 @@
+server:
+  port: 8082
+
+logging:
+  level:
+    web: trace
+spring:
+  liquibase:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  application:
+    name: '@name@'
+  datasource:
+    platform: postgres
+    username: sa
+    password: sa
+    url: jdbc:postgresql://localhost:5432/markets
+    driver-class-name: org.postgresql.Driver
+
