@@ -1,6 +1,5 @@
 package co.sptnk.lib.service;
 
-import co.sptnk.lib.exceptions.ServiceException;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
