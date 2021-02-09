@@ -1,0 +1,9 @@
+server:
+  port: 8083
+spring:
+  datasource:
+    platform: postgres
+    username: sa
+    password: sa
+    url: jdbc:postgresql://localhost:5432/event_log
+    driver-class-name: org.postgresql.Driver

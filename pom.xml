@@ -10,6 +10,7 @@
 
     <modules>
         <module>market-service</module>
+        <module>logging-service</module>
         <module>spring-microservice-abstract</module>
         <module>registry-service</module>
     </modules>

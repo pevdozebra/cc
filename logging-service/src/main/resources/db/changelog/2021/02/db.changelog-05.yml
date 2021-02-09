@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: tsydenov_ia
+      changes:
+        - createTable:
+            tableName: event_log
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                  defaultValue:
+              - column:
+                  name: user_id
+                  type: uuid
+              - column:
+                  name: event_type
+                  type: text
+              - column:
+                  name: event_code
+                  type: text
+              - column:
+                  name: event_date
+                  type: timestamptz
+              - column:
+                  name: client_type
+                  type: text
+              - column:
+                  name: client_ip
+                  type: text
+              - column:
+                  name: user_agent
+                  type: text
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: version
+                  type: bigint
+        - createIndex:
+            columns:
+              - column:
+                  descending: true
+                  name: id
+            indexName: idx_id_event_log
+            schemaName: public
+            tableName: event_log
+            unique: true
