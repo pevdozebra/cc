@@ -1,4 +1,4 @@
-package co.sptnk.lib.keys;
+package co.sptnk.lib.common.eventlog;
 
 public enum EventCode {
     UNKNOWN("Код не определен"),
