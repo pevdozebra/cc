@@ -1,9 +1,13 @@
 package co.sptnk.service.services;
 
-import co.sptnk.lib.base.AbstractCHService;
 import co.sptnk.service.model.EventLog;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.UUID;
+import java.util.Map;
 
-public interface IEventLogService extends AbstractCHService<EventLog, UUID> {
+public interface IEventLogService {
+
+    Flux<EventLog> getAll(Map<String, Object> params);
+    Mono<EventLog> put(EventLog eventLog);
 }

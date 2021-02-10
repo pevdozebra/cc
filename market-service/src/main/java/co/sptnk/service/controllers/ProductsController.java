@@ -78,7 +78,7 @@ public class ProductsController extends AbstractCrudHateoasController<Product, L
     )
     public ResponseEntity<List<Product>> getAll(@RequestParam Map<String, String> params) {
         List<Product> products;
-        products = service.getAllForUser(UUID.fromString(params.get("userId")));
+        products = service.getAll(params);
         products.forEach(p -> createLinks(p, p.getId(), AllowedLinksMethods.GET_ALL));
         return new ResponseEntity<>(products, HttpStatus.ACCEPTED);
     }
