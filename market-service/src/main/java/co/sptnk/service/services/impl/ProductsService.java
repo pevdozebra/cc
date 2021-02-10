@@ -1,12 +1,13 @@
 package co.sptnk.service.services.impl;
 
-import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.model.Product;
 import co.sptnk.service.repositories.ProductsRepo;
 import co.sptnk.service.services.IProductsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,32 +25,27 @@ public class ProductsService implements IProductsService {
         return new ArrayList<>(productsRepo.findAllByPerformerIdAndActiveTrueAndDeletedFalse(uuid));
     }
 
-    public Product add(Product product) throws MarketServiceException{
+    public Product add(Product product) {
         if (product.getId() != null) {
-            throw new MarketServiceException("Объект с таким ID уже существует");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         return productsRepo.save(product);
     }
 
     @Override
-    public Product update(Product product) throws MarketServiceException {
+    public Product update(Product product) {
         if (product.getId() == null) {
-            throw new MarketServiceException("Невозможно идентифицировать сохраняемый объект");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        Product exist = productsRepo.findProductByIdAndDeletedFalse(product.getId()).orElse(null);
-        if (exist == null) {
-            throw new MarketServiceException("Объект для сохранения не найден");
-        }
+        productsRepo.findProductByIdAndDeletedFalse(product.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return productsRepo.save(product);
     }
 
     @Override
-    public Product getOneById(Long productId) throws MarketServiceException {
-        Product product = productsRepo.findProductByIdAndDeletedFalse(productId).orElse(null);
-        if (product == null) {
-            throw new MarketServiceException("Объект не найден");
-        }
-        return product;
+    public Product getOneById(Long productId) {
+        return productsRepo.findProductByIdAndDeletedFalse(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -57,12 +53,12 @@ public class ProductsService implements IProductsService {
         return null;
     }
 
-    public void delete(Long id) throws MarketServiceException{
+    public void delete(Long id) {
         Product product = productsRepo.findProductByIdAndDeletedFalse(id).orElse(null);
         if (product == null || (product.getDeleted() != null && product.getDeleted())) {
             String error = "Не найден удаляемый продукт с id " + id;
             log.error(error);
-            throw new MarketServiceException(error);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         product.setDeleted(true);
         productsRepo.save(product);

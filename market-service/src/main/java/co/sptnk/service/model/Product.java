@@ -1,6 +1,6 @@
 package co.sptnk.service.model;
 
-import co.sptnk.service.keys.ProductStatus;
+import co.sptnk.service.ref.ProductStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;

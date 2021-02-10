@@ -1,8 +1,7 @@
 package co.sptnk.service.controllers;
 
-import co.sptnk.lib.base.AbstractCHController;
-import co.sptnk.lib.exceptions.ServiceException;
-import co.sptnk.lib.keys.AllowedLinksMethods;
+import co.sptnk.lib.constant.AllowedLinksMethods;
+import co.sptnk.lib.controller.AbstractCrudHateoasController;
 import co.sptnk.service.model.Payment;
 import co.sptnk.service.services.IPaymentsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +16,7 @@ import java.util.Map;
 @Tag(name = "PaymentsController", description = "API для объекта Payment")
 @RestController
 @RequestMapping("payment")
-public class PaymentsController extends AbstractCHController<Payment, Long> {
+public class PaymentsController extends AbstractCrudHateoasController<Payment, Long> {
 
     @Autowired
     IPaymentsService service;
@@ -26,50 +25,32 @@ public class PaymentsController extends AbstractCHController<Payment, Long> {
     @Override
     public ResponseEntity<Payment> add(@RequestBody Payment payment) {
         Payment result;
-        try {
-            result = service.add(payment);
-            result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        result = service.add(payment);
+        result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Payment> getOneById(@PathVariable("id") Long id) {
-        Payment entity;
-        try {
-            entity = createLinks(service.getOneById(id), id, AllowedLinksMethods.GET);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(entity, HttpStatus.OK);
+        return new ResponseEntity<>(createLinks(service.getOneById(id), id, AllowedLinksMethods.GET),
+                HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Payment> delete(@PathVariable("id") Long id) {
-        try {
-            service.delete(id);
-        } catch (ServiceException e) {
-            return ResponseEntity.notFound().build();
-        }
+        service.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
-    public Class<? extends AbstractCHController<Payment, Long>> getSelfClass() {
+    public Class<? extends AbstractCrudHateoasController<Payment, Long>> getSelfClass() {
         return this.getClass();
     }
 
     @Override
     public ResponseEntity<Payment> update(@RequestBody Payment payment) {
-        Payment result;
-        try {
-            result = createLinks(service.update(payment), payment.getId(), AllowedLinksMethods.PUT);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(createLinks(service.update(payment), payment.getId(), AllowedLinksMethods.PUT),
+                HttpStatus.OK);
     }
 
     @Override

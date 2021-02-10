@@ -1,4 +1,4 @@
-package co.sptnk.service.keys;
+package co.sptnk.service.ref;
 
 public enum ProductStatus {
     DRAFT,

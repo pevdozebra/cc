@@ -1,8 +1,7 @@
 package co.sptnk.service.controllers;
 
-import co.sptnk.lib.base.AbstractCHController;
-import co.sptnk.lib.exceptions.ServiceException;
-import co.sptnk.lib.keys.AllowedLinksMethods;
+import co.sptnk.lib.constant.AllowedLinksMethods;
+import co.sptnk.lib.controller.AbstractCrudHateoasController;
 import co.sptnk.service.model.Product;
 import co.sptnk.service.services.IProductsService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -28,7 +27,7 @@ import java.util.UUID;
 @Tag(name = "ProductController", description = "API объекта Product (Продукт/Услуга)")
 @RestController
 @RequestMapping("products")
-public class ProductsController extends AbstractCHController<Product, Long> {
+public class ProductsController extends AbstractCrudHateoasController<Product, Long> {
 
     @Autowired
     IProductsService service;
@@ -36,49 +35,31 @@ public class ProductsController extends AbstractCHController<Product, Long> {
     @Override
     public ResponseEntity<Product> add(@RequestBody Product product) {
         Product result;
-        try {
-            result = service.add(product);
-            result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        result = service.add(product);
+        result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Product> update(@RequestBody Product product) {
-        Product result;
-        try {
-            result = createLinks(service.update(product), product.getId(), AllowedLinksMethods.PUT);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(createLinks(service.update(product), product.getId(), AllowedLinksMethods.PUT),
+                HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Product> getOneById(@PathVariable("id") Long id) {
-        Product entity;
-        try {
-            entity = createLinks(service.getOneById(id), id, AllowedLinksMethods.GET);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(entity, HttpStatus.OK);
+        return new ResponseEntity<>(createLinks(service.getOneById(id), id, AllowedLinksMethods.GET),
+                HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Product> delete(@PathVariable("id") Long id) {
-        try {
-            service.delete(id);
-        } catch (ServiceException e) {
-            return ResponseEntity.notFound().build();
-        }
+        service.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
-    public Class<? extends AbstractCHController<Product, Long>> getSelfClass() {
+    public Class<? extends AbstractCrudHateoasController<Product, Long>> getSelfClass() {
         return ProductsController.class;
     }
 
@@ -97,12 +78,8 @@ public class ProductsController extends AbstractCHController<Product, Long> {
     )
     public ResponseEntity<List<Product>> getAll(@RequestParam Map<String, String> params) {
         List<Product> products;
-        try {
-            products = service.getAllForUser(UUID.fromString(params.get("userId")));
-            products.forEach(p -> createLinks(p, p.getId(), AllowedLinksMethods.GET_ALL));
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        products = service.getAllForUser(UUID.fromString(params.get("userId")));
+        products.forEach(p -> createLinks(p, p.getId(), AllowedLinksMethods.GET_ALL));
         return new ResponseEntity<>(products, HttpStatus.ACCEPTED);
     }
 }

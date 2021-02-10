@@ -1,12 +1,13 @@
 package co.sptnk.service.services.impl;
 
-import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.model.Order;
 import co.sptnk.service.repositories.OrdersRepo;
 import co.sptnk.service.services.IOrdersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,41 +34,39 @@ public class OrdersService implements IOrdersService {
     }
 
     @Override
-    public Order add(Order order) throws MarketServiceException {
+    public Order add(Order order) {
         if (order.getId() != null) {
-            throw new MarketServiceException("Объект с таким ID уже существует");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         return ordersRepo.save(order);
     }
 
     @Override
-    public Order update(Order order) throws MarketServiceException {
+    public Order update(Order order) {
         if (order.getId() == null) {
-            throw new MarketServiceException("Невозможно идентифицировать сохраняемый объект");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        Order exist = ordersRepo.findOrderByIdAndDeletedFalse(order.getId()).orElse(null);
-        if (exist == null) {
-            throw new MarketServiceException("Объект для сохранения не найден");
-        }
+        Order exist = ordersRepo.findOrderByIdAndDeletedFalse(order.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ordersRepo.save(order);
     }
 
-    public void delete(Long id) throws MarketServiceException{
+    public void delete(Long id) {
         Order order = ordersRepo.findById(id).orElse(null);
         if (order == null || (order.getDeleted() != null && order.getDeleted())) {
             String error = "Не найден удаляемый заказ с id " + id;
             log.error(error);
-            throw new MarketServiceException(error);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         order.setDeleted(true);
         ordersRepo.save(order);
     }
 
     @Override
-    public Order getOneById(Long orderId) throws MarketServiceException {
+    public Order getOneById(Long orderId) {
         Order order = ordersRepo.findOrderByIdAndDeletedFalse(orderId).orElse(null);
         if (order == null) {
-            throw new MarketServiceException("Объект не найден");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return order;
     }
