@@ -1,12 +1,12 @@
 package co.sptnk.service.services;
 
-import co.sptnk.lib.base.AbstractCHService;
+import co.sptnk.lib.service.AbstractCrudService;
 import co.sptnk.service.model.Order;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface IOrdersService extends AbstractCHService<Order, Long> {
+public interface IOrdersService extends AbstractCrudService<Order, Long> {
 
     /**
      * Получение списка не удаленных заказов

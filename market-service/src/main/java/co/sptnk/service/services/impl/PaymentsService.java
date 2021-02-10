@@ -1,12 +1,13 @@
 package co.sptnk.service.services.impl;
 
-import co.sptnk.service.exceptions.MarketServiceException;
 import co.sptnk.service.model.Payment;
 import co.sptnk.service.repositories.PaymentsRepo;
 import co.sptnk.service.services.IPaymentsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -19,44 +20,39 @@ public class PaymentsService implements IPaymentsService {
     PaymentsRepo paymentsRepo;
 
     @Override
-    public Payment add(Payment payment) throws MarketServiceException {
+    public Payment add(Payment payment) {
         if (payment.getId() != null) {
-            throw new MarketServiceException("Объект с таким ID уже существует");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         return paymentsRepo.save(payment);
     }
 
     @Override
-    public Payment update(Payment payment) throws MarketServiceException {
+    public Payment update(Payment payment) {
         if (payment.getId() == null) {
-            throw new MarketServiceException("Невозможно идентифицировать сохраняемый объект");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        Payment exist = paymentsRepo.findPaymentByIdAndDeletedFalse(payment.getId()).orElse(null);
-        if (exist == null) {
-            throw new MarketServiceException("Объект для сохранения не найден");
-        }
+        Payment exist = paymentsRepo.findPaymentByIdAndDeletedFalse(payment.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return paymentsRepo.save(payment);
     }
 
     @Override
-    public void delete(Long id) throws MarketServiceException {
+    public void delete(Long id) {
         Payment payment = paymentsRepo.findPaymentByIdAndDeletedFalse(id).orElse(null);
         if (payment == null || (payment.getDeleted() != null && payment.getDeleted())) {
             String error = "Не найден удаляемый продукт с id " + id;
             log.error(error);
-            throw new MarketServiceException(error);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         payment.setDeleted(true);
         paymentsRepo.save(payment);
     }
 
     @Override
-    public Payment getOneById(Long paymentId) throws MarketServiceException {
-        Payment payment = paymentsRepo.findPaymentByIdAndDeletedFalse(paymentId).orElse(null);
-        if (payment == null) {
-            throw new MarketServiceException("Объект не найден");
-        }
-        return payment;
+    public Payment getOneById(Long paymentId) {
+        return paymentsRepo.findPaymentByIdAndDeletedFalse(paymentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
