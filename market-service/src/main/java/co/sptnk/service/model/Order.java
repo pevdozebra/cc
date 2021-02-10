@@ -2,11 +2,10 @@ package co.sptnk.service.model;
 
 import co.sptnk.service.ref.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -17,68 +16,68 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Table(name="orders")
 public class Order extends RepresentationModel<Order> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Order")
     @SequenceGenerator(name = "Order", sequenceName = "orders_id_seq", allocationSize = 1)
-    Long id;
+    private Long id;
 
     /**
      * Идентификатор заказчика
      */
     @Column(name = "customer_id")
-    UUID customerId;
+    private UUID customerId;
 
     /**
      * Идентификатор исполнителя
      */
     @Column(name = "performer_id")
-    UUID performerId;
+    private UUID performerId;
 
     /**
      * Продукт для заказа
      */
     @ManyToOne
     @JoinColumn(name = "product_id")
-    Product productId;
+    private Product productId;
 
     /**
      * Дата и время заказа
      */
     @Column(name = "order_date")
-    LocalDateTime orderDate;
+    private LocalDateTime orderDate;
 
     /**
      * Дата и время исполнения
      */
     @Column(name = "perform_date")
-    LocalDateTime performDate;
+    private LocalDateTime performDate;
 
     /**
      * Статус заказа
      */
     @Enumerated(EnumType.STRING)
-    OrderStatus status;
+    private OrderStatus status;
 
     /**
      * Дата и время изменения статуса
      */
     @Column(name = "status_update")
-    LocalDateTime statusUpdateDate;
+    private LocalDateTime statusUpdateDate;
 
     /**
      * Признак удаленного заказа
      * Исключено из трансфера
      */
     @JsonIgnore
-    Boolean deleted = false;
+    private Boolean deleted = false;
 
     @Version
     @JsonIgnore
-    Long version;
+    private Long version;
 
 
 }

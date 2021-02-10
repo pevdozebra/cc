@@ -5,8 +5,6 @@ logging:
   level:
     web: trace
 spring:
-  liquibase:
-    enabled: false
   application:
     name: '@name@'
   data:

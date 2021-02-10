@@ -3,11 +3,10 @@ package co.sptnk.service.model;
 import co.sptnk.service.ref.PaymentStatus;
 import co.sptnk.service.ref.PaymentType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -19,67 +18,67 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Table(name = "payments")
 public class Payment extends RepresentationModel<Payment> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Payment")
     @SequenceGenerator(name = "Payment", sequenceName = "payments_id_seq", allocationSize = 1)
-    Long id;
+    private Long id;
 
     /**
      * Дата и время платежа
      */
     @Column(name = "pay_date")
-    LocalDateTime payDate;
+    private LocalDateTime payDate;
 
     /**
      * Дата и время проведения платежа
      */
     @Column(name = "process_date")
-    LocalDateTime processDate;
+    private LocalDateTime processDate;
 
     /**
      * Статус
      */
     @Enumerated(EnumType.STRING)
-    PaymentStatus status;
+    private PaymentStatus status;
 
     /**
      * Сумма платежа
      */
-    BigDecimal amount;
+    private BigDecimal amount;
 
     /**
      * Тип платежа
      */
     @Enumerated(EnumType.STRING)
-    PaymentType type;
+    private PaymentType type;
 
     /**
      * Идентификатор транзакции
      */
     @Column(name = "transaction_id")
-    String transactionId;
+    private String transactionId;
 
     /**
      * Связь с заказом
      */
     @ManyToOne
     @JoinColumn(name = "order_id")
-    Order orderId;
+    private Order orderId;
 
     /**
      * Идентификатор плательщика (пользователя)
      */
     @Column(name = "user_id")
-    UUID userId;
+    private UUID userId;
 
     @JsonIgnore
-    Boolean deleted;
+    private Boolean deleted;
 
     @Version
     @JsonIgnore
-    Long version;
+    private Long version;
 }

@@ -2,11 +2,10 @@ package co.sptnk.service.model;
 
 import co.sptnk.service.ref.ProductStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -18,87 +17,87 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Table(name="products")
 public class Product extends RepresentationModel<Product>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Product")
     @SequenceGenerator(name = "Product", sequenceName = "products_id_seq", allocationSize = 1)
-    Long id;
+    private Long id;
 
     /**
      * Название
      */
-    String title;
+    private String title;
 
     /**
      * Комиссия
      */
-    BigDecimal commission;
+    private BigDecimal commission;
 
     /**
      * Длительность
      */
     @Column(name = "duration")
-    Long duration;
+    private Long duration;
 
     /**
      * Тип продукта
      */
     @ManyToOne
     @JoinColumn(name = "type_id")
-    ProductType type;
+    private ProductType type;
 
     /**
      * Идентификатор пользователя, которому принадлежит продукт
      */
     @Column(name="performer_id")
-    UUID performerId;
+    private UUID performerId;
 
     /**
      * Описание
      */
-    String description;
+    private String description;
 
     /**
      * Цена
      */
-    BigDecimal price;
+    private BigDecimal price;
 
     /**
      * Услуга доступна с
      */
     @Column(name = "start_time")
-    LocalTime startTime;
+    private LocalTime startTime;
 
     /**
      * Услуга доступна до
      */
     @Column(name = "end_time")
-    LocalTime endTime;
+    private LocalTime endTime;
 
     /**
      * Статус (DRAFT, ACTIVE, ARCHIVED)
      */
     @Enumerated(EnumType.STRING)
-    ProductStatus status;
+    private ProductStatus status;
 
     /**
      * Признак удаленного продукта
      * Исключено из трансфера
      */
     @JsonIgnore
-    Boolean deleted = false;
+    private Boolean deleted = false;
 
     /**
      * Признак активного продукта
      * Исключено из трансфера
      */
     @JsonIgnore
-    Boolean active = true;
+    private Boolean active = true;
 
     @Version
     @JsonIgnore
-    Long version;
+    private Long version;
 }

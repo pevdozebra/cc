@@ -1,11 +1,10 @@
 package co.sptnk.service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -15,38 +14,38 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Table(name = "product_type")
 public class ProductType extends RepresentationModel<ProductType> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ProductType")
     @SequenceGenerator(name = "ProductType", sequenceName = "product_type_id_seq", allocationSize = 1)
-    Long id;
+    private Long id;
 
     /**
      * Название
      */
-    String title;
+    private String title;
 
     /**
      * Комиссия
      */
     @Column(name = "default_commission")
-    BigDecimal defaultCommission;
+    private BigDecimal defaultCommission;
 
     /**
      * Длительность
      */
     @Column(name = "default_duration")
-    Long defaultDuration;
+    private Long defaultDuration;
 
     /**
      * Признак устаревшего продукта
      */
-    Boolean deprecated;
+    private Boolean deprecated;
 
     @Version
     @JsonIgnore
-    Long version;
+    private Long version;
 }

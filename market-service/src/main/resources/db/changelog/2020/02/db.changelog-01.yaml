@@ -147,16 +147,16 @@ databaseChangeLog:
                     references: products(id)
               - column:
                   name: order_date
-                  type: timestamptz
+                  type: timestamp
               - column:
                   name: perform_date
-                  type: timestamptz
+                  type: timestamp
               - column:
                   name: status
                   type: text
               - column:
                   name: status_update
-                  type: timestamptz
+                  type: timestamp
               - column:
                   name: deleted
                   type: boolean
@@ -194,10 +194,10 @@ databaseChangeLog:
                   defaultValue: nextval('payments_id_seq')
               - column:
                   name: pay_date
-                  type: timestamptz
+                  type: timestamp
               - column:
                   name: process_date
-                  type: timestamptz
+                  type: timestamp
               - column:
                   name: status
                   type: text

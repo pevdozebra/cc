@@ -1,14 +1,10 @@
 package co.sptnk.service.model;
 
 
-import co.sptnk.lib.keys.EventCode;
-import co.sptnk.lib.keys.EventType;
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,30 +15,30 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = "event_log")
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventLog {
 
     @Id
-    UUID id;
+    private UUID id;
 
-    UUID userId;
+    private UUID userId;
 
-    EventType type;
+    private EventType type;
 
-    EventCode code;
+    private EventCode code;
 
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
 
-    String clientType;
+    private String clientType;
 
-    String clientIp;
+    private String clientIp;
 
-    String userAgent;
+    private String userAgent;
 
-    String description;
+    private String description;
 
     @Version
     @JsonIgnore
-    Long version;
+    private Long version;
 }
