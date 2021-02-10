@@ -1,41 +1,37 @@
 package co.sptnk.lib.common.eventlog;
 
 
-import co.sptnk.lib.common.eventlog.EventCode;
-import co.sptnk.lib.common.eventlog.EventType;
-
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
-
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 
-@NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventLog {
 
-    UUID id;
+    private UUID id;
 
-    UUID userId;
+    private UUID userId;
 
-    EventType type;
+    private EventType type;
 
-    EventCode code;
+    private EventCode code;
 
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
 
-    String clientType;
+    private String clientType;
 
-    String clientIp;
+    private String clientIp;
 
-    String userAgent;
+    private String userAgent;
 
-    String description;
+    private String description;
 }
