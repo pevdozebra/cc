@@ -1,6 +1,6 @@
-package co.sptnk.lib.base;
+package co.sptnk.lib.controller;
 
-import co.sptnk.lib.keys.AllowedLinksMethods;
+import co.sptnk.lib.constant.AllowedLinksMethods;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,10 +9,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * Базовый контроллера для CRUD операции с поддержкой HATEOAS
  * @param <Entity> - сущность БД
  */
-public abstract class AbstractCHController<Entity extends RepresentationModel<Entity>, ID> {
+public abstract class AbstractCrudHateoasController<Entity extends RepresentationModel<Entity>, ID> {
 
     /**
      * Получение продукта по идентификатору
@@ -40,7 +37,7 @@ public abstract class AbstractCHController<Entity extends RepresentationModel<En
             @ApiResponse(responseCode = "404", description = "Объект не найден")
     }
     )
-    public abstract ResponseEntity<Entity> getOneById(ID id);
+    public abstract ResponseEntity<Entity> getOneById(@PathVariable("id") ID id);
 
     /**
      * Добавление объекта
@@ -54,7 +51,7 @@ public abstract class AbstractCHController<Entity extends RepresentationModel<En
             @ApiResponse(responseCode = "400", description = "Объект уже существует")
     }
     )
-    public abstract ResponseEntity<Entity> add(Entity entity);
+    public abstract ResponseEntity<Entity> add(@RequestBody Entity entity);
 
     /**
      * Обновление объекта
@@ -67,31 +64,31 @@ public abstract class AbstractCHController<Entity extends RepresentationModel<En
             @ApiResponse(responseCode = "404", description = "Объект для сохранения не найден")
     }
     )
-    public abstract ResponseEntity<Entity> update(Entity entity);
+    public abstract ResponseEntity<Entity> update(@RequestBody Entity entity);
 
     /**
      * Удаление объекта по идентификатору
      * @param id - идетификатор объекта
      * @return ResponseEntity с кодом ошибки или успеха
      */
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @Operation(description = "Удаление объекта по идентификатору")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Объект успешно удален"),
             @ApiResponse(responseCode = "404", description = "Объект не найден")
     }
     )
-    public abstract ResponseEntity<Entity> delete(ID id);
+    public abstract ResponseEntity<Entity> delete(@PathVariable("id") ID id);
 
-    @SuppressWarnings("rawtypes")
+
     @GetMapping
-    public abstract ResponseEntity getAll(Map<String, String> map);
+    public abstract ResponseEntity<?> getAll(@RequestParam Map<String, String> map);
 
     /**
      * В реализации вернуть this.getClass()
      * @return класс контроллера
      */
-    protected abstract Class<? extends AbstractCHController<Entity, ID>> getSelfClass();
+    protected abstract Class<? extends AbstractCrudHateoasController<Entity, ID>> getSelfClass();
 
     protected Entity createLinks(Entity entity, ID id, AllowedLinksMethods method) {
         Map<AllowedLinksMethods, Link> links = new HashMap<AllowedLinksMethods, Link>(){{
