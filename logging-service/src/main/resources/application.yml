@@ -7,17 +7,16 @@ logging:
 spring:
   liquibase:
     enabled: false
-  jpa:
-    hibernate:
-      ddl-auto: validate
   application:
     name: '@name@'
-  datasource:
-    platform: postgres
-    username: sa
-    password: sa
-    url: jdbc:postgresql://localhost:5432/event_log
-    driver-class-name: org.postgresql.Driver
+  data:
+    mongodb:
+      authentication-database: admin
+      username: sa
+      password: sa
+      database: logging
+      port: 27017
+      host: localhost
 
 eureka:
   client:
