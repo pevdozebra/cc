@@ -1,7 +1,7 @@
 package co.sptnk.service.model;
 
-import co.sptnk.service.keys.PaymentStatus;
-import co.sptnk.service.keys.PaymentType;
+import co.sptnk.service.ref.PaymentStatus;
+import co.sptnk.service.ref.PaymentType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
