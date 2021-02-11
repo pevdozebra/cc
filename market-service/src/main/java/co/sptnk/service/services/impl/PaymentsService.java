@@ -1,5 +1,6 @@
 package co.sptnk.service.services.impl;
 
+import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.Payment;
 import co.sptnk.service.repositories.PaymentsRepo;
 import co.sptnk.service.services.IPaymentsService;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -17,7 +19,10 @@ import java.util.Map;
 public class PaymentsService implements IPaymentsService {
 
     @Autowired
-    PaymentsRepo paymentsRepo;
+    private PaymentsRepo paymentsRepo;
+
+    @Autowired
+    private EntityMapper<Payment, Payment> mapper;
 
     @Override
     public Payment add(Payment payment) {
@@ -34,9 +39,10 @@ public class PaymentsService implements IPaymentsService {
         }
         Payment exist = paymentsRepo.findPaymentByIdAndDeletedFalse(payment.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return paymentsRepo.save(payment);
+        return paymentsRepo.save(mapper.toEntity(payment, exist));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         Payment payment = paymentsRepo.findPaymentByIdAndDeletedFalse(id).orElse(null);
@@ -46,7 +52,6 @@ public class PaymentsService implements IPaymentsService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         payment.setDeleted(true);
-        paymentsRepo.save(payment);
     }
 
     @Override

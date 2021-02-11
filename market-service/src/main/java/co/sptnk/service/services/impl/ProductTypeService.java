@@ -1,5 +1,6 @@
 package co.sptnk.service.services.impl;
 
+import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.ProductType;
 import co.sptnk.service.repositories.ProductTypeRepo;
 import co.sptnk.service.services.IProductTypeService;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -17,7 +19,10 @@ import java.util.Map;
 public class ProductTypeService implements IProductTypeService {
 
     @Autowired
-    ProductTypeRepo productTypeRepo;
+    private ProductTypeRepo productTypeRepo;
+
+    @Autowired
+    private EntityMapper<ProductType, ProductType> mapper;
 
     @Override
     public ProductType add(ProductType productType) {
@@ -32,11 +37,12 @@ public class ProductTypeService implements IProductTypeService {
         if (productType.getId() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        productTypeRepo.findProductTypeByIdAndDeprecatedFalse(productType.getId())
+        ProductType exist = productTypeRepo.findProductTypeByIdAndDeprecatedFalse(productType.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return productTypeRepo.save(productType);
+        return productTypeRepo.save(mapper.toEntity(productType, exist));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         ProductType type = productTypeRepo.findProductTypeByIdAndDeprecatedFalse(id).orElse(null);
@@ -46,7 +52,6 @@ public class ProductTypeService implements IProductTypeService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         type.setDeprecated(true);
-        productTypeRepo.save(type);
     }
 
     @Override

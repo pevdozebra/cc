@@ -1,5 +1,6 @@
 package co.sptnk.service.services.impl;
 
+import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.Order;
 import co.sptnk.service.repositories.OrdersRepo;
 import co.sptnk.service.services.IOrdersService;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -20,6 +22,9 @@ public class OrdersService implements IOrdersService {
 
     @Autowired
     private OrdersRepo ordersRepo;
+
+    @Autowired
+    private EntityMapper<Order, Order> mapper;
 
     public List<Order> getAllNotDeleted() {
         return new ArrayList<>(ordersRepo.findAllByDeletedFalse());
@@ -48,9 +53,11 @@ public class OrdersService implements IOrdersService {
         }
         Order exist = ordersRepo.findOrderByIdAndDeletedFalse(order.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return ordersRepo.save(order);
+        return ordersRepo.save(mapper.toEntity(order, exist));
     }
 
+    @Transactional
+    @Override
     public void delete(Long id) {
         Order order = ordersRepo.findById(id).orElse(null);
         if (order == null || (order.getDeleted() != null && order.getDeleted())) {
@@ -59,7 +66,6 @@ public class OrdersService implements IOrdersService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         order.setDeleted(true);
-        ordersRepo.save(order);
     }
 
     @Override

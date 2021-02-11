@@ -8,6 +8,6 @@ import java.util.Map;
 
 public interface IEventLogService {
 
-    Flux<EventLog> getAll(Map<String, Object> params);
+    Flux<EventLog> getAll(Map<String, String> params);
     Mono<EventLog> put(EventLog eventLog);
 }

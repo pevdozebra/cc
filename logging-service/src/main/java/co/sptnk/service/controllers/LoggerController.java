@@ -23,7 +23,7 @@ public class LoggerController {
     }
 
     @GetMapping
-    public Flux<EventLog> getAll(Map<String, Object> map) {
+    public Flux<EventLog> getAll(@RequestParam Map<String, String> map) {
         return service.getAll(map);
     }
 }
