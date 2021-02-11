@@ -7,7 +7,10 @@
     <artifactId>service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>spring-microservice-abstract</module>
+        <module>market-service</module>
+        <module>logging-service</module>
+        <module>spring-microservice-lib</module>
+        <module>registry-service</module>
         <module>user-service</module>
     </modules>
     <packaging>pom</packaging>
