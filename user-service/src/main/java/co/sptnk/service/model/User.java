@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
@@ -33,7 +34,6 @@ public class User extends RepresentationModel<User> {
      * Индектификатор пользователя
      */
     @Id
-    @GeneratedValue
     private UUID id;
 
     /**
@@ -53,12 +53,6 @@ public class User extends RepresentationModel<User> {
      */
     @Column(name = "username")
     private String username;
-
-    /**
-     * Пароль
-     */
-    @Column(name = "password")
-    private String password;
 
     /**
      * Дата рождения
@@ -85,6 +79,15 @@ public class User extends RepresentationModel<User> {
             joinColumns=@JoinColumn (name="user_id"),
             inverseJoinColumns=@JoinColumn(name="interest_id"))
     private List<Interest> interests;
+
+    public User(UserRepresentation userRepresentation) {
+        this.id =  UUID.fromString(userRepresentation.getId());
+        this.firstname = userRepresentation.getFirstName();
+        this.lastname = userRepresentation.getLastName();
+        this.username = userRepresentation.getUsername();
+        this.blocked = false;
+        this.deleted = false;
+    }
 
 //    @OneToMany(mappedBy = "rated", fetch=FetchType.LAZY)
 //    public List<PerformerRating> ratings;

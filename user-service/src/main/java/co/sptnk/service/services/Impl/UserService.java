@@ -8,7 +8,15 @@ import co.sptnk.service.repositories.CardsRepo;
 import co.sptnk.service.repositories.PerformerRatingsRepo;
 import co.sptnk.service.repositories.UsersRepo;
 import co.sptnk.service.services.IUserService;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,6 +36,9 @@ public class UserService implements IUserService {
     @Autowired
     private PerformerRatingsRepo performerRatingsRepo;
 
+    @Autowired
+    private Environment environment;
+
     @Override
     public User add(User user) throws UserServiceExeption {
         if (user.getId() != null) {
@@ -45,6 +56,7 @@ public class UserService implements IUserService {
         if (exist == null) {
             throw new UserServiceExeption("Объект для сохранения не найден");
         }
+        updateUserInKeyclock(user);
         return usersRepo.save(user);
     }
 
@@ -75,7 +87,13 @@ public class UserService implements IUserService {
     public User getOneById(UUID uuid) throws UserServiceExeption {
         User user = usersRepo.findUserByIdAndDeletedFalse(uuid).orElse(null);
         if (user == null) {
-            throw new UserServiceExeption("Объект не найден");
+            User deletedUser = usersRepo.findById(uuid).orElse(null);
+            user = getUserFromKeyclock(uuid);
+            if (user != null && deletedUser == null) {
+                usersRepo.save(user);
+            } else {
+                throw new UserServiceExeption("Объект не найден");
+            }
         }
         return user;
     }
@@ -89,4 +107,54 @@ public class UserService implements IUserService {
     public List<User> getAllNotDeleted() {
         return new ArrayList<>(usersRepo.findAllByDeletedFalse());
     }
+
+
+    private User getUserFromKeyclock(UUID id){
+        RealmResource realmResource = getKeyclockRealmResource();
+        UserResource userResource = realmResource.users().get(id.toString());
+        User user = null;
+        if (userResource != null) {
+            UserRepresentation userRepresentation = userResource.toRepresentation();
+            user = new User(userRepresentation);
+        }
+        return user;
+    }
+
+
+    private void updateUserInKeyclock(User user){
+        RealmResource realmResource = getKeyclockRealmResource();
+        UserResource userResource = realmResource.users().get(user.getId().toString());
+        UserRepresentation userRepresentation = updateUserRepresentationFromUser(userResource.toRepresentation(), user);
+        userResource.update(userRepresentation);
+    }
+
+    private UserRepresentation updateUserRepresentationFromUser(UserRepresentation userRepresentation, User user) {
+        if (userRepresentation != null && user != null) {
+            userRepresentation.setFirstName(user.getFirstname());
+            userRepresentation.setLastName(user.getLastname());
+            userRepresentation.setUsername(user.getUsername());
+            userRepresentation.setFirstName(user.getFirstname());
+        }
+        return userRepresentation;
+    }
+
+    // https://keycloak.discourse.group/t/keycloak-admin-client-in-spring-boot/2547/2
+    private RealmResource getKeyclockRealmResource(){
+        Keycloak keycloak = KeycloakBuilder
+                .builder()
+                .serverUrl(environment.getProperty("keycloak.auth-server-url"))
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .realm(environment.getProperty("keycloak.realm"))
+                .clientId(environment.getProperty("keycloak.resource"))
+                .clientSecret(environment.getProperty("client-secret"))
+                .resteasyClient(
+                        new ResteasyClientBuilder()
+                                .connectionPoolSize(10).build()
+                ).build();
+
+        keycloak.tokenManager().getAccessToken();
+        RealmResource realmResource = keycloak.realm("celebrity-chat");
+        return realmResource;
+    }
+
 }

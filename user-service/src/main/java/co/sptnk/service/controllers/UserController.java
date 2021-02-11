@@ -6,6 +6,7 @@ import co.sptnk.lib.keys.AllowedLinksMethods;
 import co.sptnk.service.model.User;
 import co.sptnk.service.services.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,16 +34,9 @@ public class UserController extends AbstractCHController<User, UUID> {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
-    @Override
-    public ResponseEntity<User> add(@RequestBody User user) {
-        User result;
-        try {
-            result = service.add(user);
-            result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    @Hidden
+    public ResponseEntity<User> add(User user) {
+        return null;
     }
 
     @Override

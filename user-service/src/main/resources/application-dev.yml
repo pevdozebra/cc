@@ -15,6 +15,8 @@ spring:
 
 keycloak:
   auth-server-url: http://localhost:8080/auth
-  realm: SpringBootKeycloak
-  resource: login-app
+  realm: celebrity-chat
+  resource: keycloak-admin
   public-client: true
+
+client-secret: bff71573-18d2-4c98-84b2-ac3d7cc28752

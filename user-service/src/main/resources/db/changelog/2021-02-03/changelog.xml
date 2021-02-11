@@ -6,14 +6,12 @@
 
     <changeSet id="1" author="Sidorenko Sergey">
         <sql>
-            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
             CREATE TABLE public.users
             (
-            id uuid NOT NULL DEFAULT uuid_generate_v1(),
+            id uuid NOT NULL,
             firstname text,
             lastname text,
             username text,
-            password text,
             birth_date date,
             blocked boolean,
             deleted boolean DEFAULT false,
