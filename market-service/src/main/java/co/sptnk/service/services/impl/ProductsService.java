@@ -40,7 +40,7 @@ public class ProductsService implements IProductsService {
     @Override
     public Product update(Product product) {
         if (product.getId() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         Product exist = productsRepo.findProductByIdAndDeletedFalse(product.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -62,8 +62,9 @@ public class ProductsService implements IProductsService {
     @Transactional
     @Override
     public void delete(Long id) {
-        Product product = productsRepo.findProductByIdAndDeletedFalse(id).orElse(null);
-        if (product == null || (product.getDeleted() != null && product.getDeleted())) {
+        Product product = productsRepo.findProductByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (product.getDeleted() != null && product.getDeleted()) {
             String error = "Не найден удаляемый продукт с id " + id;
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

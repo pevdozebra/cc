@@ -35,7 +35,7 @@ public class ProductTypeService implements IProductTypeService {
     @Override
     public ProductType update(ProductType productType) {
         if (productType.getId() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         ProductType exist = productTypeRepo.findProductTypeByIdAndDeprecatedFalse(productType.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -45,8 +45,9 @@ public class ProductTypeService implements IProductTypeService {
     @Transactional
     @Override
     public void delete(Long id) {
-        ProductType type = productTypeRepo.findProductTypeByIdAndDeprecatedFalse(id).orElse(null);
-        if (type == null || (type.getDeprecated() != null && type.getDeprecated())) {
+        ProductType type = productTypeRepo.findProductTypeByIdAndDeprecatedFalse(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (type.getDeprecated() != null && type.getDeprecated()) {
             String error = "Не найден удаляемый продукт с id " + id;
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

@@ -35,7 +35,7 @@ public class PaymentsService implements IPaymentsService {
     @Override
     public Payment update(Payment payment) {
         if (payment.getId() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         Payment exist = paymentsRepo.findPaymentByIdAndDeletedFalse(payment.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -45,8 +45,9 @@ public class PaymentsService implements IPaymentsService {
     @Transactional
     @Override
     public void delete(Long id) {
-        Payment payment = paymentsRepo.findPaymentByIdAndDeletedFalse(id).orElse(null);
-        if (payment == null || (payment.getDeleted() != null && payment.getDeleted())) {
+        Payment payment = paymentsRepo.findPaymentByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (payment.getDeleted() != null && payment.getDeleted()) {
             String error = "Не найден удаляемый продукт с id " + id;
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

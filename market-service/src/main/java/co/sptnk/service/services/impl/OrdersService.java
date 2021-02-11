@@ -49,7 +49,7 @@ public class OrdersService implements IOrdersService {
     @Override
     public Order update(Order order) {
         if (order.getId() == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         Order exist = ordersRepo.findOrderByIdAndDeletedFalse(order.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -59,8 +59,9 @@ public class OrdersService implements IOrdersService {
     @Transactional
     @Override
     public void delete(Long id) {
-        Order order = ordersRepo.findById(id).orElse(null);
-        if (order == null || (order.getDeleted() != null && order.getDeleted())) {
+        Order order = ordersRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (order.getDeleted() != null && order.getDeleted()) {
             String error = "Не найден удаляемый заказ с id " + id;
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -70,11 +71,8 @@ public class OrdersService implements IOrdersService {
 
     @Override
     public Order getOneById(Long orderId) {
-        Order order = ordersRepo.findOrderByIdAndDeletedFalse(orderId).orElse(null);
-        if (order == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return order;
+        return ordersRepo.findOrderByIdAndDeletedFalse(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
