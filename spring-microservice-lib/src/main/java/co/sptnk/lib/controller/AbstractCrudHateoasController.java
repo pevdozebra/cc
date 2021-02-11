@@ -61,7 +61,7 @@ public abstract class AbstractCrudHateoasController<Entity extends Representatio
     @Operation(description = "Обновление объекта")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Объект успешно сохранен"),
-            @ApiResponse(responseCode = "404", description = "Объект для сохранения не найден")
+            @ApiResponse(responseCode = "400", description = "Объект не существует")
     }
     )
     public abstract ResponseEntity<Entity> update(@RequestBody Entity entity);
