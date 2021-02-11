@@ -112,7 +112,6 @@
                     <configuration>
                         <propertyFile>${profile.propertyFile}</propertyFile>
                         <changeLogFile>${profile.changeLogFile}</changeLogFile>
-                        <dataDir>${profile.dataDir}</dataDir>
                         <verbose>${profile.verbose}</verbose>
                         <logging>${profile.logging}</logging>
                         <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
@@ -133,14 +132,23 @@
         <profile>
             <id>dev</id>
             <activation>
-                <property>
-                    <name>profile</name>
-                    <value>dev</value>
-                </property>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
                 <skipLiquibaseRun>true</skipLiquibaseRun>
-                <profile.propertyFile>src/main/resources/db/${profile}.properties</profile.propertyFile>
+                <profile.propertyFile>src/main/resources/db/dev.properties</profile.propertyFile>
+                <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
+                <profile.verbose>true</profile.verbose>
+                <profile.logging>debug</profile.logging>
+            </properties>
+        </profile>
+        <profile>
+            <id>nocloud</id>
+            <properties>
+                <spring.profiles.active>nocloud</spring.profiles.active>
+                <skipLiquibaseRun>true</skipLiquibaseRun>
+                <profile.propertyFile>src/main/resources/db/dev.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>true</profile.verbose>
                 <profile.logging>debug</profile.logging>
@@ -148,14 +156,9 @@
         </profile>
         <profile>
             <id>staging</id>
-            <activation>
-                <property>
-                    <name>profile</name>
-                    <value>staging</value>
-                </property>
-            </activation>
             <properties>
-                <profile.propertyFile>src/main/resources/db/${profile}.properties</profile.propertyFile>
+                <spring.profiles.active>staging</spring.profiles.active>
+                <profile.propertyFile>src/main/resources/db/staging.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>debug</profile.logging>
@@ -163,14 +166,9 @@
         </profile>
         <profile>
             <id>prod</id>
-            <activation>
-                <property>
-                    <name>profile</name>
-                    <value>prod</value>
-                </property>
-            </activation>
             <properties>
-                <profile.propertyFile>src/main/resources/db/${profile}.properties</profile.propertyFile>
+                <spring.profiles.active>prod</spring.profiles.active>
+                <profile.propertyFile>src/main/resources/db/prod.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>info</profile.logging>

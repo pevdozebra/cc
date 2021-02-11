@@ -1,24 +1,13 @@
-server:
-  port: 8082
-
 logging:
   level:
     web: trace
 spring:
   liquibase:
     enabled: false
+  profiles:
+    active: '@spring.profiles.active@'
   jpa:
     hibernate:
       ddl-auto: validate
   application:
     name: '@name@'
-  datasource:
-    platform: postgres
-    username: sa
-    password: sa
-    url: jdbc:postgresql://localhost:5432/markets
-    driver-class-name: org.postgresql.Driver
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
