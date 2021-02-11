@@ -37,8 +37,4 @@ public class EventLog {
     private String userAgent;
 
     private String description;
-
-    @Version
-    @JsonIgnore
-    private Long version;
 }
