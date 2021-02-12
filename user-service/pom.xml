@@ -12,7 +12,6 @@
     </parent>
     <groupId>co.sptnk.service</groupId>
     <artifactId>user-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <name>user-service</name>
 
     <properties>
@@ -27,8 +26,8 @@
     <dependencies>
         <dependency>
             <groupId>co.sptnk</groupId>
-            <artifactId>spring-microservice-abstract</artifactId>
-            <version>1.0.0.SNAPSHOT</version>
+            <artifactId>spring-microservice-lib</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -49,7 +48,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
+            <version>${postgresql.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -104,7 +103,6 @@
                 <configuration>
                     <propertyFile>${profile.propertyFile}</propertyFile>
                     <changeLogFile>${profile.changeLogFile}</changeLogFile>
-                    <dataDir>${profile.dataDir}</dataDir>
                     <verbose>${profile.verbose}</verbose>
                     <logging>${profile.logging}</logging>
                     <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
@@ -124,14 +122,12 @@
         <profile>
             <id>dev</id>
             <activation>
-                <property>
-                    <name>profile</name>
-                    <value>dev</value>
-                </property>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
                 <skipLiquibaseRun>true</skipLiquibaseRun>
-                <profile.propertyFile>src/main/resources/db/${profile}.properties</profile.propertyFile>
+                <profile.propertyFile>src/main/resources/db/dev.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/changelog-master.yml</profile.changeLogFile>
                 <profile.verbose>true</profile.verbose>
                 <profile.logging>debug</profile.logging>
@@ -139,14 +135,8 @@
         </profile>
         <profile>
             <id>staging</id>
-            <activation>
-                <property>
-                    <name>profile</name>
-                    <value>staging</value>
-                </property>
-            </activation>
             <properties>
-                <profile.propertyFile>src/main/resources/db/${profile}.properties</profile.propertyFile>
+                <profile.propertyFile>src/main/resources/db/staging.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/changelog-master.yml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>debug</profile.logging>
@@ -154,20 +144,12 @@
         </profile>
         <profile>
             <id>prod</id>
-            <activation>
-                <property>
-                    <name>profile</name>
-                    <value>prod</value>
-                </property>
-            </activation>
             <properties>
-                <profile.propertyFile>src/main/resources/db/${profile}.properties</profile.propertyFile>
+                <profile.propertyFile>src/main/resources/db/prod.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/changelog-master.yml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>info</profile.logging>
             </properties>
         </profile>
     </profiles>
-
-
 </project>

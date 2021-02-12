@@ -1,8 +1,7 @@
 package co.sptnk.service.controllers;
 
-import co.sptnk.lib.base.AbstractCHController;
-import co.sptnk.lib.exceptions.ServiceException;
-import co.sptnk.lib.keys.AllowedLinksMethods;
+import co.sptnk.lib.constant.AllowedLinksMethods;
+import co.sptnk.lib.controller.AbstractCrudHateoasController;
 import co.sptnk.service.model.User;
 import co.sptnk.service.services.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,20 +17,15 @@ import java.util.UUID;
 @Tag(name = "UserController", description = "API объекта User (Пользователь)")
 @RestController
 @RequestMapping("users")
-public class UserController extends AbstractCHController<User, UUID> {
+public class UserController extends AbstractCrudHateoasController<User, UUID> {
 
     @Autowired
     private IUserService service;
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getOneById(@PathVariable("id") UUID uuid) {
-        User entity;
-        try {
-            entity = createLinks(service.getOneById(uuid), uuid, AllowedLinksMethods.GET);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(entity, HttpStatus.OK);
+        return new ResponseEntity<>(createLinks(service.getOneById(uuid), uuid, AllowedLinksMethods.GET),
+                HttpStatus.OK);
     }
 
     @Hidden
@@ -41,22 +35,13 @@ public class UserController extends AbstractCHController<User, UUID> {
 
     @Override
     public ResponseEntity<User> update(@RequestBody User user) {
-        User result;
-        try {
-            result = createLinks(service.update(user), user.getId(), AllowedLinksMethods.PUT);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>( createLinks(service.update(user), user.getId(), AllowedLinksMethods.PUT),
+                HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<User> delete(@RequestBody UUID id) {
-        try {
-            service.delete(id);
-        } catch (ServiceException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<User> delete(@PathVariable UUID id) {
+        service.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -66,7 +51,7 @@ public class UserController extends AbstractCHController<User, UUID> {
     }
 
     @Override
-    protected Class<? extends AbstractCHController<User, UUID>> getSelfClass() {
+    protected Class<? extends AbstractCrudHateoasController<User, UUID>> getSelfClass() {
         return this.getClass();
     }
 }

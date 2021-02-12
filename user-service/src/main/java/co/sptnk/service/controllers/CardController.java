@@ -1,8 +1,7 @@
 package co.sptnk.service.controllers;
 
-import co.sptnk.lib.base.AbstractCHController;
-import co.sptnk.lib.exceptions.ServiceException;
-import co.sptnk.lib.keys.AllowedLinksMethods;
+import co.sptnk.lib.constant.AllowedLinksMethods;
+import co.sptnk.lib.controller.AbstractCrudHateoasController;
 import co.sptnk.service.model.Card;
 import co.sptnk.service.services.ICardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,52 +15,34 @@ import java.util.Map;
 @Tag(name = "CardController", description = "API для объекта Card (Карта)")
 @RestController
 @RequestMapping("cards")
-public class CardController extends AbstractCHController<Card, Long> {
+public class CardController extends AbstractCrudHateoasController<Card, Long> {
 
     @Autowired
     private ICardService service;
 
     @GetMapping("/{id}")
     public ResponseEntity<Card> getOneById(@PathVariable("id") Long id) {
-        Card entity;
-        try {
-            entity = createLinks(service.getOneById(id), id, AllowedLinksMethods.GET);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(entity, HttpStatus.OK);
+        return new ResponseEntity<>(createLinks(service.getOneById(id), id, AllowedLinksMethods.GET),
+                HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Card> add(@RequestBody Card card) {
         Card result;
-        try {
-            result = service.add(card);
-            result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        result = service.add(card);
+        result = createLinks(result, result.getId(), AllowedLinksMethods.POST);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Card> update(@RequestBody Card card) {
-        Card result;
-        try {
-            result = createLinks(service.update(card), card.getId(), AllowedLinksMethods.PUT);
-        } catch (ServiceException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>( createLinks(service.update(card), card.getId(), AllowedLinksMethods.PUT),
+                HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Card> delete(@RequestBody Long id) {
-        try {
-            service.delete(id);
-        } catch (ServiceException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Card> delete(@PathVariable Long id) {
+        service.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -71,7 +52,7 @@ public class CardController extends AbstractCHController<Card, Long> {
     }
 
     @Override
-    protected Class<? extends AbstractCHController<Card, Long>> getSelfClass() {
+    protected Class<? extends AbstractCrudHateoasController<Card, Long>> getSelfClass() {
         return this.getClass();
     }
 }

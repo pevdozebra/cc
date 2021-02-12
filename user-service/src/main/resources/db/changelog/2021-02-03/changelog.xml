@@ -13,6 +13,7 @@
             lastname text,
             username text,
             birth_date date,
+            email text,
             blocked boolean,
             deleted boolean DEFAULT false,
             CONSTRAINT pk_users PRIMARY KEY (id)

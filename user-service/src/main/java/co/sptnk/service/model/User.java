@@ -61,6 +61,12 @@ public class User extends RepresentationModel<User> {
     private LocalDate birthDate;
 
     /**
+     * email
+     */
+    @Column(name = "email")
+    private String email;
+
+    /**
      * Флаг блокировки
      */
     @Column(name = "blocked")
@@ -85,8 +91,8 @@ public class User extends RepresentationModel<User> {
         this.firstname = userRepresentation.getFirstName();
         this.lastname = userRepresentation.getLastName();
         this.username = userRepresentation.getUsername();
-        this.blocked = false;
-        this.deleted = false;
+        this.email = userRepresentation.getEmail();
+        this.blocked = !userRepresentation.isEnabled();
     }
 
 //    @OneToMany(mappedBy = "rated", fetch=FetchType.LAZY)

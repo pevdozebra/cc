@@ -1,11 +1,12 @@
 package co.sptnk.service.services.Impl;
 
-import co.sptnk.service.exceptions.UserServiceExeption;
 import co.sptnk.service.model.Interest;
 import co.sptnk.service.repositories.InterestRepo;
 import co.sptnk.service.services.IInterestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,40 +19,39 @@ public class InterestService implements IInterestService {
     private InterestRepo interestRepo;
 
     @Override
-    public List<Interest> findAllByParent(Long id) throws UserServiceExeption {
+    public List<Interest> findAllByParent(Long id) {
         Interest interest = interestRepo.findInterestByIdAndDeletedFalse(id).orElse(null);
         if (interest == null) {
-            throw new UserServiceExeption("Объект не найден");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return new ArrayList<>(interestRepo.findAllByParent(interest));
     }
 
     @Override
-    public Interest add(Interest interest) throws UserServiceExeption {
+    public Interest add(Interest interest){
         if (interest.getId() != null) {
-            throw new UserServiceExeption("ID объекта должен быть пуст");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         return interestRepo.save(interest);
     }
 
     @Override
-    public Interest update(Interest interest) throws UserServiceExeption {
+    public Interest update(Interest interest){
         if (interest.getId() == null) {
-            throw new UserServiceExeption("Невозможно идентифицировать сохраняемый объект");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         Interest exist = interestRepo.findInterestByIdAndDeletedFalse(interest.getId()).orElse(null);
         if (exist == null) {
-            throw new UserServiceExeption("Объект для сохранения не найден");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return interestRepo.save(interest);
     }
 
     @Override
-    public void delete(Long id) throws UserServiceExeption {
+    public void delete(Long id) {
         Interest interest = interestRepo.findById(id).orElse(null);
         if (interest == null) {
-            String error = "Не найден удаляемый интерес с id " + id;
-            throw new UserServiceExeption(error);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
        interestRepo.findAllByParent(interest).forEach(subInterest -> {
                subInterest.setDeleted(true);
@@ -62,10 +62,10 @@ public class InterestService implements IInterestService {
     }
 
     @Override
-    public Interest getOneById(Long id) throws UserServiceExeption {
+    public Interest getOneById(Long id) {
         Interest interest = interestRepo.findInterestByIdAndDeletedFalse(id).orElse(null);
         if (interest == null) {
-            throw new UserServiceExeption("Объект не найден");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return interest;
     }
