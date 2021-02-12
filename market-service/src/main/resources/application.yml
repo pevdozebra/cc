@@ -1,0 +1,13 @@
+logging:
+  level:
+    web: trace
+spring:
+  liquibase:
+    enabled: false
+  profiles:
+    active: '@spring.profiles.active@'
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  application:
+    name: '@name@'
