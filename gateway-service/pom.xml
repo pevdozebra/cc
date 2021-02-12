@@ -29,6 +29,34 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>jersey-apache-client4</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webflux-core</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webflux-ui</artifactId>
+            <version>1.4.2</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -58,38 +86,26 @@
         <profile>
             <id>dev</id>
             <activation>
-                <property>
-                    <name>profile</name>
-                    <value>dev</value>
-                </property>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
                 <profile.verbose>true</profile.verbose>
                 <profile.logging>debug</profile.logging>
             </properties>
         </profile>
         <profile>
             <id>staging</id>
-            <activation>
-                <property>
-                    <name>profile</name>
-                    <value>staging</value>
-                </property>
-            </activation>
             <properties>
+                <spring.profiles.active>staging</spring.profiles.active>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>debug</profile.logging>
             </properties>
         </profile>
         <profile>
             <id>prod</id>
-            <activation>
-                <property>
-                    <name>profile</name>
-                    <value>prod</value>
-                </property>
-            </activation>
             <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>info</profile.logging>
             </properties>

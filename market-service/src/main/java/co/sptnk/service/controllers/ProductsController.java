@@ -4,10 +4,8 @@ import co.sptnk.lib.constant.AllowedLinksMethods;
 import co.sptnk.lib.controller.AbstractCrudHateoasController;
 import co.sptnk.service.model.Product;
 import co.sptnk.service.services.IProductsService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +20,6 @@ import java.util.Map;
 
 
 @Slf4j
-@OpenAPIDefinition(info = @Info(description = "Api для взаимодействия с сервисом продуктов и услуг", title = "Market-service"))
 @Tag(name = "ProductController", description = "API объекта Product (Продукт/Услуга)")
 @RestController
 @RequestMapping("products")

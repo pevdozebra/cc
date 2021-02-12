@@ -13,7 +13,7 @@
     <groupId>co.sptnk</groupId>
     <artifactId>registry-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>eureka-registry-service</name>
+    <name>registry-service</name>
 
     <dependencies>
         <dependency>
@@ -37,5 +37,35 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+                <profile.verbose>true</profile.verbose>
+                <profile.logging>debug</profile.logging>
+            </properties>
+        </profile>
+        <profile>
+            <id>staging</id>
+            <properties>
+                <spring.profiles.active>staging</spring.profiles.active>
+                <profile.verbose>false</profile.verbose>
+                <profile.logging>debug</profile.logging>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+                <profile.verbose>false</profile.verbose>
+                <profile.logging>info</profile.logging>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

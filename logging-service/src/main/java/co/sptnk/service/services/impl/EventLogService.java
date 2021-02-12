@@ -21,7 +21,7 @@ public class EventLogService implements IEventLogService {
 
 
     @Override
-    public Flux<EventLog> getAll(Map<String, Object> params) {
+    public Flux<EventLog> getAll(Map<String, String> params) {
         return eventLogRepo.findAll();
     }
 
