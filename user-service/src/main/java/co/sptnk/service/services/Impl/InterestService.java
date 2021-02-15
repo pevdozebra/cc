@@ -73,7 +73,7 @@ public class InterestService implements IInterestService {
 
     @Override
     public List<Interest> getAll(Map<String, String> params) {
-        Page<Interest> page = interestRepo.findAll(getExample(params),pageableCreator.getPageable(params,0,10));
+        Page<Interest> page = interestRepo.findAll(getExample(params),pageableCreator.getPageable(params));
         return new ArrayList<>(page.getContent());
     }
 

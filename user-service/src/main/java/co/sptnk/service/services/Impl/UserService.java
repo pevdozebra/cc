@@ -106,7 +106,7 @@ public class UserService implements IUserService {
 
     @Override
     public List<User> getAll(Map<String, String> params) {
-        Page<User> page = usersRepo.findAll(getExample(params),pageableCreator.getPageable(params,0,10));
+        Page<User> page = usersRepo.findAll(getExample(params),pageableCreator.getPageable(params));
         return new ArrayList<>(page.getContent());
     }
 
@@ -177,7 +177,7 @@ public class UserService implements IUserService {
 
     // https://keycloak.discourse.group/t/keycloak-admin-client-in-spring-boot/2547/2
     private RealmResource getKeyclockRealmResource(){
-        Keycloak keycloak = KeycloakBuilder
+           Keycloak keycloak = KeycloakBuilder
                 .builder()
                 .serverUrl(environment.getProperty("keycloak.auth-server-url"))
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)

@@ -67,7 +67,7 @@ public class PerformerVerificationService implements IPerformerVerificationServi
 
     @Override
     public List<PerformerVerification> getAll(Map<String, String> params) {
-        Page<PerformerVerification> page = performerVerificationsRepo.findAll(getExample(params),pageableCreator.getPageable(params,0,10));
+        Page<PerformerVerification> page = performerVerificationsRepo.findAll(getExample(params),pageableCreator.getPageable(params));
         return new ArrayList<>(page.getContent());
     }
 

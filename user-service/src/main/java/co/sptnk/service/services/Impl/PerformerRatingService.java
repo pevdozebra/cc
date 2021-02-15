@@ -83,7 +83,7 @@ public class PerformerRatingService implements IPerformerRatingService {
 
     @Override
     public List<PerformerRating> getAll(Map<String, String> params){
-        Page<PerformerRating> page = performerRatingsRepo.findAll(getExample(params),pageableCreator.getPageable(params,0,10));
+        Page<PerformerRating> page = performerRatingsRepo.findAll(getExample(params),pageableCreator.getPageable(params));
         return new ArrayList<>(page.getContent());
     }
 

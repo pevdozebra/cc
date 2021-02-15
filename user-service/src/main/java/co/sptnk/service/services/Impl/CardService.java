@@ -67,7 +67,7 @@ public class CardService implements ICardService {
 
     @Override
     public List<Card> getAll(Map<String, String> params) {
-        Page<Card> page = cardsRepo.findAll(getExample(params),pageableCreator.getPageable(params,0,10));
+        Page<Card> page = cardsRepo.findAll(getExample(params),pageableCreator.getPageable(params));
         return new ArrayList<>(page.getContent());
     }
 
