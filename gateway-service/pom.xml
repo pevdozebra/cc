@@ -3,43 +3,33 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-        <version>2.3.5.RELEASE</version>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.4.2</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <name>logging-service</name>
-    <groupId>co.sptnk.service</groupId>
-    <artifactId>logging-service</artifactId>
+    <groupId>co.sptnk</groupId>
+    <artifactId>gateway-service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>gateway-service</name>
 
     <properties>
         <java.version>1.8</java.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <postgresql.version>42.2.18</postgresql.version>
-        <liquibase.version>4.2.2</liquibase.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>co.sptnk</groupId>
-            <artifactId>spring-microservice-lib</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -59,6 +49,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webflux-core</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webflux-ui</artifactId>
+            <version>1.4.2</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -66,7 +66,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Hoxton.SR9</version>
+                <version>2020.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -79,12 +79,6 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>2.4.1</version>
-                    <executions>
-                        <execution>
-                            <phase>install</phase>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -98,14 +92,6 @@
             </activation>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
-                <profile.verbose>true</profile.verbose>
-                <profile.logging>debug</profile.logging>
-            </properties>
-        </profile>
-        <profile>
-            <id>nocloud</id>
-            <properties>
-                <spring.profiles.active>nocloud</spring.profiles.active>
                 <profile.verbose>true</profile.verbose>
                 <profile.logging>debug</profile.logging>
             </properties>
