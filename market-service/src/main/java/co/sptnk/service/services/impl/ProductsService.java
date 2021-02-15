@@ -1,16 +1,22 @@
 package co.sptnk.service.services.impl;
 
+import co.sptnk.lib.common.AMQPKeys;
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventLogDTO;
+import co.sptnk.lib.common.eventlog.EventType;
 import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.Product;
 import co.sptnk.service.repositories.ProductsRepo;
 import co.sptnk.service.services.IProductsService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +30,9 @@ public class ProductsService implements IProductsService {
     private ProductsRepo productsRepo;
 
     @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
     private EntityMapper<Product, Product> mapper;
 
     public List<Product> getAllForUser(UUID uuid) {
@@ -34,6 +43,14 @@ public class ProductsService implements IProductsService {
         if (product.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        product.setDeleted(false);
+        product.setActive(true);
+        EventLogDTO eventLog = new EventLogDTO();
+        eventLog.setType(EventType.INFO);
+        eventLog.setCode(EventCode.PRODUCT_CREATE);
+        eventLog.setEventDate(LocalDateTime.now());
+        eventLog.setDescription("Тест добавления продукта 1");
+        rabbitTemplate.convertAndSend(AMQPKeys.TOPIC_EVENTLOG, eventLog);
         return productsRepo.save(product);
     }
 

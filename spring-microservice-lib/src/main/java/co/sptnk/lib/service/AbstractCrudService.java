@@ -1,11 +1,10 @@
 package co.sptnk.lib.service;
 
-import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
 import java.util.Map;
 
-public interface AbstractCrudService<Entity extends RepresentationModel<Entity>, ID> {
+public interface AbstractCrudService<Entity, ID> {
 
     /**
      * Добавление нового объекта

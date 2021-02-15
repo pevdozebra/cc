@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -19,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="products")
-public class Product extends RepresentationModel<Product>{
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Product")
@@ -88,14 +87,14 @@ public class Product extends RepresentationModel<Product>{
      * Исключено из трансфера
      */
     @JsonIgnore
-    private Boolean deleted = false;
+    private Boolean deleted;
 
     /**
      * Признак активного продукта
      * Исключено из трансфера
      */
     @JsonIgnore
-    private Boolean active = true;
+    private Boolean active;
 
     @Version
     @JsonIgnore

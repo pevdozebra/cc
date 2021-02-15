@@ -1,6 +1,7 @@
 server:
-  port: 0
+  port: 8082
 spring:
+
   datasource:
     platform: postgres
     username: sa
@@ -13,3 +14,4 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+

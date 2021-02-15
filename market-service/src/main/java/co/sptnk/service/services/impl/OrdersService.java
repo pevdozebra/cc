@@ -6,6 +6,7 @@ import co.sptnk.service.repositories.OrdersRepo;
 import co.sptnk.service.services.IOrdersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,7 @@ public class OrdersService implements IOrdersService {
         if (order.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        order.setDeleted(false);
         return ordersRepo.save(order);
     }
 
@@ -77,6 +79,8 @@ public class OrdersService implements IOrdersService {
 
     @Override
     public List<Order> getAll(Map<String, String> params) {
+        Order order = new Order();
+        Example.of(order).getMatcher().withIgnoreNullValues();
         return ordersRepo.findAll();
     }
 }

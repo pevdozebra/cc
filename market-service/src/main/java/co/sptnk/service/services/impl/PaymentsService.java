@@ -29,6 +29,7 @@ public class PaymentsService implements IPaymentsService {
         if (payment.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        payment.setDeleted(false);
         return paymentsRepo.save(payment);
     }
 

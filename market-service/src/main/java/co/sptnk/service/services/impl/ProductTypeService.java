@@ -29,6 +29,7 @@ public class ProductTypeService implements IProductTypeService {
         if (productType.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        productType.setDeprecated(false);
         return productTypeRepo.save(productType);
     }
 
