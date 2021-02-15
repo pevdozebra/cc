@@ -11,13 +11,6 @@ spring:
     active: '@spring.profiles.active@'
   cloud:
     gateway:
-#      discovery:
-#        locator:
-#          enabled: true
-#      globalcors:
-#        cors-configurations:
-#              '[/**]':
-#                  allowedOrigins: lb://gateway-service
       routes:
         - id: logging-service
           uri: lb://logging-service
@@ -43,12 +36,9 @@ logging:
   level:
     web: trace
 springdoc:
-  api-docs:
-    groups:
-      enabled: true
-#  group-configs:
-#    - group: market
-#      paths-to-match: market
-#    - group: eventlog
-#      paths-to-match: evetlog
+  swagger-ui:
+    urls:
+      - name: market
+      - name: users
+      - name: eventlog
 
