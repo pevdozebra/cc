@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -45,9 +46,9 @@ public class UserController extends AbstractCrudHateoasController<User, UUID> {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping
-    public ResponseEntity getAll(Map<String, String> map) {
-        return new ResponseEntity<>(service.getAllNotDeleted(), HttpStatus.OK);
+    @GetMapping()
+    public ResponseEntity getAll(@RequestParam  Map<String, String> map) {
+        return new ResponseEntity<>(service.getAll(map), HttpStatus.OK);
     }
 
     @Override

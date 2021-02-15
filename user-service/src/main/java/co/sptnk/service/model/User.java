@@ -8,15 +8,10 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
 import javax.persistence.Table;
 import javax.persistence.Id;
 import javax.persistence.Column;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
 import java.time.LocalDate;

@@ -1,19 +1,22 @@
 package co.sptnk.service.services.Impl;
 
+import co.sptnk.service.common.EntityMapper;
+import co.sptnk.service.common.PageableCreator;
 import co.sptnk.service.model.Card;
-import co.sptnk.service.model.User;
 import co.sptnk.service.repositories.CardsRepo;
 import co.sptnk.service.repositories.UsersRepo;
 import co.sptnk.service.services.ICardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class CardService implements ICardService {
@@ -22,14 +25,14 @@ public class CardService implements ICardService {
     private CardsRepo cardsRepo;
     @Autowired
     private UsersRepo usersRepo;
+    @Autowired
+    private EntityMapper<Card, Card> mapper;
+    @Autowired
+    private PageableCreator pageableCreator;
 
     @Override
     public List<Card> getAllForUser(UUID userId)  {
-        User user = usersRepo.findUserByIdAndDeletedFalse(userId).orElse(null);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return new ArrayList<>(cardsRepo.findCardByUserAndDeletedFalse(user));
+        return new ArrayList<>(cardsRepo.findCardByUser_IdAndDeletedFalse(userId));
     }
 
     @Override
@@ -45,39 +48,45 @@ public class CardService implements ICardService {
         if (card.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        Card exist = cardsRepo.findCardByIdAndDeletedFalse(card.getId()).orElse(null);
-        if (exist == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return cardsRepo.save(card);
+        Card exist = cardsRepo.findCardByIdAndDeletedFalse(card.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return cardsRepo.save(mapper.toEntity(card, exist));
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Card card = cardsRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (card.getDeleted() != null && card.getDeleted()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
         card.setDeleted(true);
-        cardsRepo.save(card);
     }
 
     @Override
     public Card getOneById(Long id) {
-        Card card = cardsRepo.findCardByIdAndDeletedFalse(id).orElse(null);
-        if (card == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        Card card = cardsRepo.findCardByIdAndDeletedFalse(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return card;
     }
 
     @Override
     public List<Card> getAll(Map<String, String> params) {
-        return cardsRepo.findAll();
+        Page<Card> page = cardsRepo.findAll(getExample(params),pageableCreator.getPageable(params,0,10));
+        return new ArrayList<>(page.getContent());
     }
 
     @Override
     public List<Card> getAllNotDeleted() {
         return new ArrayList<>(cardsRepo.findAllByDeletedFalse());
+    }
+
+    private Example<Card> getExample(Map<String, String> params){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Card card = new Card();
+        card.setId(params.get("id") != null ? Long.parseLong(params.get("id")):null);
+        card.setUser(params.get("userId") != null ? usersRepo.findById(UUID.fromString(params.get("userId"))).orElse(null):null);
+        card.setBindDate(params.get("bindDate") != null ? LocalDateTime.parse(params.get("bindDate"), formatter):null);
+        card.setMaskedNumber(params.get("maskedNumber"));
+        card.setAquireUrl(params.get("aquireUrl"));
+        card.setArchived(params.get("archived") != null ? Boolean.parseBoolean(params.get("archived")): null);
+        card.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): false);
+        return Example.of(card);
     }
 }

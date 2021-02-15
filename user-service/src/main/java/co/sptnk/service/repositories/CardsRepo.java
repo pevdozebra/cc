@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface CardsRepo extends JpaRepository<Card, Long> {
@@ -16,4 +17,5 @@ public interface CardsRepo extends JpaRepository<Card, Long> {
 
     Optional<Card> findCardByIdAndDeletedFalse(Long id);
 
+    Collection<Card> findCardByUser_IdAndDeletedFalse(UUID user_id);
 }

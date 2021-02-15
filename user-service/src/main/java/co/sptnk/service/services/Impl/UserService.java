@@ -1,9 +1,13 @@
 package co.sptnk.service.services.Impl;
 
+import co.sptnk.service.common.EntityMapper;
+import co.sptnk.service.common.PageableCreator;
 import co.sptnk.service.model.Card;
+import co.sptnk.service.model.Interest;
 import co.sptnk.service.model.PerformerRating;
 import co.sptnk.service.model.User;
 import co.sptnk.service.repositories.CardsRepo;
+import co.sptnk.service.repositories.InterestRepo;
 import co.sptnk.service.repositories.PerformerRatingsRepo;
 import co.sptnk.service.repositories.UsersRepo;
 import co.sptnk.service.services.IUserService;
@@ -16,10 +20,15 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,22 +39,27 @@ public class UserService implements IUserService {
 
     @Autowired
     private UsersRepo usersRepo;
-
+    @Autowired
+    private InterestRepo interestRepo;
     @Autowired
     private CardsRepo cardsRepo;
-
     @Autowired
     private PerformerRatingsRepo performerRatingsRepo;
-
     @Autowired
     private Environment environment;
+    @Autowired
+    private EntityMapper<User, User> mapper;
+    @Autowired
+    private PageableCreator pageableCreator;
+
 
     @Override
     public User add(User user) {
-        if (user.getId() != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-        return usersRepo.save(user);
+//        if (user.getId() != null) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+//        }
+//        return usersRepo.save(user);
+        return null;
     }
 
     @Override
@@ -53,35 +67,26 @@ public class UserService implements IUserService {
         if (user.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        User exist = usersRepo.findUserByIdAndDeletedFalse(user.getId()).orElse(null);
-        if (exist == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        User exist = usersRepo.findUserByIdAndDeletedFalse(user.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         updateUserInKeyclock(user);
-        return usersRepo.save(user);
+        return usersRepo.save(mapper.toEntity(user, exist));
     }
 
     @Override
+    @Transactional
     public void delete(UUID uuid) {
         User user = usersRepo.findById(uuid).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (user.getDeleted() != null && user.getDeleted()) {
-           throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
         List<Card> cards = (List<Card>) cardsRepo.findCardByUserAndDeletedFalse(user);
         cards.forEach(card -> {
             card.setDeleted(true);
-            cardsRepo.save(card);
         });
         List<PerformerRating> ratings = (List<PerformerRating>) performerRatingsRepo.findPerformerRatingByRatedAndDeletedFalse(user);
         ratings.forEach(rating -> {
             rating.setDeleted(true);
-            performerRatingsRepo.save(rating);
         });
-
         user.getInterests().clear();
-        user.setDeleted(true);
         blockUserInKeyclock(user);
-        usersRepo.save(user);
+        user.setDeleted(true);
     }
 
     @Override
@@ -101,14 +106,35 @@ public class UserService implements IUserService {
 
     @Override
     public List<User> getAll(Map<String, String> params) {
-        return usersRepo.findAll();
+        Page<User> page = usersRepo.findAll(getExample(params),pageableCreator.getPageable(params,0,10));
+        return new ArrayList<>(page.getContent());
+    }
+
+    private Example<User> getExample(Map<String, String> params){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        User user = new User();
+        user.setId(params.get("id") != null ? UUID.fromString(params.get("id")):null);
+        user.setFirstname(params.get("firstname"));
+        user.setLastname(params.get("lastname"));
+        user.setUsername(params.get("username"));
+        user.setBirthDate(params.get("birthDate") != null ? LocalDate.parse(params.get("birthDate"), formatter):null);
+        user.setEmail(params.get("email"));
+        user.setBlocked(params.get("blocked") != null ? Boolean.parseBoolean(params.get("blocked")): null);
+        user.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): false);
+        if (params.get("interestId") != null) {
+            Interest interest = interestRepo.findInterestByIdAndDeletedFalse(Long.parseLong(params.get("interestId"))).orElse(null);
+            List<Interest> list = new ArrayList<>();
+            list.add(interest);
+            user.setInterests(list);
+        }
+        return Example.of(user);
     }
 
     @Override
     public List<User> getAllNotDeleted() {
         return new ArrayList<>(usersRepo.findAllByDeletedFalse());
     }
-
 
     private User getUserFromKeyclock(UUID id){
         RealmResource realmResource = getKeyclockRealmResource();

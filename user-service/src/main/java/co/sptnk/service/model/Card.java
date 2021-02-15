@@ -69,5 +69,4 @@ public class Card extends RepresentationModel<Card> {
     @Column(name = "deleted")
     @JsonIgnore
     private Boolean deleted = false;
-
 }

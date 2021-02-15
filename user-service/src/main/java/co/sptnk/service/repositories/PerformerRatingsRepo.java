@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface PerformerRatingsRepo extends JpaRepository<PerformerRating, Long> {
@@ -17,4 +18,5 @@ public interface PerformerRatingsRepo extends JpaRepository<PerformerRating, Lon
 
     Optional<PerformerRating> findPerformerRatingByIdAndDeletedFalse(Long id);
 
+    Collection<PerformerRating> findPerformerRatingByRated_IdAndDeletedFalse(UUID user_id);
 }

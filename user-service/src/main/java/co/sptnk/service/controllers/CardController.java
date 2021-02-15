@@ -47,8 +47,8 @@ public class CardController extends AbstractCrudHateoasController<Card, Long> {
     }
 
     @GetMapping
-    public ResponseEntity getAll(Map<String, String> map) {
-        return new ResponseEntity<>(service.getAllNotDeleted(), HttpStatus.OK);
+    public ResponseEntity getAll(@RequestParam Map<String, String> map) {
+        return new ResponseEntity<>(service.getAll(map), HttpStatus.OK);
     }
 
     @Override

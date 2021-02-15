@@ -1,6 +1,6 @@
 package co.sptnk.service.repositories;
 
-import co.sptnk.service.model.Interest;
+import co.sptnk.service.model.Interest;;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,5 +15,4 @@ public interface InterestRepo extends JpaRepository<Interest, Long> {
     Optional<Interest> findInterestByIdAndDeletedFalse(Long id);
 
     Collection<Interest> findAllByDeletedFalse();
-
 }
