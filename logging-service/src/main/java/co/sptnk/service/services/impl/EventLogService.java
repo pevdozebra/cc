@@ -6,11 +6,8 @@ import co.sptnk.service.services.IEventLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.UUID;
 
 
 @Service
@@ -25,11 +22,4 @@ public class EventLogService implements IEventLogService {
         return eventLogRepo.findAll();
     }
 
-    @Override
-    public Mono<EventLog> put(EventLog eventLog) {
-        eventLog.setId(UUID.randomUUID());
-        if( eventLog.getEventDate() == null)
-            eventLog.setEventDate(LocalDateTime.now());
-        return eventLogRepo.save(eventLog);
-    }
 }
