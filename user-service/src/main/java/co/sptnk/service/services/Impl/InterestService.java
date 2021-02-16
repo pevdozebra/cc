@@ -1,12 +1,13 @@
 package co.sptnk.service.services.Impl;
 
-import co.sptnk.service.common.EntityMapper;
+
 import co.sptnk.service.common.PageableCreator;
 import co.sptnk.service.model.Interest;
 import co.sptnk.service.model.User;
 import co.sptnk.service.repositories.InterestRepo;
 import co.sptnk.service.repositories.UsersRepo;
 import co.sptnk.service.services.IInterestService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -28,9 +29,7 @@ public class InterestService implements IInterestService {
     @Autowired
     private UsersRepo usersRepo;
     @Autowired
-    private EntityMapper<Interest, Interest> mapper;
-    @Autowired
-    private PageableCreator pageableCreator;
+    private ModelMapper modelMapper;
 
     @Override
     public List<Interest> findAllByParent(Long id) {
@@ -52,7 +51,8 @@ public class InterestService implements IInterestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         Interest exist = interestRepo.findInterestByIdAndDeletedFalse(interest.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return interestRepo.save(mapper.toEntity(interest, exist));
+        modelMapper.map(interest, exist);
+        return interestRepo.save(exist);
     }
 
     @Override
@@ -73,7 +73,13 @@ public class InterestService implements IInterestService {
 
     @Override
     public List<Interest> getAll(Map<String, String> params) {
-        Page<Interest> page = interestRepo.findAll(getExample(params),pageableCreator.getPageable(params));
+        Page<Interest> page;
+        try {
+            page = interestRepo.findAll(getExample(params), PageableCreator.getPageable(params));
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         return new ArrayList<>(page.getContent());
     }
 
@@ -81,7 +87,7 @@ public class InterestService implements IInterestService {
         Interest interest = new Interest();
         interest.setId(params.get("id") != null ? Long.parseLong(params.get("id")):null);
         interest.setTitle(params.get("title"));
-        interest.setParent(params.get("parent_id") != null ? interestRepo.findById(Long.parseLong(params.get("parent_id"))).orElse(null):null);
+        interest.setParent(params.get("parent_id") != null ? interestRepo.getOne(Long.parseLong(params.get("parent_id"))):null);
         interest.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): false);
         if (params.get("userId") != null) {
             User user = usersRepo.findUserByIdAndDeletedFalse(UUID.fromString(params.get("userId"))).orElse(null);

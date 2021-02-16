@@ -1,11 +1,7 @@
 package co.sptnk.service.services.Impl;
 
-import co.sptnk.service.common.EntityMapper;
 import co.sptnk.service.common.PageableCreator;
-import co.sptnk.service.model.Card;
-import co.sptnk.service.model.Interest;
-import co.sptnk.service.model.PerformerRating;
-import co.sptnk.service.model.User;
+import co.sptnk.service.model.*;
 import co.sptnk.service.repositories.CardsRepo;
 import co.sptnk.service.repositories.InterestRepo;
 import co.sptnk.service.repositories.PerformerRatingsRepo;
@@ -18,6 +14,7 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
@@ -48,9 +45,7 @@ public class UserService implements IUserService {
     @Autowired
     private Environment environment;
     @Autowired
-    private EntityMapper<User, User> mapper;
-    @Autowired
-    private PageableCreator pageableCreator;
+    private ModelMapper modelMapper;
 
 
     @Override
@@ -69,7 +64,8 @@ public class UserService implements IUserService {
         }
         User exist = usersRepo.findUserByIdAndDeletedFalse(user.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         updateUserInKeyclock(user);
-        return usersRepo.save(mapper.toEntity(user, exist));
+        modelMapper.map(user, exist);
+        return usersRepo.save(exist);
     }
 
     @Override
@@ -106,7 +102,13 @@ public class UserService implements IUserService {
 
     @Override
     public List<User> getAll(Map<String, String> params) {
-        Page<User> page = usersRepo.findAll(getExample(params),pageableCreator.getPageable(params));
+        Page<User> page;
+        try {
+            page = usersRepo.findAll(getExample(params), PageableCreator.getPageable(params));
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         return new ArrayList<>(page.getContent());
     }
 

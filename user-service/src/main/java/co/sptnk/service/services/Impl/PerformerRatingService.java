@@ -1,12 +1,13 @@
 package co.sptnk.service.services.Impl;
 
-import co.sptnk.service.common.EntityMapper;
 import co.sptnk.service.common.PageableCreator;
+import co.sptnk.service.model.Interest;
 import co.sptnk.service.model.PerformerRating;
 import co.sptnk.service.model.User;
 import co.sptnk.service.repositories.PerformerRatingsRepo;
 import co.sptnk.service.repositories.UsersRepo;
 import co.sptnk.service.services.IPerformerRatingService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -30,9 +31,7 @@ public class PerformerRatingService implements IPerformerRatingService {
     @Autowired
     private UsersRepo usersRepo;
     @Autowired
-    private EntityMapper<PerformerRating, PerformerRating> mapper;
-    @Autowired
-    private PageableCreator pageableCreator;
+    private ModelMapper modelMapper;
 
     @Override
     public List<PerformerRating> findAllByPerformer(UUID userId) {
@@ -64,7 +63,8 @@ public class PerformerRatingService implements IPerformerRatingService {
         }
         PerformerRating exist = performerRatingsRepo.findPerformerRatingByIdAndDeletedFalse(performerRating.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return performerRatingsRepo.save(mapper.toEntity(performerRating, exist));
+        modelMapper.map(performerRating, exist);
+        return performerRatingsRepo.save(exist);
     }
 
     @Override
@@ -83,7 +83,13 @@ public class PerformerRatingService implements IPerformerRatingService {
 
     @Override
     public List<PerformerRating> getAll(Map<String, String> params){
-        Page<PerformerRating> page = performerRatingsRepo.findAll(getExample(params),pageableCreator.getPageable(params));
+        Page<PerformerRating> page;
+        try {
+            page = performerRatingsRepo.findAll(getExample(params), PageableCreator.getPageable(params));
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         return new ArrayList<>(page.getContent());
     }
 
@@ -97,8 +103,8 @@ public class PerformerRatingService implements IPerformerRatingService {
 
         PerformerRating performerRating = new PerformerRating();
         performerRating.setId(params.get("id") != null ? Long.parseLong(params.get("id")):null);
-        performerRating.setRated(params.get("ratedId") != null ? usersRepo.findById(UUID.fromString(params.get("ratedId"))).orElse(null):null);
-        performerRating.setRater(params.get("raterId") != null ? usersRepo.findById(UUID.fromString(params.get("raterId"))).orElse(null):null);
+        performerRating.setRated(params.get("ratedId") != null ? usersRepo.getOne(UUID.fromString(params.get("ratedId"))):null);
+        performerRating.setRater(params.get("raterId") != null ? usersRepo.getOne(UUID.fromString(params.get("raterId"))):null);
         performerRating.setReasonId(params.get("reasonId") != null ? Long.parseLong(params.get("reasonId")):null);
         performerRating.setRating(params.get("rating") != null ? Integer.parseInt(params.get("rating")):null);
         performerRating.setDate(params.get("date") != null ? LocalDateTime.parse(params.get("date"), formatter):null);

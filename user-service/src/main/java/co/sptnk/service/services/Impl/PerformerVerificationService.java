@@ -1,11 +1,12 @@
 package co.sptnk.service.services.Impl;
 
-import co.sptnk.service.common.EntityMapper;
 import co.sptnk.service.common.PageableCreator;
+import co.sptnk.service.model.PerformerRating;
 import co.sptnk.service.model.PerformerVerification;
 import co.sptnk.service.repositories.PerformerVerificationsRepo;
 import co.sptnk.service.repositories.UsersRepo;
 import co.sptnk.service.services.IPerformerVerificationService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -29,9 +30,7 @@ public class PerformerVerificationService implements IPerformerVerificationServi
     @Autowired
     private UsersRepo usersRepo;
     @Autowired
-    private EntityMapper<PerformerVerification, PerformerVerification> mapper;
-    @Autowired
-    private PageableCreator pageableCreator;
+    private ModelMapper modelMapper;
 
     @Override
     public PerformerVerification add(PerformerVerification performerVerification) {
@@ -48,7 +47,8 @@ public class PerformerVerificationService implements IPerformerVerificationServi
         }
         PerformerVerification exist = performerVerificationsRepo.findPerformerVerificationByIdAndDeletedFalse(performerVerification.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return performerVerificationsRepo.save(mapper.toEntity(performerVerification, exist));
+        modelMapper.map(performerVerification, exist);
+        return performerVerificationsRepo.save(exist);
     }
 
     @Override
@@ -67,7 +67,13 @@ public class PerformerVerificationService implements IPerformerVerificationServi
 
     @Override
     public List<PerformerVerification> getAll(Map<String, String> params) {
-        Page<PerformerVerification> page = performerVerificationsRepo.findAll(getExample(params),pageableCreator.getPageable(params));
+        Page<PerformerVerification> page;
+        try {
+            page = performerVerificationsRepo.findAll(getExample(params), PageableCreator.getPageable(params));
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         return new ArrayList<>(page.getContent());
     }
 
@@ -80,8 +86,8 @@ public class PerformerVerificationService implements IPerformerVerificationServi
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         PerformerVerification performerVerification = new PerformerVerification();
         performerVerification.setId(params.get("id") != null ? Long.parseLong(params.get("id")):null);
-        performerVerification.setPerformer(params.get("performerId") != null ? usersRepo.findById(UUID.fromString(params.get("performerId"))).orElse(null):null);
-        performerVerification.setVerifier(params.get("verifierId") != null ? usersRepo.findById(UUID.fromString(params.get("verifierId"))).orElse(null):null);
+        performerVerification.setPerformer(params.get("performerId") != null ? usersRepo.getOne(UUID.fromString(params.get("performerId"))):null);
+        performerVerification.setVerifier(params.get("verifierId") != null ? usersRepo.getOne(UUID.fromString(params.get("verifierId"))):null);
         performerVerification.setCreateDate(params.get("createDate") != null ? LocalDateTime.parse(params.get("createDate"), formatter):null);
         performerVerification.setDecisionDate(params.get("decisionDate") != null ? LocalDateTime.parse(params.get("decisionDate"), formatter):null);
         performerVerification.setSuccessDecision(params.get("successDecision") != null ? Boolean.parseBoolean(params.get("successDecision")): null);

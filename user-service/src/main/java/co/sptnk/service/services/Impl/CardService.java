@@ -1,11 +1,11 @@
 package co.sptnk.service.services.Impl;
 
-import co.sptnk.service.common.EntityMapper;
 import co.sptnk.service.common.PageableCreator;
 import co.sptnk.service.model.Card;
 import co.sptnk.service.repositories.CardsRepo;
 import co.sptnk.service.repositories.UsersRepo;
 import co.sptnk.service.services.ICardService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -26,9 +26,7 @@ public class CardService implements ICardService {
     @Autowired
     private UsersRepo usersRepo;
     @Autowired
-    private EntityMapper<Card, Card> mapper;
-    @Autowired
-    private PageableCreator pageableCreator;
+    private ModelMapper modelMapper;
 
     @Override
     public List<Card> getAllForUser(UUID userId)  {
@@ -49,7 +47,8 @@ public class CardService implements ICardService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         Card exist = cardsRepo.findCardByIdAndDeletedFalse(card.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return cardsRepo.save(mapper.toEntity(card, exist));
+        modelMapper.map(card, exist);
+        return cardsRepo.save(exist);
     }
 
     @Override
@@ -67,7 +66,13 @@ public class CardService implements ICardService {
 
     @Override
     public List<Card> getAll(Map<String, String> params) {
-        Page<Card> page = cardsRepo.findAll(getExample(params),pageableCreator.getPageable(params));
+        Page<Card> page;
+        try {
+            page = cardsRepo.findAll(getExample(params), PageableCreator.getPageable(params));
+        }
+        catch (Exception e){
+           throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         return new ArrayList<>(page.getContent());
     }
 
@@ -81,7 +86,7 @@ public class CardService implements ICardService {
 
         Card card = new Card();
         card.setId(params.get("id") != null ? Long.parseLong(params.get("id")):null);
-        card.setUser(params.get("userId") != null ? usersRepo.findById(UUID.fromString(params.get("userId"))).orElse(null):null);
+        card.setUser(params.get("userId") != null ? usersRepo.getOne(UUID.fromString(params.get("userId"))):null);
         card.setBindDate(params.get("bindDate") != null ? LocalDateTime.parse(params.get("bindDate"), formatter):null);
         card.setMaskedNumber(params.get("maskedNumber"));
         card.setAquireUrl(params.get("aquireUrl"));
