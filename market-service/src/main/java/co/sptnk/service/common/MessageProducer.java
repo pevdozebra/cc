@@ -5,7 +5,7 @@ import co.sptnk.lib.common.eventlog.EventCode;
 import co.sptnk.lib.common.eventlog.EventLogDTO;
 import co.sptnk.lib.common.eventlog.EventType;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 @Component
 public class MessageProducer {
 
-    private final AsyncRabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-    public MessageProducer(AsyncRabbitTemplate rabbitTemplate) {
+    public MessageProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
