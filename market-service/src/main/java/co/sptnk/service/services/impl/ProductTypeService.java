@@ -3,11 +3,11 @@ package co.sptnk.service.services.impl;
 import co.sptnk.lib.common.eventlog.EventCode;
 import co.sptnk.lib.common.eventlog.EventType;
 import co.sptnk.service.common.MessageProducer;
-import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.ProductType;
 import co.sptnk.service.repositories.ProductTypeRepo;
 import co.sptnk.service.services.IProductTypeService;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class ProductTypeService implements IProductTypeService {
 
     @Autowired
-    private EntityMapper<ProductType, ProductType> mapper;
+    private ModelMapper mapper;
 
     private final ProductTypeRepo productTypeRepo;
 
@@ -59,7 +59,8 @@ public class ProductTypeService implements IProductTypeService {
                 EventType.INFO,
                 EventCode.PRODUCT_TYPE_EDIT.getDescription(exist.getId())
         );
-        return productTypeRepo.save(mapper.toEntity(productType, exist));
+        mapper.map(productType, exist);
+        return productTypeRepo.save(exist);
     }
 
     @Transactional

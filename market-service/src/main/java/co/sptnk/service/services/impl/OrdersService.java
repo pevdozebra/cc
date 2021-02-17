@@ -3,11 +3,11 @@ package co.sptnk.service.services.impl;
 import co.sptnk.lib.common.eventlog.EventCode;
 import co.sptnk.lib.common.eventlog.EventType;
 import co.sptnk.service.common.MessageProducer;
-import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.Order;
 import co.sptnk.service.repositories.OrdersRepo;
 import co.sptnk.service.services.IOrdersService;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class OrdersService implements IOrdersService {
 
     @Autowired
-    private EntityMapper<Order, Order> mapper;
+    private ModelMapper mapper;
 
     private final OrdersRepo ordersRepo;
 
@@ -60,7 +60,8 @@ public class OrdersService implements IOrdersService {
                 EventType.INFO,
                 EventCode.ORDER_EDIT.getDescription(exist.getId())
         );
-        return ordersRepo.save(mapper.toEntity(order, exist));
+        mapper.map(order, exist);
+        return ordersRepo.save(exist);
     }
 
     @Transactional

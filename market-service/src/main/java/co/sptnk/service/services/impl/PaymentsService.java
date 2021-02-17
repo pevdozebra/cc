@@ -3,11 +3,11 @@ package co.sptnk.service.services.impl;
 import co.sptnk.lib.common.eventlog.EventCode;
 import co.sptnk.lib.common.eventlog.EventType;
 import co.sptnk.service.common.MessageProducer;
-import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.Payment;
 import co.sptnk.service.repositories.PaymentsRepo;
 import co.sptnk.service.services.IPaymentsService;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class PaymentsService implements IPaymentsService {
 
     @Autowired
-    private EntityMapper<Payment, Payment> mapper;
+    private ModelMapper mapper;
 
     private final PaymentsRepo paymentsRepo;
 
@@ -59,7 +59,8 @@ public class PaymentsService implements IPaymentsService {
                 EventType.INFO,
                 EventCode.PAYMENT_EDIT.getDescription(exist.getId())
         );
-        return paymentsRepo.save(mapper.toEntity(payment, exist));
+        mapper.map(payment, exist);
+        return paymentsRepo.save(exist);
     }
 
     @Transactional
