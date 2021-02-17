@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EntityMapper<Obj, Entity> {
+public class EntityMapper<OBJ, ENTITY> {
 
     @Autowired
     private ModelMapper modelMapper;
@@ -17,7 +17,7 @@ public class EntityMapper<Obj, Entity> {
      * @param entity - найденная сущность под объект
      * @return - обновленная сущность
      */
-    public Entity toEntity(Obj object, Entity entity) {
+    public ENTITY toEntity(OBJ object, ENTITY entity) {
         if (object != null && entity != null) {
             modelMapper.map(object, entity);
         }

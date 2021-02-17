@@ -13,13 +13,13 @@ import java.util.Map;
 
 /**
  * Базовый контроллера для CRUD операции
- * @param <Entity> - сущность БД
+ * @param <ENTITY> - сущность БД
  */
-public abstract class AbstractCrudController<Entity, ID> {
+public abstract class AbstractCrudController<ENTITY, ID> {
 
-    private AbstractCrudService<Entity, ID> service;
+    private final AbstractCrudService<ENTITY, ID> service;
 
-    public AbstractCrudController(AbstractCrudService<Entity, ID> service) {
+    public AbstractCrudController(AbstractCrudService<ENTITY, ID> service) {
         this.service = service;
     }
 
@@ -35,7 +35,7 @@ public abstract class AbstractCrudController<Entity, ID> {
             @ApiResponse(responseCode = "400", description = "Объект уже существует")
     }
     )
-    public ResponseEntity<Entity> add(@RequestBody Entity entity) {
+    public ResponseEntity<ENTITY> add(@RequestBody ENTITY entity) {
         return new ResponseEntity<>(service.add(entity), HttpStatus.CREATED);
     }
 
@@ -50,7 +50,7 @@ public abstract class AbstractCrudController<Entity, ID> {
             @ApiResponse(responseCode = "400", description = "Объект не существует")
     }
     )
-    public ResponseEntity<Entity> update(@RequestBody Entity entity) {
+    public ResponseEntity<ENTITY> update(@RequestBody ENTITY entity) {
         return new ResponseEntity<>(service.update(entity),
                 HttpStatus.OK);
     }
@@ -69,7 +69,7 @@ public abstract class AbstractCrudController<Entity, ID> {
             @ApiResponse(responseCode = "404", description = "Объект не найден")
     }
     )
-    public ResponseEntity<Entity> getOneById(@PathVariable("id") ID id) {
+    public ResponseEntity<ENTITY> getOneById(@PathVariable("id") ID id) {
         return new ResponseEntity<>(service.getOneById(id),
                 HttpStatus.OK);
     }
@@ -86,7 +86,7 @@ public abstract class AbstractCrudController<Entity, ID> {
             @ApiResponse(responseCode = "404", description = "Объект не найден")
     }
     )
-    public ResponseEntity<Entity> delete(@PathVariable("id") ID id) {
+    public ResponseEntity<ENTITY> delete(@PathVariable("id") ID id) {
         service.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
