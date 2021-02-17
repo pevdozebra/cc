@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>gateway-service</module>
         <module>market-service</module>
         <module>logging-service</module>
         <module>spring-microservice-lib</module>

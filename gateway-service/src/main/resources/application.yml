@@ -1,0 +1,44 @@
+server:
+  port: 8080
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+spring:
+  application:
+    name: '@name@'
+  profiles:
+    active: '@spring.profiles.active@'
+  cloud:
+    gateway:
+      routes:
+        - id: logging-service
+          uri: lb://logging-service
+          predicates:
+            - Path=/eventlog/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/cards/**, /interests/**, /ratings/**, /verification/**, /users/**
+        - id: market-service
+          uri: lb://market-service
+          predicates:
+            - Path=/products/**, /orders/**, /payment/**, /producttype/**, /market/**
+          filters:
+            - RewritePath=/(?<path>.*)/v3/api-docs, /v3/api-docs
+        - id: openapi
+          uri: lb://gateway-service
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+logging:
+  level:
+    web: trace
+springdoc:
+  swagger-ui:
+    urls:
+      - name: market
+      - name: users
+      - name: eventlog
+
