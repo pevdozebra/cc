@@ -1,5 +1,8 @@
 package co.sptnk.service.services.impl;
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.common.MessageProducer;
 import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.ProductType;
 import co.sptnk.service.repositories.ProductTypeRepo;
@@ -19,10 +22,16 @@ import java.util.Map;
 public class ProductTypeService implements IProductTypeService {
 
     @Autowired
-    private ProductTypeRepo productTypeRepo;
-
-    @Autowired
     private EntityMapper<ProductType, ProductType> mapper;
+
+    private final ProductTypeRepo productTypeRepo;
+
+    private final MessageProducer messageProducer;
+
+    public ProductTypeService(ProductTypeRepo repo, MessageProducer producer) {
+        this.productTypeRepo = repo;
+        this.messageProducer = producer;
+    }
 
     @Override
     public ProductType add(ProductType productType) {
@@ -30,6 +39,11 @@ public class ProductTypeService implements IProductTypeService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         productType.setDeprecated(false);
+        messageProducer.sendLogMessage(
+                EventCode.PRODUCT_TYPE_CREATE,
+                EventType.INFO,
+                EventCode.PRODUCT_TYPE_CREATE.getDescription()
+        );
         return productTypeRepo.save(productType);
     }
 
@@ -40,6 +54,11 @@ public class ProductTypeService implements IProductTypeService {
         }
         ProductType exist = productTypeRepo.findProductTypeByIdAndDeprecatedFalse(productType.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        messageProducer.sendLogMessage(
+                EventCode.PRODUCT_TYPE_EDIT,
+                EventType.INFO,
+                EventCode.PRODUCT_TYPE_EDIT.getDescription(exist.getId())
+        );
         return productTypeRepo.save(mapper.toEntity(productType, exist));
     }
 
@@ -53,6 +72,11 @@ public class ProductTypeService implements IProductTypeService {
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        messageProducer.sendLogMessage(
+                EventCode.PRODUCT_TYPE_DELETE,
+                EventType.INFO,
+                EventCode.PRODUCT_TYPE_DELETE.getDescription(id)
+        );
         type.setDeprecated(true);
     }
 

@@ -1,5 +1,8 @@
 package co.sptnk.service.services.impl;
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.common.MessageProducer;
 import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.Order;
 import co.sptnk.service.repositories.OrdersRepo;
@@ -12,31 +15,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Service
 public class OrdersService implements IOrdersService {
 
     @Autowired
-    private OrdersRepo ordersRepo;
-
-    @Autowired
     private EntityMapper<Order, Order> mapper;
 
-    public List<Order> getAllNotDeleted() {
-        return new ArrayList<>(ordersRepo.findAllByDeletedFalse());
-    }
+    private final OrdersRepo ordersRepo;
 
-    public List<Order> getCustomerList(UUID uuid) {
-        return new ArrayList<>(ordersRepo.findAllByCustomerIdAndDeletedFalse(uuid));
-    }
+    private final MessageProducer messageProducer;
 
-    public List<Order> getPerformerList(UUID uuid) {
-        return new ArrayList<>(ordersRepo.findAllByPerformerIdAndDeletedFalse(uuid));
+    public OrdersService(OrdersRepo ordersRepo, MessageProducer messageProducer) {
+        this.ordersRepo = ordersRepo;
+        this.messageProducer = messageProducer;
     }
 
     @Override
@@ -45,6 +40,11 @@ public class OrdersService implements IOrdersService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         order.setDeleted(false);
+        messageProducer.sendLogMessage(
+                EventCode.ORDER_CREATE,
+                EventType.INFO,
+                EventCode.ORDER_CREATE.getDescription()
+        );
         return ordersRepo.save(order);
     }
 
@@ -55,6 +55,11 @@ public class OrdersService implements IOrdersService {
         }
         Order exist = ordersRepo.findOrderByIdAndDeletedFalse(order.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        messageProducer.sendLogMessage(
+                EventCode.ORDER_EDIT,
+                EventType.INFO,
+                EventCode.ORDER_EDIT.getDescription(exist.getId())
+        );
         return ordersRepo.save(mapper.toEntity(order, exist));
     }
 
@@ -68,6 +73,11 @@ public class OrdersService implements IOrdersService {
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        messageProducer.sendLogMessage(
+                EventCode.ORDER_DELETE,
+                EventType.INFO,
+                EventCode.ORDER_DELETE.getDescription(id)
+        );
         order.setDeleted(true);
     }
 

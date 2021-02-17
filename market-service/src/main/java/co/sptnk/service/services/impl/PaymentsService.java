@@ -1,5 +1,8 @@
 package co.sptnk.service.services.impl;
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.common.MessageProducer;
 import co.sptnk.service.mappers.EntityMapper;
 import co.sptnk.service.model.Payment;
 import co.sptnk.service.repositories.PaymentsRepo;
@@ -19,10 +22,16 @@ import java.util.Map;
 public class PaymentsService implements IPaymentsService {
 
     @Autowired
-    private PaymentsRepo paymentsRepo;
-
-    @Autowired
     private EntityMapper<Payment, Payment> mapper;
+
+    private final PaymentsRepo paymentsRepo;
+
+    private final MessageProducer messageProducer;
+
+    public PaymentsService(PaymentsRepo paymentsRepo, MessageProducer messageProducer) {
+        this.messageProducer = messageProducer;
+        this.paymentsRepo = paymentsRepo;
+    }
 
     @Override
     public Payment add(Payment payment) {
@@ -30,6 +39,11 @@ public class PaymentsService implements IPaymentsService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         payment.setDeleted(false);
+        messageProducer.sendLogMessage(
+                EventCode.PAYMENT_CREATE,
+                EventType.INFO,
+                EventCode.PAYMENT_CREATE.getDescription()
+        );
         return paymentsRepo.save(payment);
     }
 
@@ -40,6 +54,11 @@ public class PaymentsService implements IPaymentsService {
         }
         Payment exist = paymentsRepo.findPaymentByIdAndDeletedFalse(payment.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        messageProducer.sendLogMessage(
+                EventCode.PAYMENT_EDIT,
+                EventType.INFO,
+                EventCode.PAYMENT_EDIT.getDescription(exist.getId())
+        );
         return paymentsRepo.save(mapper.toEntity(payment, exist));
     }
 
@@ -53,6 +72,11 @@ public class PaymentsService implements IPaymentsService {
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        messageProducer.sendLogMessage(
+                EventCode.PAYMENT_DELETE,
+                EventType.INFO,
+                EventCode.PAYMENT_DELETE.getDescription(id)
+        );
         payment.setDeleted(true);
     }
 
