@@ -9,4 +9,4 @@ spring:
     name: '@name@'
   profiles:
     active: '@spring.profiles.active@'
-ra
+

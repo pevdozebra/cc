@@ -1,13 +1,17 @@
 server:
   port: 8082
 spring:
-
   datasource:
     platform: postgres
     username: sa
     password: sa
     url: jdbc:postgresql://localhost:5432/markets
     driver-class-name: org.postgresql.Driver
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: mqsa
+    password: sa
 eureka:
   instance:
     instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
