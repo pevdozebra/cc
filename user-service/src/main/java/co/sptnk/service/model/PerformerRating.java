@@ -1,9 +1,10 @@
 package co.sptnk.service.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
@@ -24,6 +25,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table(name="performer_rating")
+@DynamicInsert
+@DynamicUpdate
 public class PerformerRating extends RepresentationModel<PerformerRating> {
 
     /**
@@ -77,7 +80,6 @@ public class PerformerRating extends RepresentationModel<PerformerRating> {
      * Флаг удаления записи (фактическое удаление не происходит)
      */
     @Column(name = "deleted")
-    @JsonIgnore
-    private Boolean deleted = false;
+    private Boolean deleted;
 
 }

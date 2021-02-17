@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
@@ -24,6 +26,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name="interest")
+@DynamicInsert
+@DynamicUpdate
 public class Interest extends RepresentationModel<Interest> {
 
     /**
@@ -51,8 +55,7 @@ public class Interest extends RepresentationModel<Interest> {
      * Флаг удаления записи (фактическое удаление не происходит)
      */
     @Column(name = "deleted")
-    @JsonIgnore
-    private Boolean deleted = false;
+    private Boolean deleted;
 
     @ManyToMany
     @JoinTable (name="rel_user_interest",

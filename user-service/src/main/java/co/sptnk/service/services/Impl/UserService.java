@@ -1,10 +1,9 @@
 package co.sptnk.service.services.Impl;
 
 import co.sptnk.service.common.PageableCreator;
-import co.sptnk.service.model.*;
-import co.sptnk.service.repositories.CardsRepo;
+import co.sptnk.service.model.User;
+import co.sptnk.service.model.Interest;
 import co.sptnk.service.repositories.InterestRepo;
-import co.sptnk.service.repositories.PerformerRatingsRepo;
 import co.sptnk.service.repositories.UsersRepo;
 import co.sptnk.service.services.IUserService;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -39,10 +38,6 @@ public class UserService implements IUserService {
     @Autowired
     private InterestRepo interestRepo;
     @Autowired
-    private CardsRepo cardsRepo;
-    @Autowired
-    private PerformerRatingsRepo performerRatingsRepo;
-    @Autowired
     private Environment environment;
     @Autowired
     private ModelMapper modelMapper;
@@ -58,29 +53,22 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public User update(User user) {
         if (user.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        user.setDeleted(null);
         User exist = usersRepo.findUserByIdAndDeletedFalse(user.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        updateUserInKeyclock(user);
         modelMapper.map(user, exist);
-        return usersRepo.save(exist);
+        updateUserInKeyclock(exist);
+        return exist;
     }
 
     @Override
     @Transactional
     public void delete(UUID uuid) {
         User user = usersRepo.findById(uuid).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        List<Card> cards = (List<Card>) cardsRepo.findCardByUserAndDeletedFalse(user);
-        cards.forEach(card -> {
-            card.setDeleted(true);
-        });
-        List<PerformerRating> ratings = (List<PerformerRating>) performerRatingsRepo.findPerformerRatingByRatedAndDeletedFalse(user);
-        ratings.forEach(rating -> {
-            rating.setDeleted(true);
-        });
-        user.getInterests().clear();
         blockUserInKeyclock(user);
         user.setDeleted(true);
     }

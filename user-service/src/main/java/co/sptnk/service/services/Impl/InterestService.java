@@ -42,26 +42,26 @@ public class InterestService implements IInterestService {
         if (interest.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        interest.setDeleted(null);
         return interestRepo.save(interest);
     }
 
     @Override
+    @Transactional
     public Interest update(Interest interest){
         if (interest.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        interest.setDeleted(null);
         Interest exist = interestRepo.findInterestByIdAndDeletedFalse(interest.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(interest, exist);
-        return interestRepo.save(exist);
+        return exist;
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
        Interest interest = interestRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-       interestRepo.findAllByParent(interest).forEach(subInterest -> {
-               subInterest.setDeleted(true);
-        });
        interest.setDeleted(true);
     }
 

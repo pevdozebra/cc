@@ -15,7 +15,7 @@
             birth_date date,
             email text,
             blocked boolean,
-            deleted boolean DEFAULT false,
+            deleted boolean NOT NULL DEFAULT false,
             CONSTRAINT pk_users PRIMARY KEY (id)
             );
 
@@ -76,7 +76,7 @@
             masked_number text,
             aquire_url text,
             archived boolean,
-            deleted boolean DEFAULT false,
+            deleted boolean NOT NULL DEFAULT false,
 
             CONSTRAINT pk_card PRIMARY KEY (id),
             CONSTRAINT fk_card_user FOREIGN KEY (user_id)

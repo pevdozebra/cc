@@ -1,7 +1,6 @@
 package co.sptnk.service.services.Impl;
 
 import co.sptnk.service.common.PageableCreator;
-import co.sptnk.service.model.PerformerRating;
 import co.sptnk.service.model.PerformerVerification;
 import co.sptnk.service.repositories.PerformerVerificationsRepo;
 import co.sptnk.service.repositories.UsersRepo;
@@ -37,18 +36,21 @@ public class PerformerVerificationService implements IPerformerVerificationServi
         if (performerVerification.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        performerVerification.setDeleted(null);
         return performerVerificationsRepo.save(performerVerification);
     }
 
     @Override
+    @Transactional
     public PerformerVerification update(PerformerVerification performerVerification) {
         if (performerVerification.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        performerVerification.setDeleted(null);
         PerformerVerification exist = performerVerificationsRepo.findPerformerVerificationByIdAndDeletedFalse(performerVerification.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(performerVerification, exist);
-        return performerVerificationsRepo.save(exist);
+        return exist;
     }
 
     @Override

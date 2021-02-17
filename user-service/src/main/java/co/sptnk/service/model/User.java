@@ -1,9 +1,10 @@
 package co.sptnk.service.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -23,8 +24,9 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name="users")
+@DynamicInsert
+@DynamicUpdate
 public class User extends RepresentationModel<User> {
-
     /**
      * Индектификатор пользователя
      */
@@ -65,14 +67,13 @@ public class User extends RepresentationModel<User> {
      * Флаг блокировки
      */
     @Column(name = "blocked")
-    private Boolean blocked = false;
+    private Boolean blocked;
 
     /**
      * Флаг удаления записи (фактическое удаление не происходит)
      */
     @Column(name = "deleted")
-    @JsonIgnore
-    private Boolean deleted = false;
+    private Boolean deleted;
 
 
     @ManyToMany
@@ -89,20 +90,4 @@ public class User extends RepresentationModel<User> {
         this.email = userRepresentation.getEmail();
         this.blocked = !userRepresentation.isEnabled();
     }
-
-//    @OneToMany(mappedBy = "rated", fetch=FetchType.LAZY)
-//    public List<PerformerRating> ratings;
-//
-//    @OneToMany(mappedBy = "rater", fetch=FetchType.LAZY)
-//    public List<PerformerRating> postedRatings;
-//
-//    @OneToMany(mappedBy = "user", fetch=FetchType.LAZY)
-//    public List<Card> cards;
-//
-//    @OneToOne(mappedBy = "performer", fetch = FetchType.LAZY)
-//    private PerformerVerification verification;
-//
-//    @OneToMany(mappedBy = "verifier", fetch=FetchType.LAZY)
-//    public List<PerformerVerification> postedVerifications;
-
 }

@@ -1,9 +1,10 @@
 package co.sptnk.service.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
@@ -24,6 +25,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table(name="performer_verification")
+@DynamicInsert
+@DynamicUpdate
 public class PerformerVerification extends RepresentationModel<PerformerVerification> {
     /**
      * Индектификатор верификации
@@ -76,6 +79,5 @@ public class PerformerVerification extends RepresentationModel<PerformerVerifica
      * Флаг удаления записи (фактическое удаление не происходит)
      */
     @Column(name = "deleted")
-    @JsonIgnore
-    private Boolean deleted = false;
+    private Boolean deleted;
 }

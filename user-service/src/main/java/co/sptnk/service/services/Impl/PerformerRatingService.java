@@ -1,7 +1,6 @@
 package co.sptnk.service.services.Impl;
 
 import co.sptnk.service.common.PageableCreator;
-import co.sptnk.service.model.Interest;
 import co.sptnk.service.model.PerformerRating;
 import co.sptnk.service.model.User;
 import co.sptnk.service.repositories.PerformerRatingsRepo;
@@ -53,18 +52,21 @@ public class PerformerRatingService implements IPerformerRatingService {
         if (rated == null || rater == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        performerRating.setDeleted(null);
         return performerRatingsRepo.save(performerRating);
     }
 
     @Override
+    @Transactional
     public PerformerRating update(PerformerRating performerRating) {
         if (performerRating.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        performerRating.setDeleted(null);
         PerformerRating exist = performerRatingsRepo.findPerformerRatingByIdAndDeletedFalse(performerRating.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(performerRating, exist);
-        return performerRatingsRepo.save(exist);
+        return exist;
     }
 
     @Override

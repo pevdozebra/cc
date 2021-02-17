@@ -38,17 +38,20 @@ public class CardService implements ICardService {
         if (card.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        card.setDeleted(null);
         return cardsRepo.save(card);
     }
 
     @Override
+    @Transactional
     public Card update(Card card) {
         if (card.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        card.setDeleted(null);
         Card exist = cardsRepo.findCardByIdAndDeletedFalse(card.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(card, exist);
-        return cardsRepo.save(exist);
+        return exist;
     }
 
     @Override
