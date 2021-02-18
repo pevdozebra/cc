@@ -1,0 +1,18 @@
+logging:
+  level:
+    web: trace
+
+spring:
+  data:
+    mongodb:
+      authentication-database: admin
+      username: sa
+      password: sa
+      database: logging
+      port: 27017
+      host: localhost
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: mqsa
+    password: sa

@@ -1,12 +1,13 @@
 server:
-  port: 8083
+  port: ${LOGGING_SERVICE_PORT:0}
 
-logging:
-  level:
-    web: trace
 spring:
   application:
     name: '@name@'
   profiles:
     active: '@spring.profiles.active@'
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${REGISTRY_SERVICE_HOST:localhost}:${RGISTRY_SERVICE_PORT:8761}/eureka/

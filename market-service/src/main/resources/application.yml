@@ -1,6 +1,6 @@
-logging:
-  level:
-    web: trace
+server:
+  port: ${MARKET_SERVICE_PORT:0}
+
 spring:
   liquibase:
     enabled: false
@@ -12,3 +12,9 @@ spring:
   application:
     name: '@name@'
 
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+  client:
+    serviceUrl:
+      defaultZone: http://${REGISTRY_SERVICE_HOST:localhost}:${RGISTRY_SERVICE_PORT:8761}/eureka/

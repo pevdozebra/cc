@@ -12,7 +12,3 @@ spring:
     port: 5672
     username: mqsa
     password: sa
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/

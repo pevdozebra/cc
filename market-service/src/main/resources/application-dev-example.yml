@@ -1,0 +1,12 @@
+logging:
+  level:
+    web: trace
+
+spring:
+  datasource:
+    platform: postgres
+    username: sa
+    password: sa
+    url: jdbc:postgresql://localhost:5432/markets
+    driver-class-name: org.postgresql.Driver
+
