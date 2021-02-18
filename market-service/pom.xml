@@ -158,6 +158,7 @@
             <id>staging</id>
             <properties>
                 <spring.profiles.active>staging</spring.profiles.active>
+                <skipLiquibaseRun>true</skipLiquibaseRun>
                 <profile.propertyFile>src/main/resources/db/staging.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
@@ -168,6 +169,7 @@
             <id>prod</id>
             <properties>
                 <spring.profiles.active>prod</spring.profiles.active>
+                <skipLiquibaseRun>true</skipLiquibaseRun>
                 <profile.propertyFile>src/main/resources/db/prod.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>

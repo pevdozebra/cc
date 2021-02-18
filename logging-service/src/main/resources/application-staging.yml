@@ -1,5 +1,7 @@
-server:
-  port: 8083
+logging:
+  level:
+    web: debug
+
 spring:
   data:
     mongodb:
@@ -9,7 +11,3 @@ spring:
       database: logging
       port: 27017
       host: localhost
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
