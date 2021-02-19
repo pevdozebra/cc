@@ -1,10 +1,13 @@
 package co.sptnk.service.market.services.impl;
 
-import co.sptnk.service.market.mappers.EntityMapper;
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.market.common.MessageProducer;
 import co.sptnk.service.market.model.Payment;
 import co.sptnk.service.market.repositories.PaymentsRepo;
 import co.sptnk.service.market.services.IPaymentsService;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,16 +22,28 @@ import java.util.Map;
 public class PaymentsService implements IPaymentsService {
 
     @Autowired
-    private PaymentsRepo paymentsRepo;
+    private ModelMapper mapper;
 
-    @Autowired
-    private EntityMapper<Payment, Payment> mapper;
+    private final PaymentsRepo paymentsRepo;
+
+    private final MessageProducer messageProducer;
+
+    public PaymentsService(PaymentsRepo paymentsRepo, MessageProducer messageProducer) {
+        this.messageProducer = messageProducer;
+        this.paymentsRepo = paymentsRepo;
+    }
 
     @Override
     public Payment add(Payment payment) {
         if (payment.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        payment.setDeleted(false);
+        messageProducer.sendLogMessage(
+                EventCode.PAYMENT_CREATE,
+                EventType.INFO,
+                EventCode.PAYMENT_CREATE.getDescription()
+        );
         return paymentsRepo.save(payment);
     }
 
@@ -39,7 +54,13 @@ public class PaymentsService implements IPaymentsService {
         }
         Payment exist = paymentsRepo.findPaymentByIdAndDeletedFalse(payment.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return paymentsRepo.save(mapper.toEntity(payment, exist));
+        messageProducer.sendLogMessage(
+                EventCode.PAYMENT_EDIT,
+                EventType.INFO,
+                EventCode.PAYMENT_EDIT.getDescription(exist.getId())
+        );
+        mapper.map(payment, exist);
+        return paymentsRepo.save(exist);
     }
 
     @Transactional
@@ -52,6 +73,11 @@ public class PaymentsService implements IPaymentsService {
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        messageProducer.sendLogMessage(
+                EventCode.PAYMENT_DELETE,
+                EventType.INFO,
+                EventCode.PAYMENT_DELETE.getDescription(id)
+        );
         payment.setDeleted(true);
     }
 

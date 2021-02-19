@@ -1,41 +1,37 @@
 package co.sptnk.service.market.services.impl;
 
-import co.sptnk.service.market.mappers.EntityMapper;
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.market.common.MessageProducer;
 import co.sptnk.service.market.model.Order;
 import co.sptnk.service.market.repositories.OrdersRepo;
 import co.sptnk.service.market.services.IOrdersService;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Service
 public class OrdersService implements IOrdersService {
 
     @Autowired
-    private OrdersRepo ordersRepo;
+    private ModelMapper mapper;
 
-    @Autowired
-    private EntityMapper<Order, Order> mapper;
+    private final OrdersRepo ordersRepo;
 
-    public List<Order> getAllNotDeleted() {
-        return new ArrayList<>(ordersRepo.findAllByDeletedFalse());
-    }
+    private final MessageProducer messageProducer;
 
-    public List<Order> getCustomerList(UUID uuid) {
-        return new ArrayList<>(ordersRepo.findAllByCustomerIdAndDeletedFalse(uuid));
-    }
-
-    public List<Order> getPerformerList(UUID uuid) {
-        return new ArrayList<>(ordersRepo.findAllByPerformerIdAndDeletedFalse(uuid));
+    public OrdersService(OrdersRepo ordersRepo, MessageProducer messageProducer) {
+        this.ordersRepo = ordersRepo;
+        this.messageProducer = messageProducer;
     }
 
     @Override
@@ -43,6 +39,12 @@ public class OrdersService implements IOrdersService {
         if (order.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        order.setDeleted(false);
+        messageProducer.sendLogMessage(
+                EventCode.ORDER_CREATE,
+                EventType.INFO,
+                EventCode.ORDER_CREATE.getDescription()
+        );
         return ordersRepo.save(order);
     }
 
@@ -53,7 +55,13 @@ public class OrdersService implements IOrdersService {
         }
         Order exist = ordersRepo.findOrderByIdAndDeletedFalse(order.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return ordersRepo.save(mapper.toEntity(order, exist));
+        messageProducer.sendLogMessage(
+                EventCode.ORDER_EDIT,
+                EventType.INFO,
+                EventCode.ORDER_EDIT.getDescription(exist.getId())
+        );
+        mapper.map(order, exist);
+        return ordersRepo.save(exist);
     }
 
     @Transactional
@@ -66,6 +74,11 @@ public class OrdersService implements IOrdersService {
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        messageProducer.sendLogMessage(
+                EventCode.ORDER_DELETE,
+                EventType.INFO,
+                EventCode.ORDER_DELETE.getDescription(id)
+        );
         order.setDeleted(true);
     }
 
@@ -77,6 +90,8 @@ public class OrdersService implements IOrdersService {
 
     @Override
     public List<Order> getAll(Map<String, String> params) {
+        Order order = new Order();
+        Example.of(order).getMatcher().withIgnoreNullValues();
         return ordersRepo.findAll();
     }
 }

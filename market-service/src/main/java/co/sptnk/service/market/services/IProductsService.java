@@ -15,4 +15,5 @@ public interface IProductsService extends AbstractCrudService<Product, Long> {
      */
     List<Product> getAllForUser(UUID performerUuid);
 
+
 }

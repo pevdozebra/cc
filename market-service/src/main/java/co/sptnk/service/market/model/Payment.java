@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -20,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "payments")
-public class Payment extends RepresentationModel<Payment> {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Payment")
