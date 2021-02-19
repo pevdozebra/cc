@@ -1,3 +1,5 @@
+server:
+  port: 8082
 spring:
   datasource:
     platform: postgres
@@ -5,3 +7,8 @@ spring:
     password: sa
     url: jdbc:postgresql://localhost:5432/markets
     driver-class-name: org.postgresql.Driver
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: mqsa
+    password: sa

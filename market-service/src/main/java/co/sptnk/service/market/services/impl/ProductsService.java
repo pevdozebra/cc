@@ -1,11 +1,17 @@
 package co.sptnk.service.market.services.impl;
 
-import co.sptnk.service.market.mappers.EntityMapper;
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.market.common.MessageProducer;
 import co.sptnk.service.market.model.Product;
+import co.sptnk.service.market.ref.ProductStatus;
 import co.sptnk.service.market.repositories.ProductsRepo;
+import co.sptnk.service.market.search.ProductSearchSample;
 import co.sptnk.service.market.services.IProductsService;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +27,16 @@ import java.util.UUID;
 public class ProductsService implements IProductsService {
 
     @Autowired
-    private ProductsRepo productsRepo;
+    private ModelMapper modelMapper;
 
-    @Autowired
-    private EntityMapper<Product, Product> mapper;
+    private final ProductsRepo productsRepo;
+
+    private final MessageProducer messageProducer;
+
+    public ProductsService(ProductsRepo productsRepo, MessageProducer producer) {
+        this.productsRepo = productsRepo;
+        this.messageProducer = producer;
+    }
 
     public List<Product> getAllForUser(UUID uuid) {
         return new ArrayList<>(productsRepo.findAllByPerformerIdAndActiveTrueAndDeletedFalse(uuid));
@@ -34,6 +46,14 @@ public class ProductsService implements IProductsService {
         if (product.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        product.setDeleted(false);
+        product.setActive(true);
+        product.setStatus(ProductStatus.ACTIVE);
+        messageProducer.sendLogMessage(
+                EventCode.PRODUCT_CREATE,
+                EventType.INFO,
+                EventCode.PRODUCT_CREATE.getDescription()
+        );
         return productsRepo.save(product);
     }
 
@@ -44,7 +64,13 @@ public class ProductsService implements IProductsService {
         }
         Product exist = productsRepo.findProductByIdAndDeletedFalse(product.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return productsRepo.save(mapper.toEntity(product, exist));
+        messageProducer.sendLogMessage(
+                EventCode.PRODUCT_EDIT,
+                EventType.INFO,
+                EventCode.PRODUCT_EDIT.getDescription(exist.getId())
+        );
+        modelMapper.map(product, exist);
+        return productsRepo.save(exist);
     }
 
     @Override
@@ -54,8 +80,9 @@ public class ProductsService implements IProductsService {
     }
 
     @Override
-    public List<Product> getAll(Map<String, String> params) {
-        return productsRepo.findAll();
+    public Page<Product> getAll(Map<String, String> params) {
+        ProductSearchSample search = ProductSearchSample.parse(params);
+        return productsRepo.findAll(search.getSample(), search.getPageable());
     }
 
 
@@ -69,6 +96,11 @@ public class ProductsService implements IProductsService {
             log.error(error);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        messageProducer.sendLogMessage(
+                EventCode.PRODUCT_DELETE,
+                EventType.INFO,
+                EventCode.PRODUCT_DELETE.getDescription(id)
+        );
         product.setDeleted(true);
     }
 

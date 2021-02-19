@@ -1,11 +1,12 @@
 package co.sptnk.service.logging.services;
 
 import co.sptnk.service.logging.model.EventLog;
-import reactor.core.publisher.Flux;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IEventLogService {
 
-    Flux<EventLog> getAll(Map<String, String> params);
+    List<EventLog> getAll(Map<String, String> params);
+    EventLog save(EventLog eventLog);
 }

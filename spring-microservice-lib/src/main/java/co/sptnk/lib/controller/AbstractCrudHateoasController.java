@@ -19,9 +19,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * Базовый контроллера для CRUD операции с поддержкой HATEOAS
- * @param <Entity> - сущность БД
+ * @param <ENTITY> - сущность БД
  */
-public abstract class AbstractCrudHateoasController<Entity extends RepresentationModel<Entity>, ID> {
+public abstract class AbstractCrudHateoasController<ENTITY extends RepresentationModel<ENTITY>, ID> {
 
     /**
      * Получение продукта по идентификатору
@@ -37,7 +37,7 @@ public abstract class AbstractCrudHateoasController<Entity extends Representatio
             @ApiResponse(responseCode = "404", description = "Объект не найден")
     }
     )
-    public abstract ResponseEntity<Entity> getOneById(@PathVariable("id") ID id);
+    public abstract ResponseEntity<ENTITY> getOneById(@PathVariable("id") ID id);
 
     /**
      * Добавление объекта
@@ -51,7 +51,7 @@ public abstract class AbstractCrudHateoasController<Entity extends Representatio
             @ApiResponse(responseCode = "400", description = "Объект уже существует")
     }
     )
-    public abstract ResponseEntity<Entity> add(@RequestBody Entity entity);
+    public abstract ResponseEntity<ENTITY> add(@RequestBody ENTITY entity);
 
     /**
      * Обновление объекта
@@ -64,7 +64,7 @@ public abstract class AbstractCrudHateoasController<Entity extends Representatio
             @ApiResponse(responseCode = "400", description = "Объект не существует")
     }
     )
-    public abstract ResponseEntity<Entity> update(@RequestBody Entity entity);
+    public abstract ResponseEntity<ENTITY> update(@RequestBody ENTITY entity);
 
     /**
      * Удаление объекта по идентификатору
@@ -78,7 +78,7 @@ public abstract class AbstractCrudHateoasController<Entity extends Representatio
             @ApiResponse(responseCode = "404", description = "Объект не найден")
     }
     )
-    public abstract ResponseEntity<Entity> delete(@PathVariable("id") ID id);
+    public abstract ResponseEntity<ENTITY> delete(@PathVariable("id") ID id);
 
 
     @GetMapping
@@ -88,9 +88,9 @@ public abstract class AbstractCrudHateoasController<Entity extends Representatio
      * В реализации вернуть this.getClass()
      * @return класс контроллера
      */
-    protected abstract Class<? extends AbstractCrudHateoasController<Entity, ID>> getSelfClass();
+    protected abstract Class<? extends AbstractCrudHateoasController<ENTITY, ID>> getSelfClass();
 
-    protected Entity createLinks(Entity entity, ID id, AllowedLinksMethods method) {
+    protected ENTITY createLinks(ENTITY entity, ID id, AllowedLinksMethods method) {
         Map<AllowedLinksMethods, Link> links = new HashMap<AllowedLinksMethods, Link>(){{
             put(AllowedLinksMethods.POST,
                     linkTo(methodOn(getSelfClass()).add(entity)).withSelfRel().withName("add").withType(HttpMethod.POST.name()));
