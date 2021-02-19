@@ -18,7 +18,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +29,7 @@ import java.util.UUID;
 @Table(name="users")
 @DynamicInsert
 @DynamicUpdate
-public class User extends RepresentationModel<User> implements Serializable {
+public class User extends RepresentationModel<User> {
     /**
      * Индектификатор пользователя
      */
