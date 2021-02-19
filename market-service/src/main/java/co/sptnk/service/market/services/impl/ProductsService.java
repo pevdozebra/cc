@@ -2,7 +2,7 @@ package co.sptnk.service.market.services.impl;
 
 import co.sptnk.lib.common.eventlog.EventCode;
 import co.sptnk.lib.common.eventlog.EventType;
-import co.sptnk.service.common.MessageProducer;
+import co.sptnk.service.market.common.MessageProducer;
 import co.sptnk.service.market.model.Product;
 import co.sptnk.service.market.repositories.ProductsRepo;
 import co.sptnk.service.market.services.IProductsService;

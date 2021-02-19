@@ -1,17 +1,17 @@
 package co.sptnk.service.logging.controllers;
 
-import co.sptnk.service.logging.model.EventLog;
 import co.sptnk.service.logging.services.impl.EventLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class LoggerController {
     }
     )
     @GetMapping
-    public Flux<EventLog> getAll(@RequestParam Map<String, String> map) {
-        return service.getAll(map);
+    public ResponseEntity<?> getAll(@RequestParam Map<String, String> map) {
+        return new ResponseEntity<>(service.getAll(map), HttpStatus.OK);
     }
 }

@@ -1,6 +1,7 @@
-package co.sptnk.service.searchsample;
+package co.sptnk.service.market.search;
 
-import co.sptnk.service.model.Order;
+
+import co.sptnk.service.market.model.Order;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Example;

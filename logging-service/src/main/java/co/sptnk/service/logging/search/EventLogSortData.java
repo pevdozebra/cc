@@ -1,8 +1,8 @@
-package co.sptnk.service.searchsample;
+package co.sptnk.service.logging.search;
 
 import co.sptnk.lib.common.eventlog.EventCode;
 import co.sptnk.lib.common.eventlog.EventType;
-import co.sptnk.service.model.EventLog;
+import co.sptnk.service.logging.model.EventLog;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Example;

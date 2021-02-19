@@ -1,4 +1,4 @@
-package co.sptnk.service.common;
+package co.sptnk.service.market.common;
 
 import co.sptnk.lib.common.AMQPKeys;
 import co.sptnk.lib.common.eventlog.EventCode;

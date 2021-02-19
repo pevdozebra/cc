@@ -1,4 +1,4 @@
-package co.sptnk.service.cofig;
+package co.sptnk.service.logging.config;
 
 import co.sptnk.lib.common.AMQPKeys;
 import org.springframework.amqp.core.*;

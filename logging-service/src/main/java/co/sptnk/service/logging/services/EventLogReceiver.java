@@ -1,8 +1,9 @@
-package co.sptnk.service.services.impl;
+package co.sptnk.service.logging.services;
 
 import co.sptnk.lib.common.AMQPKeys;
 import co.sptnk.lib.common.eventlog.EventLogDTO;
-import co.sptnk.service.model.EventLog;
+import co.sptnk.service.logging.model.EventLog;
+import co.sptnk.service.logging.services.impl.EventLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -26,8 +27,7 @@ public class EventLogReceiver {
     @RabbitHandler
     public void receiveMessage(EventLogDTO eventlogDTO) {
         EventLog eventLog = modelMapper.map(eventlogDTO, EventLog.class);
-        eventLogService.save(eventLog).subscribe(r -> {
-            log.info("Объект " + r.getId() + " сохранен в БД");
-        });
+        eventLogService.save(eventLog);
+        log.info("Объект " + eventLog.getId() + " сохранен в БД");
     }
 }
