@@ -1,7 +1,8 @@
 package co.sptnk.service.market.search;
 
-
-import co.sptnk.service.market.model.Order;
+import co.sptnk.service.market.model.Product;
+import co.sptnk.service.market.model.ProductType;
+import co.sptnk.service.market.ref.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Example;
@@ -16,31 +17,37 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class OrderSearchSample {
-
-    private Example<Order> sample;
+public class ProductSearchSample {
+    private Example<Product> sample;
     private Pageable pageable;
 
-    private OrderSearchSample() {
+    private ProductSearchSample() {
     }
 
 
-    public static OrderSearchSample parse(Map<String, String> params) {
-        OrderSearchSample data = new OrderSearchSample();
+    public static ProductSearchSample parse(Map<String, String> params) {
+        ProductSearchSample data = new ProductSearchSample();
         try {
-            Order order = new Order();
-            order.setCustomerId(params.get("customerId") != null ? UUID.fromString(params.get("customerId")) : null);
-            order.setPerformerId(params.get("performerId") != null ? UUID.fromString(params.get("performerId")) : null);
+            Product product = new Product();
+            product.setPerformerId(params.get("performerId") != null ? UUID.fromString(params.get("performerId")) : null);
+            product.setStatus(params.get("status") != null ? ProductStatus.valueOf(params.get("status")) : null);
+            if (params.get("type") != null) {
+                ProductType type = new ProductType();
+                type.setTitle(params.get("type"));
+                product.setType(type);
+            }
+            product.setDeleted(false);
+            product.setActive(true);
 //            this.startDate = params.get("startDate") != null ?
 //                    LocalDateTime.parse(params.get("startDate"), DateTimeFormatter.ISO_DATE_TIME) : null;
 //            this.startDate = params.get("endDate") != null ?
 //                    LocalDateTime.parse(params.get("endDate"), DateTimeFormatter.ISO_DATE_TIME) : null;
             data.setPageable(PageRequest.of(
                     params.get("page") != null ? Integer.parseInt(params.get("page")) : 0,
-                    params.get("offset") != null ? Integer.parseInt(params.get("count")) : Integer.MAX_VALUE
+                    params.get("count") != null ? Integer.parseInt(params.get("count")) : Integer.MAX_VALUE
             ));
             ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreNullValues();
-            data.setSample(Example.of(order, matcher));
+            data.setSample(Example.of(product, matcher));
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }

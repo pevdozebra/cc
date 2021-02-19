@@ -4,11 +4,14 @@ import co.sptnk.lib.common.eventlog.EventCode;
 import co.sptnk.lib.common.eventlog.EventType;
 import co.sptnk.service.market.common.MessageProducer;
 import co.sptnk.service.market.model.Product;
+import co.sptnk.service.market.ref.ProductStatus;
 import co.sptnk.service.market.repositories.ProductsRepo;
+import co.sptnk.service.market.search.ProductSearchSample;
 import co.sptnk.service.market.services.IProductsService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,7 @@ public class ProductsService implements IProductsService {
         }
         product.setDeleted(false);
         product.setActive(true);
+        product.setStatus(ProductStatus.ACTIVE);
         messageProducer.sendLogMessage(
                 EventCode.PRODUCT_CREATE,
                 EventType.INFO,
@@ -76,8 +80,9 @@ public class ProductsService implements IProductsService {
     }
 
     @Override
-    public List<Product> getAll(Map<String, String> params) {
-        return productsRepo.findAll();
+    public Page<Product> getAll(Map<String, String> params) {
+        ProductSearchSample search = ProductSearchSample.parse(params);
+        return productsRepo.findAll(search.getSample(), search.getPageable());
     }
 
 

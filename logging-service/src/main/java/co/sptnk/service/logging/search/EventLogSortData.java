@@ -6,6 +6,7 @@ import co.sptnk.service.logging.model.EventLog;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,8 @@ public class EventLogSortData {
             ));
             eventLog.setType(params.get("type") != null ? EventType.valueOf(params.get("type")) : null);
             eventLog.setCode(params.get("code") != null ? EventCode.valueOf(params.get("code")) : null);
-            data.setSample(Example.of(eventLog));
+            ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreNullValues();
+            data.setSample(Example.of(eventLog, matcher));
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
