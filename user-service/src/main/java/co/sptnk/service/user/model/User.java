@@ -8,13 +8,16 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.hateoas.RepresentationModel;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Id;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ManyToMany;
-import javax.persistence.JoinTable;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -26,13 +29,15 @@ import java.util.UUID;
 @Table(name="users")
 @DynamicInsert
 @DynamicUpdate
-public class User extends RepresentationModel<User> {
+public class User extends RepresentationModel<User> implements Serializable {
     /**
      * Индектификатор пользователя
      */
     @Id
     private UUID id;
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    private UserDetails userDetails;
     /**
      * Имя
      */

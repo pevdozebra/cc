@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: tsydenov_ia
+      changes:
+        - createTable:
+            tableName: user_details
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    foreignKeyName: fk_users
+                    references: users(id)
+              - column:
+                  name: average_rating
+                  type: numeric(4,3)
+        - createIndex:
+            columns:
+              - column:
+                  descending: true
+                  name: id
+            indexName: idx_id_user_details
+            schemaName: public
+            tableName: user_details
+            unique: true
