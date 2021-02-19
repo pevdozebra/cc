@@ -23,12 +23,7 @@
             $$ LANGUAGE plpgsql;
         </sql>
         <rollback>
-            DROP TABLE rel_user_interest;
-            DROP TABLE performer_verification;
-            DROP TABLE card;
-            DROP TABLE performer_rating;
-            DROP TABLE interest;
-            DROP TABLE users;
+            DROP FUNCTION compute_average_rating()
         </rollback>
     </changeSet>
     <changeSet id="6" author="tsydenov_ia">
@@ -38,12 +33,7 @@
             PROCEDURE compute_average_rating();
         </sql>
         <rollback>
-            DROP TABLE rel_user_interest;
-            DROP TABLE performer_verification;
-            DROP TABLE card;
-            DROP TABLE performer_rating;
-            DROP TABLE interest;
-            DROP TABLE users;
+            DROP TRIGGER performer_rating_t ON performer_rating
         </rollback>
 
     </changeSet>
