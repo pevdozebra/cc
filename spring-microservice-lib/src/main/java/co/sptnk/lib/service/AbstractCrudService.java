@@ -1,7 +1,6 @@
 package co.sptnk.lib.service;
 
 
-import java.util.List;
 import java.util.Map;
 
 public interface AbstractCrudService<Entity, ID> {
@@ -37,5 +36,5 @@ public interface AbstractCrudService<Entity, ID> {
      * @param params - параметры фильтра
      * @return - список объектов результата
      */
-    List<Entity> getAll(Map<String, String> params);
+    Iterable<Entity> getAll(Map<String, String> params);
 }
