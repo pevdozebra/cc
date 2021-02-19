@@ -12,12 +12,6 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: user_id
-                  type: uuid
-                  constraints:
-                    foreignKeyName: fk_users
-                    references: users(id)
-              - column:
                   name: average_rating
                   type: numeric(4,3)
         - createIndex:
