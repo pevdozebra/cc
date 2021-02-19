@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface InterestRepo extends JpaRepository<Interest, Long> {
@@ -15,4 +16,6 @@ public interface InterestRepo extends JpaRepository<Interest, Long> {
     Optional<Interest> findInterestByIdAndDeletedFalse(Long id);
 
     Collection<Interest> findAllByDeletedFalse();
+
+    Collection<Interest> findByDeletedFalseAndIdIn(Set<Long> id);
 }

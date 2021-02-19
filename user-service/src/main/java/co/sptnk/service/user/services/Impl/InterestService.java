@@ -91,9 +91,9 @@ public class InterestService implements IInterestService {
         interest.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): null);
         if (params.get("userId") != null) {
             User user = usersRepo.findUserByIdAndDeletedFalse(UUID.fromString(params.get("userId"))).orElse(null);
-            List<User> list = new ArrayList<>();
-            list.add(user);
-            interest.setUsers(list);
+            List<Interest> list = new ArrayList<>();
+            list.add(interest);
+            user.getInterests().addAll(list);
         }
         return Example.of(interest);
     }

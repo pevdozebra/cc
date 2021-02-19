@@ -19,7 +19,7 @@ import javax.persistence.Column;
 import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -29,7 +29,6 @@ import java.util.List;
 @DynamicInsert
 @DynamicUpdate
 public class Interest extends RepresentationModel<Interest> {
-
     /**
      * Индектификатор интереса
      */
@@ -62,5 +61,34 @@ public class Interest extends RepresentationModel<Interest> {
             joinColumns=@JoinColumn (name="interest_id"),
             inverseJoinColumns=@JoinColumn(name="user_id"))
     @JsonIgnore
-    private List<User> users;
+    private Set<User> users;
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (other == this) {
+            return true;
+        }
+        if (!(other.getClass() == getClass())) {
+            return false;
+        }
+        Interest entity = (Interest) other;
+        if (this.id == null) {
+            return false;
+        }
+        if (entity.getId() == null) {
+            return false;
+        }
+        return this.id.equals(entity.getId());
+    }
+
 }

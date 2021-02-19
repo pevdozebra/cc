@@ -10,13 +10,14 @@ import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Id;
 import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
 import java.time.LocalDate;
-import java.util.List;
+
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -80,7 +81,7 @@ public class User extends RepresentationModel<User> {
     @JoinTable (name="rel_user_interest",
             joinColumns=@JoinColumn (name="user_id"),
             inverseJoinColumns=@JoinColumn(name="interest_id"))
-    private List<Interest> interests;
+    private Set<Interest> interests;
 
     public User(UserRepresentation userRepresentation) {
         this.id =  UUID.fromString(userRepresentation.getId());
@@ -90,4 +91,33 @@ public class User extends RepresentationModel<User> {
         this.email = userRepresentation.getEmail();
         this.blocked = !userRepresentation.isEnabled();
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (other == this) {
+            return true;
+        }
+        if (!(other.getClass() == getClass())) {
+            return false;
+        }
+        User entity = (User) other;
+        if (this.id == null) {
+            return false;
+        }
+        if (entity.getId() == null) {
+            return false;
+        }
+        return this.id.equals(entity.getId());
+    }
+
 }
