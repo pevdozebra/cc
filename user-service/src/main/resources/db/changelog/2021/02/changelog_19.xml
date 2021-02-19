@@ -37,28 +37,4 @@
             DROP TRIGGER performer_rating_t ON performer_rating
         </rollback>
     </changeSet>
-    <changeSet id="7" author="tsydenov_ia">
-        <sql splitStatements="false">
-            CREATE OR REPLACE FUNCTION insert_user_details() RETURNS TRIGGER AS
-            $$
-            BEGIN
-            INSERT INTO user_details (id, average_rating) VALUES (NEW.id, 0);
-            RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-        </sql>
-        <rollback>
-            DROP FUNCTION insert_user_details();
-        </rollback>
-    </changeSet>
-    <changeSet id="8" author="tsydenov_ia">
-        <sql splitStatements="false">
-            CREATE TRIGGER user_details_t
-            AFTER INSERT ON users FOR EACH ROW EXECUTE
-            PROCEDURE insert_user_details();
-        </sql>
-        <rollback>
-            DROP TRIGGER user_details_t ON users
-        </rollback>
-    </changeSet>
 </databaseChangeLog>
