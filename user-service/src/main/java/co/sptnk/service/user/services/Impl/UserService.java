@@ -3,6 +3,8 @@ package co.sptnk.service.user.services.Impl;
 import co.sptnk.service.user.common.PageableCreator;
 import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.Interest;
+import co.sptnk.service.user.model.UserDetails;
+import co.sptnk.service.user.model.dto.UserSignUpData;
 import co.sptnk.service.user.repositories.InterestRepo;
 import co.sptnk.service.user.repositories.UsersRepo;
 import co.sptnk.service.user.services.IUserService;
@@ -12,6 +14,10 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.CreatedResponseUtil;
+import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -102,8 +109,8 @@ public class UserService implements IUserService {
 
         User user = new User();
         user.setId(params.get("id") != null ? UUID.fromString(params.get("id")):null);
-        user.setFirstname(params.get("firstname"));
-        user.setLastname(params.get("lastname"));
+        user.setFirstName(params.get("firstname"));
+        user.setLastName(params.get("lastname"));
         user.setUsername(params.get("username"));
         user.setBirthDate(params.get("birthDate") != null ? LocalDate.parse(params.get("birthDate"), formatter):null);
         user.setEmail(params.get("email"));
@@ -141,8 +148,59 @@ public class UserService implements IUserService {
         return user.getInterests();
     }
 
+    @Override
+    public AccessTokenResponse signUp(UserSignUpData userSignUpData) {
+        if (usersRepo.findUserByUsername(userSignUpData.getPhone()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+        AccessTokenResponse accessTokenResponse;
+
+        try {
+
+            UserDetails userDetails = new UserDetails(userSignUpData);
+            User user = new User(userSignUpData);
+
+            RealmResource realmResource = getKeyclockRealmResourceByClient();
+            UserRepresentation userRepresentation = realmResource.users().search(user.getUsername()).stream().findFirst().orElse(null);
+            if  (userRepresentation !=null){
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            } else {
+                userRepresentation = new UserRepresentation();
+            }
+
+            userRepresentation.setEnabled(true);
+            userRepresentation = updateUserRepresentationFromUser(userRepresentation, user);
+            Response response = realmResource.users().create(userRepresentation);
+            String userId = CreatedResponseUtil.getCreatedId(response);
+
+            CredentialRepresentation passwordCred = new CredentialRepresentation();
+            passwordCred.setTemporary(false);
+            passwordCred.setType(CredentialRepresentation.PASSWORD);
+            String password = UUID.randomUUID().toString();
+            passwordCred.setValue(password);
+
+            UserResource userResource = realmResource.users().get(userId);
+            userResource.resetPassword(passwordCred);
+//                RoleRepresentation roleRepresentation = realmResource.roles()
+//                        .get("role").toRepresentation();
+//
+//                userResource.roles().realmLevel()
+//                        .add(Arrays.asList(roleRepresentation));
+
+            user.setId(UUID.fromString(userId));
+            userDetails.setId(UUID.fromString(userId));
+            user.setUserDetails(userDetails);
+            usersRepo.save(user);
+
+            accessTokenResponse = getAccessTokenResponse(user.getUsername(), password);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+        return accessTokenResponse;
+    }
+
     private User getUserFromKeyclock(UUID id){
-        RealmResource realmResource = getKeyclockRealmResource();
+        RealmResource realmResource = getKeyclockRealmResourceByClient();
         UserResource userResource = realmResource.users().get(id.toString());
         User user = null;
         if (userResource != null) {
@@ -154,14 +212,14 @@ public class UserService implements IUserService {
 
 
     private void updateUserInKeyclock(User user){
-        RealmResource realmResource = getKeyclockRealmResource();
+        RealmResource realmResource = getKeyclockRealmResourceByClient();
         UserResource userResource = realmResource.users().get(user.getId().toString());
         UserRepresentation userRepresentation = updateUserRepresentationFromUser(userResource.toRepresentation(), user);
         userResource.update(userRepresentation);
     }
 
     private void blockUserInKeyclock(User user) {
-        RealmResource realmResource = getKeyclockRealmResource();
+        RealmResource realmResource = getKeyclockRealmResourceByClient();
         UserResource userResource = realmResource.users().get(user.getId().toString());
         UserRepresentation userRepresentation = userResource.toRepresentation();
         userRepresentation.setEnabled(false);
@@ -170,18 +228,17 @@ public class UserService implements IUserService {
 
     private UserRepresentation updateUserRepresentationFromUser(UserRepresentation userRepresentation, User user) {
         if (userRepresentation != null && user != null) {
-            userRepresentation.setFirstName(user.getFirstname());
-            userRepresentation.setLastName(user.getLastname());
             userRepresentation.setUsername(user.getUsername());
-            userRepresentation.setFirstName(user.getFirstname());
+            userRepresentation.setFirstName(user.getFirstName());
+            userRepresentation.setLastName(user.getLastName());
             userRepresentation.setEmail(user.getEmail());
-            userRepresentation.setEnabled(!user.getBlocked());
+            userRepresentation.setEnabled(user.getBlocked()!=null ? !user.getBlocked() : null);
         }
         return userRepresentation;
     }
 
     // https://keycloak.discourse.group/t/keycloak-admin-client-in-spring-boot/2547/2
-    private RealmResource getKeyclockRealmResource(){
+    private RealmResource getKeyclockRealmResourceByClient(){
            Keycloak keycloak = KeycloakBuilder
                 .builder()
                 .serverUrl(environment.getProperty("keycloak.auth-server-url"))
@@ -196,6 +253,22 @@ public class UserService implements IUserService {
         keycloak.tokenManager().getAccessToken();
         RealmResource realmResource = keycloak.realm("celebrity-chat");
         return realmResource;
+    }
+
+    private AccessTokenResponse getAccessTokenResponse(String username, String password) {
+        Keycloak keycloak = KeycloakBuilder
+                .builder()
+                .serverUrl(environment.getProperty("keycloak.auth-server-url"))
+                .grantType(OAuth2Constants.PASSWORD)
+                .realm(environment.getProperty("keycloak.realm"))
+                .clientId(environment.getProperty("keycloak.resource"))
+                .username(username)
+                .password(password)
+                .resteasyClient(
+                        new ResteasyClientBuilder()
+                                .connectionPoolSize(10).build()
+                ).build();
+        return keycloak.tokenManager().getAccessToken();
     }
 
 }
