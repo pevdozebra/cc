@@ -1,0 +1,78 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
+
+    <changeSet id="9" author="tsydenov_ia">
+        <sql splitStatements="false">
+            CREATE TABLE public.service_configuration
+            (
+            id text PRIMARY KEY,
+            description text,
+            value_type text,
+            value text
+            );
+        </sql>
+        <rollback>
+            DROP TABLE service_configuration;
+        </rollback>
+    </changeSet>
+    <changeSet id="10" author="tsydenov_ia">
+        <sql splitStatements="false">
+            INSERT INTO service_configuration (id, description, value_type, value)
+            values ('VALIDATION_SMS_SEND_MAX', 'Количество запросов кода СМС до блокировки', 'INT', '5');
+            INSERT INTO service_configuration (id, description, value_type, value)
+            values ('VALIDATION_SMS_SEND_BLOCK_PERIOD', 'Период блокировки запросов кода СМС', 'HOUR', '24');
+            INSERT INTO service_configuration (id, description, value_type, value)
+            values ('VALIDATION_SMS_TIMEOUT', 'Период действия кода СМС', 'MINUTE', '5');
+            INSERT INTO service_configuration (id, description, value_type, value)
+            values ('VALIDATION_SMS_TEST_MODE', 'Тестовый режим авторизации по СМС ( true - отправка СМС отключена, false - СМС отправляются)', 'BOOL', 'true');
+            INSERT INTO service_configuration (id, description, value_type, value)
+            values ('VALIDATION_SMS_TEST_CODE', 'СМС код в тестовом режиме', 'STRING', '123456');
+            INSERT INTO service_configuration (id, description, value_type, value)
+            values ('VALIDATION_SMS_CODE_LENGTH', 'Длина кода СМС', 'INT', '6');
+        </sql>
+        <rollback>
+            DELETE FROM service_configuration WHERE id IN
+            ('VALIDATION_SMS_SEND_MAX',
+             'VALIDATION_SMS_SEND_BLOCK_PERIOD',
+             'VALIDATION_SMS_TIMEOUT',
+             'VALIDATION_SMS_TEST_MODE',
+             'VALIDATION_SMS_TEST_CODE',
+             'VALIDATION_SMS_CODE_LENGTH');
+        </rollback>
+    </changeSet>
+    <changeSet id="11" author="tsydenov_ia">
+        <sql splitStatements="false">
+            CREATE TABLE public.validation
+            (
+            id text,
+            type text,
+            send_count integer,
+            first_send_date timestamptz,
+            PRIMARY KEY (user_id, type)
+            );
+        </sql>
+        <rollback>
+            DROP TABLE validation;
+        </rollback>
+    </changeSet>
+    <changeSet id="12" author="tsydenov_ia">
+        <sql splitStatements="false">
+            CREATE TABLE public.validation_code
+            (
+            id bigserial PRIMARY KEY,
+            validation_id text,
+            validation_type text,
+            value text,
+            issue_date timestamptz,
+            expire_date timestamptz,
+            FOREIGN KEY (user_id, type) REFERENCES validation(user_id, type)
+            );
+        </sql>
+        <rollback>
+            DROP TABLE validation_code;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
