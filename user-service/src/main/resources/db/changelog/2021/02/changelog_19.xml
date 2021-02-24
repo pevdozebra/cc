@@ -10,10 +10,16 @@
             $$
             DECLARE
             ratings numeric;
+            performer uuid;
             BEGIN
+            IF (TG_OP = 'DELETE') THEN
+            performer = OLD.performer_id;
+            ELSE
+            performer = NEW.performer_id;
+            END IF;
             SELECT AVG(rating) INTO ratings FROM
-            (SELECT pr.rating FROM performer_rating AS pr WHERE performer_id = NEW.performer_id) AS prselect;
-            UPDATE user_details SET average_rating = ratings WHERE id = NEW.performer_id;
+            (SELECT pr.rating FROM performer_rating AS pr WHERE performer_id = performer) AS prselect;
+            UPDATE user_details SET average_rating = ratings WHERE id = performer;
             RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
