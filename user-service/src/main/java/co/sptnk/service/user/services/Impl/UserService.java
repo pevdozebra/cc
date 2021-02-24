@@ -124,8 +124,7 @@ public class UserService implements IUserService {
     }
 
     private User getUserFromKeyclock(UUID id){
-        RealmResource realmResource = keyCloak;
-        UserResource userResource = realmResource.users().get(id.toString());
+        UserResource userResource = keyCloak.users().get(id.toString());
         User user = null;
         if (userResource != null) {
             UserRepresentation userRepresentation = userResource.toRepresentation();
@@ -136,15 +135,13 @@ public class UserService implements IUserService {
 
 
     private void updateUserInKeyclock(User user){
-        RealmResource realmResource = keyCloak;
-        UserResource userResource = realmResource.users().get(user.getId().toString());
+        UserResource userResource = keyCloak.users().get(user.getId().toString());
         UserRepresentation userRepresentation = updateUserRepresentationFromUser(userResource.toRepresentation(), user);
         userResource.update(userRepresentation);
     }
 
     private void blockUserInKeyclock(User user) {
-        RealmResource realmResource = keyCloak;
-        UserResource userResource = realmResource.users().get(user.getId().toString());
+        UserResource userResource = keyCloak.users().get(user.getId().toString());
         UserRepresentation userRepresentation = userResource.toRepresentation();
         userRepresentation.setEnabled(false);
         userResource.update(userRepresentation);
