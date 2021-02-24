@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -21,6 +23,7 @@ public class ValidationPK implements Serializable {
     @Column(name = "id")
     private String id;
 
+    @Enumerated(EnumType.STRING)
     private ValidationType type;
 
     @Override

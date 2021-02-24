@@ -5,11 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,4 +34,14 @@ public class Validation {
     @Column(name = "first_send_date")
     private OffsetDateTime lastSendDate;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "validation_id"),
+            @JoinColumn(name = "validation_type")
+    })
+    private Set<ValidationCode> codes = new HashSet<>();
+
+    public void addCode(ValidationCode code) {
+        codes.add(code);
+    }
 }

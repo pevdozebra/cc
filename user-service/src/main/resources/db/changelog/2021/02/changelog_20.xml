@@ -51,7 +51,7 @@
             type text,
             send_count integer,
             first_send_date timestamptz,
-            PRIMARY KEY (user_id, type)
+            PRIMARY KEY (id, type)
             );
         </sql>
         <rollback>
@@ -68,7 +68,7 @@
             value text,
             issue_date timestamptz,
             expire_date timestamptz,
-            FOREIGN KEY (user_id, type) REFERENCES validation(user_id, type)
+            FOREIGN KEY (validation_id, validation_type) REFERENCES validation(id, type)
             );
         </sql>
         <rollback>

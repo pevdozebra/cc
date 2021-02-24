@@ -2,15 +2,23 @@ package co.sptnk.service.user.controllers;
 
 import co.sptnk.lib.constant.AllowedLinksMethods;
 import co.sptnk.lib.controller.AbstractCrudHateoasController;
+import co.sptnk.service.user.common.GeneratedCode;
+import co.sptnk.service.user.dto.Auth;
 import co.sptnk.service.user.model.User;
+import co.sptnk.service.user.services.IAuthService;
 import co.sptnk.service.user.services.IUserService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.UUID;
@@ -22,6 +30,9 @@ public class UserController extends AbstractCrudHateoasController<User, UUID> {
 
     @Autowired
     private IUserService service;
+
+    @Autowired
+    private IAuthService authService;
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getOneById(@PathVariable("id") UUID uuid) {
@@ -49,6 +60,11 @@ public class UserController extends AbstractCrudHateoasController<User, UUID> {
     @GetMapping()
     public ResponseEntity getAll(@RequestParam  Map<String, String> map) {
         return new ResponseEntity<>(service.getAll(map), HttpStatus.OK);
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<GeneratedCode> signIn(@RequestBody Auth auth) {
+        return new ResponseEntity<>(authService.signIn(auth), HttpStatus.OK);
     }
 
     @Override
