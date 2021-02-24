@@ -1,21 +1,17 @@
 package co.sptnk.service.user.services.Impl;
 
 import co.sptnk.service.user.common.PageableCreator;
-import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.Interest;
+import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.repositories.InterestRepo;
 import co.sptnk.service.user.repositories.UsersRepo;
 import co.sptnk.service.user.services.IUserService;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -38,9 +34,10 @@ public class UserService implements IUserService {
     @Autowired
     private InterestRepo interestRepo;
     @Autowired
-    private Environment environment;
-    @Autowired
     private ModelMapper modelMapper;
+    @Lazy
+    @Autowired
+    private RealmResource keyCloak;
 
 
     @Override
@@ -127,7 +124,7 @@ public class UserService implements IUserService {
     }
 
     private User getUserFromKeyclock(UUID id){
-        RealmResource realmResource = getKeyclockRealmResource();
+        RealmResource realmResource = keyCloak;
         UserResource userResource = realmResource.users().get(id.toString());
         User user = null;
         if (userResource != null) {
@@ -139,14 +136,14 @@ public class UserService implements IUserService {
 
 
     private void updateUserInKeyclock(User user){
-        RealmResource realmResource = getKeyclockRealmResource();
+        RealmResource realmResource = keyCloak;
         UserResource userResource = realmResource.users().get(user.getId().toString());
         UserRepresentation userRepresentation = updateUserRepresentationFromUser(userResource.toRepresentation(), user);
         userResource.update(userRepresentation);
     }
 
     private void blockUserInKeyclock(User user) {
-        RealmResource realmResource = getKeyclockRealmResource();
+        RealmResource realmResource = keyCloak;
         UserResource userResource = realmResource.users().get(user.getId().toString());
         UserRepresentation userRepresentation = userResource.toRepresentation();
         userRepresentation.setEnabled(false);
@@ -163,24 +160,6 @@ public class UserService implements IUserService {
             userRepresentation.setEnabled(!user.getBlocked());
         }
         return userRepresentation;
-    }
-
-    // https://keycloak.discourse.group/t/keycloak-admin-client-in-spring-boot/2547/2
-    private RealmResource getKeyclockRealmResource(){
-           Keycloak keycloak = KeycloakBuilder
-                .builder()
-                .serverUrl(environment.getProperty("keycloak.auth-server-url"))
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .realm(environment.getProperty("keycloak.realm"))
-                .clientId(environment.getProperty("keycloak.resource"))
-                .clientSecret(environment.getProperty("client-secret"))
-                .resteasyClient(
-                        new ResteasyClientBuilder()
-                                .connectionPoolSize(10).build()
-                ).build();
-        keycloak.tokenManager().getAccessToken();
-        RealmResource realmResource = keycloak.realm("celebrity-chat");
-        return realmResource;
     }
 
 }
