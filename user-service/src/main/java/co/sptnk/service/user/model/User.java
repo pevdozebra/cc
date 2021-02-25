@@ -95,7 +95,7 @@ public class User extends RepresentationModel<User> {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (this.getId()!= null ? this.getId().hashCode() : 0);
         return hash;
     }
 
@@ -111,13 +111,13 @@ public class User extends RepresentationModel<User> {
             return false;
         }
         User entity = (User) other;
-        if (this.id == null) {
+        if (this.getId() == null) {
             return false;
         }
         if (entity.getId() == null) {
             return false;
         }
-        return this.id.equals(entity.getId());
+        return this.getId().equals(entity.getId());
     }
 
 }

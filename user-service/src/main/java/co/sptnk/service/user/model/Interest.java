@@ -66,7 +66,7 @@ public class Interest extends RepresentationModel<Interest> {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (this.getId()!= null ? this.getId().hashCode() : 0);
         return hash;
     }
 
@@ -82,13 +82,13 @@ public class Interest extends RepresentationModel<Interest> {
             return false;
         }
         Interest entity = (Interest) other;
-        if (this.id == null) {
+        if (this.getId() == null) {
             return false;
         }
         if (entity.getId() == null) {
             return false;
         }
-        return this.id.equals(entity.getId());
+        return this.getId().equals(entity.getId());
     }
 
 }
