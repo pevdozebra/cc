@@ -1,4 +1,4 @@
-package co.sptnk.service.logging.config;
+package co.sptnk.service.market.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

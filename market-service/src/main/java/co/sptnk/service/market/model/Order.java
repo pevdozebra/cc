@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="orders")
-public class Order extends RepresentationModel<Order> {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Order")
@@ -73,7 +72,7 @@ public class Order extends RepresentationModel<Order> {
      * Исключено из трансфера
      */
     @JsonIgnore
-    private Boolean deleted = false;
+    private Boolean deleted;
 
     @Version
     @JsonIgnore

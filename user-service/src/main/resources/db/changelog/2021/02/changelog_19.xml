@@ -1,0 +1,41 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
+
+    <changeSet id="5" author="tsydenov_ia">
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION compute_average_rating() RETURNS TRIGGER AS
+            $$
+            DECLARE
+            ratings numeric;
+            performer uuid;
+            BEGIN
+            IF (TG_OP = 'DELETE') THEN
+            performer = OLD.performer_id;
+            ELSE
+            performer = NEW.performer_id;
+            END IF;
+            SELECT AVG(rating) INTO ratings FROM
+            (SELECT pr.rating FROM performer_rating AS pr WHERE performer_id = performer) AS prselect;
+            UPDATE user_details SET average_rating = ratings WHERE id = performer;
+            RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+        <rollback>
+            DROP FUNCTION compute_average_rating()
+        </rollback>
+    </changeSet>
+    <changeSet id="6" author="tsydenov_ia">
+        <sql splitStatements="false">
+            CREATE TRIGGER performer_rating_t
+            AFTER INSERT OR UPDATE OR DELETE ON performer_rating FOR EACH ROW EXECUTE
+            PROCEDURE compute_average_rating();
+        </sql>
+        <rollback>
+            DROP TRIGGER performer_rating_t ON performer_rating
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
