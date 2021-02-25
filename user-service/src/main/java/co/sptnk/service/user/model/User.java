@@ -1,5 +1,6 @@
 package co.sptnk.service.user.model;
 
+import co.sptnk.service.user.model.dto.UserSignUpData;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,17 +13,12 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
 import java.time.LocalDate;
 
 import java.util.Set;
@@ -49,18 +45,18 @@ public class User extends RepresentationModel<User> {
      * Имя
      */
     @Column(name = "firstname")
-    private String firstname;
+    private String firstName;
 
     /**
      * Фамилия
      */
     @Column(name = "lastname")
-    private String lastname;
+    private String lastName;
 
     /**
-     * Логин
+     * Логин(телефон)
      */
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     /**
@@ -96,11 +92,18 @@ public class User extends RepresentationModel<User> {
 
     public User(UserRepresentation userRepresentation) {
         this.id =  UUID.fromString(userRepresentation.getId());
-        this.firstname = userRepresentation.getFirstName();
-        this.lastname = userRepresentation.getLastName();
+        this.firstName = userRepresentation.getFirstName();
+        this.lastName = userRepresentation.getLastName();
         this.username = userRepresentation.getUsername();
         this.email = userRepresentation.getEmail();
         this.blocked = !userRepresentation.isEnabled();
+    }
+
+    public User(UserSignUpData userSignUpData) {
+        this.firstName = userSignUpData.getFirstName();
+        this.lastName = userSignUpData.getLastName();
+        this.username = userSignUpData.getPhone();
+        this.email = userSignUpData.getEmail();
     }
 
     @Override

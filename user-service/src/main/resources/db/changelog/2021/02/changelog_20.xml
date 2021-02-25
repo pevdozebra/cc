@@ -1,0 +1,37 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
+
+    <changeSet id="2" author="Sidorenko Sergey">
+        <sql>
+            ALTER TABLE public.user_details
+            ADD COLUMN socialmedia_url text;
+
+            ALTER TABLE public.user_details
+            ADD COLUMN socialmedia_type text;
+
+            ALTER TABLE public.user_details
+            ADD COLUMN pen_name text;
+
+            ALTER TABLE public.user_details
+            ADD COLUMN registration_type text;
+
+        </sql>
+        <rollback>
+            ALTER TABLE public.user_details
+            DROP COLUMN socialmedia_url;
+
+            ALTER TABLE public.user_details
+            DROP COLUMN socialmedia_type;
+
+            ALTER TABLE public.user_details
+            DROP COLUMN pen_name;
+
+            ALTER TABLE public.user_details
+            DROP COLUMN registration_type;
+
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

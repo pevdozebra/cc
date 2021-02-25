@@ -3,6 +3,8 @@ package co.sptnk.service.user.services;
 import co.sptnk.lib.service.AbstractCrudService;
 import co.sptnk.service.user.model.Interest;
 import co.sptnk.service.user.model.User;
+import co.sptnk.service.user.model.dto.UserSignUpData;
+import org.keycloak.representations.AccessTokenResponse;
 
 import java.util.List;
 import java.util.Set;
