@@ -3,5 +3,11 @@ databaseChangeLog:
       file: /2021/02/changelog_03.xml
       relativeToChangelogFile: true
   - include:
+      file: /2021/02/changelog_19.yml
+      relativeToChangelogFile: true
+  - include:
+      file: /2021/02/changelog_19.xml
+      relativeToChangelogFile: true
+  - include:
       file: /2021/02/changelog_20.xml
       relativeToChangelogFile: true

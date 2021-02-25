@@ -8,12 +8,15 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import java.time.LocalDate;
 import java.util.List;
@@ -33,6 +36,9 @@ public class User extends RepresentationModel<User> {
     @Id
     private UUID id;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private UserDetails userDetails;
     /**
      * Имя
      */
