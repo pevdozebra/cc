@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -23,6 +24,6 @@ public class UserDetails {
     private UUID id;
 
     @Column(name = "average_rating")
-    private Double averageRating;
+    private BigDecimal averageRating;
 }
 

@@ -9,16 +9,17 @@
             CREATE OR REPLACE FUNCTION compute_average_rating() RETURNS TRIGGER AS
             $$
             DECLARE
-            ratings integer;
-            r_count integer;
-            average numeric(4,3);
+            ratings numeric;
+            performer uuid;
             BEGIN
-            SELECT SUM(rating) INTO ratings FROM
-            (SELECT pr.rating FROM performer_rating AS pr WHERE performer_id = NEW.performer_id) AS prselect;
-            SELECT COUNT(rating) INTO r_count FROM
-            (SELECT pr.rating FROM performer_rating AS pr WHERE performer_id = NEW.performer_id) AS prselect;
-            SELECT round((CAST(ratings AS NUMERIC)/r_count), 3) INTO average;
-            UPDATE user_details SET average_rating = average WHERE id = NEW.performer_id;
+            IF (TG_OP = 'DELETE') THEN
+            performer = OLD.performer_id;
+            ELSE
+            performer = NEW.performer_id;
+            END IF;
+            SELECT AVG(rating) INTO ratings FROM
+            (SELECT pr.rating FROM performer_rating AS pr WHERE performer_id = performer) AS prselect;
+            UPDATE user_details SET average_rating = ratings WHERE id = performer;
             RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
