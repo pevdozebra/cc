@@ -116,12 +116,6 @@ public class UserService implements IUserService {
         user.setEmail(params.get("email"));
         user.setBlocked(params.get("blocked") != null ? Boolean.parseBoolean(params.get("blocked")): null);
         user.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): null);
-        if (params.get("interestId") != null) {
-            Interest interest = interestRepo.findInterestByIdAndDeletedFalse(Long.parseLong(params.get("interestId"))).orElse(null);
-            List<Interest> list = new ArrayList<>();
-            list.add(interest);
-            user.getInterests().addAll(list);
-        }
         return Example.of(user);
     }
 

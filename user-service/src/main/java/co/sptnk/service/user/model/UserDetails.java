@@ -8,7 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -23,6 +29,7 @@ public class UserDetails {
     private UUID id;
 
     @Column(name = "average_rating")
+    private BigDecimal averageRating;
     private Double averageRating;
 
     /**
