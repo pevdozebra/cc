@@ -25,10 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService implements IUserService {
@@ -112,18 +109,30 @@ public class UserService implements IUserService {
         user.setEmail(params.get("email"));
         user.setBlocked(params.get("blocked") != null ? Boolean.parseBoolean(params.get("blocked")): null);
         user.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): null);
-        if (params.get("interestId") != null) {
-            Interest interest = interestRepo.findInterestByIdAndDeletedFalse(Long.parseLong(params.get("interestId"))).orElse(null);
-            List<Interest> list = new ArrayList<>();
-            list.add(interest);
-            user.setInterests(list);
-        }
         return Example.of(user);
     }
 
     @Override
     public List<User> getAllNotDeleted() {
         return new ArrayList<>(usersRepo.findAllByDeletedFalse());
+    }
+
+    @Override
+    @Transactional
+    public Set<Interest> addInterests(Set<Long> ids, UUID userId) {
+        User user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Set<Interest> interests = new HashSet<>(interestRepo.findByDeletedFalseAndIdIn(ids));
+        user.getInterests().addAll(interests);
+        return user.getInterests();
+    }
+
+    @Override
+    @Transactional
+    public Set<Interest> deleteInterests(Set<Long> ids, UUID userId) {
+        User user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Set<Interest> interests = new HashSet<>(interestRepo.findByDeletedFalseAndIdIn(ids));
+        user.getInterests().removeAll(interests);
+        return user.getInterests();
     }
 
     private User getUserFromKeyclock(UUID id){

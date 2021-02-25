@@ -3,7 +3,6 @@ package co.sptnk.service.user.services.Impl;
 
 import co.sptnk.service.user.common.PageableCreator;
 import co.sptnk.service.user.model.Interest;
-import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.repositories.InterestRepo;
 import co.sptnk.service.user.repositories.UsersRepo;
 import co.sptnk.service.user.services.IInterestService;
@@ -19,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class InterestService implements IInterestService {
@@ -89,12 +87,6 @@ public class InterestService implements IInterestService {
         interest.setTitle(params.get("title"));
         interest.setParent(params.get("parent_id") != null ? interestRepo.getOne(Long.parseLong(params.get("parent_id"))):null);
         interest.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): null);
-        if (params.get("userId") != null) {
-            User user = usersRepo.findUserByIdAndDeletedFalse(UUID.fromString(params.get("userId"))).orElse(null);
-            List<User> list = new ArrayList<>();
-            list.add(user);
-            interest.setUsers(list);
-        }
         return Example.of(interest);
     }
 
