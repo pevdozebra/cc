@@ -30,7 +30,6 @@ public class UserDetails {
 
     @Column(name = "average_rating")
     private BigDecimal averageRating;
-    private Double averageRating;
 
     /**
      * Ссылка на соцсеть

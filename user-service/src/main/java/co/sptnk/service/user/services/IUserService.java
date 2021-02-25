@@ -33,6 +33,4 @@ public interface IUserService extends AbstractCrudService<User, UUID> {
      * @return - итоговый список всех интересов пользователя после удаления
      */
     Set<Interest> deleteInterests(Set<Long> ids, UUID userId);
-
-    AccessTokenResponse signUp(UserSignUpData userSignUpData);
 }

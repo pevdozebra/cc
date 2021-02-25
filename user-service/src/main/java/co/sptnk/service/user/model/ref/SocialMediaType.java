@@ -1,8 +1,9 @@
 package co.sptnk.service.user.model.ref;
 
 public enum SocialMediaType {
-    CUSTOMER,
-    PERFORMER;
+    INSTAGRAM,
+    VK,
+    TIKTOK;
 
     public String getName() {
         return this.name();
