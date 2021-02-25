@@ -4,8 +4,10 @@ import co.sptnk.service.user.common.GeneratedCode;
 import co.sptnk.service.user.common.ValidationType;
 import co.sptnk.service.user.common.config.ConfigName;
 import co.sptnk.service.user.common.config.ConfigStore;
+import co.sptnk.service.user.common.utils.KeyCloakUserUtil;
 import co.sptnk.service.user.dto.Auth;
 import co.sptnk.service.user.dto.Tokens;
+import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.Validation;
 import co.sptnk.service.user.model.ValidationCode;
 import co.sptnk.service.user.model.keys.ValidationPK;
@@ -13,7 +15,10 @@ import co.sptnk.service.user.repositories.UsersRepo;
 import co.sptnk.service.user.repositories.ValidationCodeRepo;
 import co.sptnk.service.user.repositories.ValidationRepo;
 import co.sptnk.service.user.services.IAuthService;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
@@ -34,13 +39,17 @@ public class AuthService implements IAuthService {
 
     private final ValidationCodeRepo codeRepo;
 
+    private final RealmResource keyCloak;
+
     @Autowired
     private ConfigStore config;
 
-    public AuthService(UsersRepo usersRepo, ValidationRepo validationRepo, ValidationCodeRepo codeRepo) {
+    public AuthService(UsersRepo usersRepo, ValidationRepo validationRepo,
+                       ValidationCodeRepo codeRepo, @Lazy RealmResource keyCloak) {
         this.usersRepo = usersRepo;
         this.validationRepo = validationRepo;
         this.codeRepo = codeRepo;
+        this.keyCloak = keyCloak;
     }
 
     @Override
@@ -98,6 +107,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    @Transactional
     public Tokens validate(String code, String validationId) {
         Tokens tokens = new Tokens();
         Validation vExample = new Validation();
@@ -107,7 +117,18 @@ public class AuthService implements IAuthService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (validation.getCodes().isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
+        User user = usersRepo.findUserByUsername(validationId)
+                .orElse(null);
+        if (user == null) {
+            user = new User();
+            user.setUsername(validationId);
+            user.setBlocked(false);
+            user.setDeleted(false);
+            keyCloak.users().create(KeyCloakUserUtil
+                    .updateRepresentationForUser(new UserRepresentation(), user));
+            //TODO получить UUID, посмотреть в userService
+            usersRepo.save(user);
+        }
 
         return tokens;
     }
