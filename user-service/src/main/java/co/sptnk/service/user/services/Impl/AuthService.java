@@ -1,7 +1,6 @@
 package co.sptnk.service.user.services.Impl;
 
 import co.sptnk.service.user.common.GeneratedCode;
-import co.sptnk.service.user.common.KeyCloakTemplate;
 import co.sptnk.service.user.common.ValidationType;
 import co.sptnk.service.user.common.config.ConfigName;
 import co.sptnk.service.user.common.config.ConfigStore;

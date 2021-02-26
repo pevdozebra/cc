@@ -1,4 +1,9 @@
+server:
+  port: 8081
+
 spring:
+  application:
+    name: '@name@'
   datasource:
     url: jdbc:postgresql://localhost:5432/users
     username: sa
@@ -10,8 +15,7 @@ spring:
 
 keycloak:
   auth-server-url: http://localhost:8080/auth
-  realm: celebrity-chat
-  resource: keycloak-admin
-  public-client: true
-
-client-secret: bff71573-18d2-4c98-84b2-ac3d7cc28752
+  realm: telescope
+  resource: telescope-admin
+  credentials:
+    secret: 8771d6e8-0e14-4161-83a2-b7d1b5777be8
