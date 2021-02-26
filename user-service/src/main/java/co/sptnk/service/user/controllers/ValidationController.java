@@ -1,6 +1,6 @@
 package co.sptnk.service.user.controllers;
 
-import co.sptnk.service.user.dto.Tokens;
+import co.sptnk.service.user.model.dto.Tokens;
 import co.sptnk.service.user.services.Impl.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -9,17 +9,16 @@ import co.sptnk.service.user.model.dto.UserSignUpData;
 import co.sptnk.service.user.repositories.InterestRepo;
 import co.sptnk.service.user.repositories.UsersRepo;
 import co.sptnk.service.user.services.IUserService;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +28,10 @@ import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -44,6 +43,8 @@ public class UserService implements IUserService {
     private InterestRepo interestRepo;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private Environment environment;
     @Autowired
     private KeycloakProvider keycloakProvider;
 

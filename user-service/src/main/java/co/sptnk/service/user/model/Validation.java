@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -27,6 +28,9 @@ public class Validation {
 
     @EmbeddedId
     private ValidationPK id;
+
+    @Column(name = "user_id")
+    private UUID userId;
 
     @Column(name = "send_count")
     private Integer sendCount;

@@ -1,4 +1,4 @@
-package co.sptnk.service.user.dto;
+package co.sptnk.service.user.model.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,12 +1,12 @@
 package co.sptnk.service.user.services.Impl;
 
 import co.sptnk.service.user.common.GeneratedCode;
+import co.sptnk.service.user.common.KeycloakProvider;
 import co.sptnk.service.user.common.ValidationType;
 import co.sptnk.service.user.common.config.ConfigName;
 import co.sptnk.service.user.common.config.ConfigStore;
-import co.sptnk.service.user.common.utils.KeyCloakUserUtil;
-import co.sptnk.service.user.dto.Auth;
-import co.sptnk.service.user.dto.Tokens;
+import co.sptnk.service.user.model.dto.Auth;
+import co.sptnk.service.user.model.dto.Tokens;
 import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.Validation;
 import co.sptnk.service.user.model.ValidationCode;
@@ -18,9 +18,12 @@ import co.sptnk.service.user.services.IAuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,19 +49,24 @@ public class AuthService implements IAuthService {
 
     private final RealmResource keyCloak;
 
-    private final KeyCloakTemplate kTemplate;
+    private final KeycloakProvider provider;
 
     @Autowired
     private ConfigStore config;
 
+    @Autowired
+    private ModelMapper mapper;
+
+
+
     public AuthService(UsersRepo usersRepo, ValidationRepo validationRepo,
-                       ValidationCodeRepo codeRepo, @Lazy RealmResource keyCloak,
-                       @Lazy KeyCloakTemplate template) {
+                       ValidationCodeRepo codeRepo, Environment environment,
+                       @Lazy KeycloakProvider provider) {
         this.usersRepo = usersRepo;
         this.validationRepo = validationRepo;
         this.codeRepo = codeRepo;
-        this.keyCloak = keyCloak;
-        this.kTemplate = template;
+        this.provider = provider;
+        this.keyCloak = provider.get().realm(environment.getProperty("keycloak.realm"));
     }
 
     @Override
@@ -118,13 +126,12 @@ public class AuthService implements IAuthService {
     @Override
     @Transactional
     public Tokens validate(String code, String validationId) {
-        Tokens tokens = new Tokens();
-        String userId = "";
+        Tokens tokens;
         ValidationType type;
         User user = usersRepo.findUserByUsername(validationId)
                 .orElse(null);
         if (user == null) {
-            //user = createUser(validationId);
+            user = createUser(validationId);
             type = ValidationType.SIGN_UP_SMS;
         } else {
             if (user.getDeleted() || user.getBlocked()) {
@@ -155,11 +162,13 @@ public class AuthService implements IAuthService {
             }
         }
         validation.setSendCount(0);
-        if (validation.getId().getType() == ValidationType.SIGN_IN_SMS) {
-            //TODO авторизация, получение токенов, запись токенов в объект Tokens
-        } else if (validation.getId().getType() == ValidationType.SIGN_UP_SMS) {
-            //TODO создание пользователя (использовать createUser), авторизация, получение токенов, запись токенов в объект Tokens
-        }
+        AccessTokenResponse response = provider.getAccessTokenForUser(user.getId().toString());
+        tokens = Tokens.builder()
+                .id(user.getId())
+                .accessToken(response.getToken())
+                .refreshToken(response.getRefreshToken())
+                .isNew(type == ValidationType.SIGN_UP_SMS)
+                .build();
         return tokens;
     }
 
@@ -168,8 +177,9 @@ public class AuthService implements IAuthService {
         user.setUsername(username);
         user.setBlocked(false);
         user.setDeleted(false);
-        Response response = keyCloak.users().create(KeyCloakUserUtil
-                .updateRepresentationForUser(new UserRepresentation(), user));
+        UserRepresentation representation = mapper.map(user, UserRepresentation.class);
+        representation.setEnabled(!user.getBlocked());
+        Response response = keyCloak.users().create(representation);
         String userId = CreatedResponseUtil.getCreatedId(response);
         user.setId(UUID.fromString(userId));
         usersRepo.save(user);

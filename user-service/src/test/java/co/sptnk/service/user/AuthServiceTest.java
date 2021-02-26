@@ -1,7 +1,7 @@
 package co.sptnk.service.user;
 
 import co.sptnk.service.user.common.GeneratedCode;
-import co.sptnk.service.user.dto.Auth;
+import co.sptnk.service.user.model.dto.Auth;
 import co.sptnk.service.user.services.Impl.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -15,18 +15,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @SpringBootTest
-@ActiveProfiles("staging")
+@ActiveProfiles("dev")
 public class AuthServiceTest {
 
     @Autowired
     private AuthService service;
 
     private GeneratedCode code;
-    private final String phone = "79843456740";
+
+    private String phone;
 
     @Test
     public void signIn() {
         Auth auth = new Auth();
+        phone = RandomStringUtils.randomNumeric(11);
         auth.setPhone(phone);
         try {
             code = service.signIn(auth);
@@ -42,8 +44,7 @@ public class AuthServiceTest {
         auth.setPhone(RandomStringUtils.randomNumeric(11));
         assertThrows(ResponseStatusException.class, () -> {
             for (int i = 0; i < 6; i++) {
-                GeneratedCode gCode = service.signIn(auth);
-                log.info(String.format("Получен код: %s. Всего попыток генерации - %s", gCode, i));
+                service.signIn(auth);
             }
         });
 

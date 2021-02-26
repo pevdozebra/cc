@@ -1,14 +1,14 @@
-package co.sptnk.service.user.dto;
+package co.sptnk.service.user.model.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@Builder
 public class Tokens {
     private UUID id;
     private String accessToken;

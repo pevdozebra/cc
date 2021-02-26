@@ -16,7 +16,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-
 @Component
 public class KeycloakProvider {
 
@@ -33,7 +32,7 @@ public class KeycloakProvider {
 
     // https://keycloak.discourse.group/t/keycloak-admin-client-in-spring-boot/2547/2
     private Keycloak getKeyclockByClient(){
-        Keycloak keycloak = KeycloakBuilder
+        return KeycloakBuilder
                 .builder()
                 .serverUrl(environment.getProperty("keycloak.auth-server-url"))
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
@@ -44,7 +43,6 @@ public class KeycloakProvider {
                         new ResteasyClientBuilder()
                                 .connectionPoolSize(10).build()
                 ).build();
-        return keycloak;
     }
 
     public AccessTokenResponse getAccessTokenForUser(String userId) {
