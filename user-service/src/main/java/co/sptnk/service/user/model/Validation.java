@@ -44,4 +44,8 @@ public class Validation {
     public void addCode(ValidationCode code) {
         codes.add(code);
     }
+
+    public void deleteCode(ValidationCode code) {
+        codes.remove(code);
+    }
 }
