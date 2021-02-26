@@ -5,11 +5,11 @@ import co.sptnk.service.user.common.KeycloakProvider;
 import co.sptnk.service.user.common.ValidationType;
 import co.sptnk.service.user.common.config.ConfigName;
 import co.sptnk.service.user.common.config.ConfigStore;
-import co.sptnk.service.user.model.dto.Auth;
-import co.sptnk.service.user.model.dto.Tokens;
 import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.Validation;
 import co.sptnk.service.user.model.ValidationCode;
+import co.sptnk.service.user.model.dto.Auth;
+import co.sptnk.service.user.model.dto.Tokens;
 import co.sptnk.service.user.model.keys.ValidationPK;
 import co.sptnk.service.user.repositories.UsersRepo;
 import co.sptnk.service.user.repositories.ValidationCodeRepo;
@@ -32,7 +32,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.ws.rs.core.Response;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -95,7 +94,7 @@ public class AuthService implements IAuthService {
             if (validation.getSendCount() < config.getConfig(ConfigName.VALIDATION_SMS_SEND_MAX, Integer.class)) {
                 validation.setSendCount(validation.getSendCount() + 1);
             } else {
-                if (Duration.between(OffsetDateTime.now(ZoneOffset.UTC), validation.getLastSendDate())
+                if (Duration.between(OffsetDateTime.now(), validation.getLastSendDate())
                         .compareTo(config.getConfig(ConfigName.VALIDATION_SMS_SEND_BLOCK_PERIOD, Duration.class)) > 0) {
                     validation.setSendCount(1);
                     validation.setLastSendDate(OffsetDateTime.now());
@@ -131,7 +130,6 @@ public class AuthService implements IAuthService {
         User user = usersRepo.findUserByUsername(validationId)
                 .orElse(null);
         if (user == null) {
-            user = createUser(validationId);
             type = ValidationType.SIGN_UP_SMS;
         } else {
             if (user.getDeleted() || user.getBlocked()) {
@@ -154,11 +152,24 @@ public class AuthService implements IAuthService {
             log.info(String.format("Код валидации %s не найден", code));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
-            ValidationCode value = codes.stream().findFirst().get();
-            if(Duration.between(value.getExpireDate(),OffsetDateTime.now(ZoneOffset.UTC)).getSeconds() > 0) {
+            Boolean[] checked = new Boolean[]{false};
+            codes.forEach(value -> {
+                if (!value.getExpireDate().isBefore(OffsetDateTime.now())) {
+                    checked[0] = true;
+                }
                 validation.deleteCode(value);
+                codeRepo.delete(value);
+            });
+            if (!checked[0]) {
                 log.info(String.format("Код %s просрочен", code));
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            }
+        }
+        if (type == ValidationType.SIGN_UP_SMS) {
+            try {
+                user = createUser(validationId);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
         }
         validation.setSendCount(0);
