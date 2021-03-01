@@ -1,5 +1,9 @@
 server:
-  port: 8082
+  port 8082
+  gateway:
+    host: http://localhost
+    port: 8080
+
 spring:
   datasource:
     platform: postgres
