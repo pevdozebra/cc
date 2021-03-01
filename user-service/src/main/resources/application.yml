@@ -1,5 +1,8 @@
 server:
   port: ${USER_SERVICE_PORT:0}
+  gateway:
+    host: http://localhost
+    port: 8080
 
 spring:
   application:

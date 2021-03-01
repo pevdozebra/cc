@@ -1,4 +1,4 @@
-package co.sptnk.service.market.config;
+package co.sptnk.service.user.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
