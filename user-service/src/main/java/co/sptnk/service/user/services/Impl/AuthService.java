@@ -12,7 +12,6 @@ import co.sptnk.service.user.model.dto.Auth;
 import co.sptnk.service.user.model.dto.Tokens;
 import co.sptnk.service.user.model.keys.ValidationPK;
 import co.sptnk.service.user.repositories.UsersRepo;
-import co.sptnk.service.user.repositories.ValidationCodeRepo;
 import co.sptnk.service.user.repositories.ValidationRepo;
 import co.sptnk.service.user.services.IAuthService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +43,6 @@ public class AuthService implements IAuthService {
 
     private final ValidationRepo validationRepo;
 
-    private final ValidationCodeRepo codeRepo;
-
     private final RealmResource keyCloak;
 
     private final KeycloakProvider provider;
@@ -57,13 +54,10 @@ public class AuthService implements IAuthService {
     private ModelMapper mapper;
 
 
-
     public AuthService(UsersRepo usersRepo, ValidationRepo validationRepo,
-                       ValidationCodeRepo codeRepo, Environment environment,
-                       @Lazy KeycloakProvider provider) {
+                       Environment environment, @Lazy KeycloakProvider provider) {
         this.usersRepo = usersRepo;
         this.validationRepo = validationRepo;
-        this.codeRepo = codeRepo;
         this.provider = provider;
         this.keyCloak = provider.get().realm(environment.getProperty("keycloak.realm"));
     }
