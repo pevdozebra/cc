@@ -76,41 +76,20 @@ public class AuthService implements IAuthService {
         }
         User user = usersRepo.findUserByUsername(auth.getPhone())
                 .orElse(null);
-        ValidationPK key;
-        if (user == null) {
-            key = new ValidationPK(auth.getPhone(), ValidationType.SIGN_UP_SMS);
-        } else {
-            key = new ValidationPK(auth.getPhone(), ValidationType.SIGN_IN_SMS);
-        }
+        ValidationPK key = new ValidationPK(auth.getPhone(), user == null ?
+                ValidationType.SIGN_UP_SMS : ValidationType.SIGN_IN_SMS);
 
         Validation validation = validationRepo
                 .findById(key)
-                .orElse(new Validation());
-        if (validation.getId() == null) {
-            validation.setId(key);
-            validation.setSendCount(1);
-            validation.setLastSendDate(OffsetDateTime.now());
-        } else {
-            if (validation.getSendCount() < config.getConfig(ConfigName.VALIDATION_SMS_SEND_MAX, Integer.class)) {
-                validation.setSendCount(validation.getSendCount() + 1);
-            } else {
-                if (Duration.between(OffsetDateTime.now(), validation.getLastSendDate())
-                        .compareTo(config.getConfig(ConfigName.VALIDATION_SMS_SEND_BLOCK_PERIOD, Duration.class)) > 0) {
-                    validation.setSendCount(1);
-                    validation.setLastSendDate(OffsetDateTime.now());
-                } else {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-                }
-            }
-        }
+                .map(this::updateValidation)
+                .orElseGet(() -> createValidation(key));
+
         log.info(String.format("Отправлено %s кодов для %s", validation.getSendCount(), validation.getId().getId()));
         ValidationCode validationCode = new ValidationCode();
-        GeneratedCode code;
-        if (config.getConfig(ConfigName.VALIDATION_SMS_TEST_MODE, Boolean.class)) {
-            code = new GeneratedCode(config.getConfig(ConfigName.VALIDATION_SMS_TEST_CODE, String.class));
-        } else {
-            code = new GeneratedCode(config.getConfig(ConfigName.VALIDATION_SMS_CODE_LENGTH, Integer.class));
-        }
+        GeneratedCode code = config.getConfig(ConfigName.VALIDATION_SMS_TEST_MODE, Boolean.class) ?
+                new GeneratedCode(config.getConfig(ConfigName.VALIDATION_SMS_TEST_CODE, String.class)) :
+                new GeneratedCode(config.getConfig(ConfigName.VALIDATION_SMS_CODE_LENGTH, Integer.class));
+
         validationCode.setValue(code.hash());
         validationCode.setIssueDate(OffsetDateTime.now());
         validationCode.setExpireDate(OffsetDateTime.now()
@@ -129,13 +108,9 @@ public class AuthService implements IAuthService {
         ValidationType type;
         User user = usersRepo.findUserByUsername(validationId)
                 .orElse(null);
-        if (user == null) {
-            type = ValidationType.SIGN_UP_SMS;
-        } else {
-            if (user.getDeleted() || user.getBlocked()) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-            type = ValidationType.SIGN_IN_SMS;
+        type = user == null ? ValidationType.SIGN_UP_SMS : ValidationType.SIGN_IN_SMS;
+        if (user != null && (user.getDeleted() || user.getBlocked())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         log.info(String.format("Проверка кода валидации для типа %s", type.getName()));
         GeneratedCode gCode = new GeneratedCode(code);
@@ -143,7 +118,8 @@ public class AuthService implements IAuthService {
                 .findById(new ValidationPK(validationId, type))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (validation.getCodes().isEmpty()) {
-            log.info(String.format("Для пользователя %s не наден код валидации для типа %s", validationId, type.getName()));
+            log.info(String.format("Для пользователя %s не наден код валидации для типа %s",
+                    validationId, type.getName()));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         List<ValidationCode> codes = validation.getCodes().stream()
@@ -181,6 +157,29 @@ public class AuthService implements IAuthService {
                 .isNew(type == ValidationType.SIGN_UP_SMS)
                 .build();
         return tokens;
+    }
+
+    private Validation updateValidation(Validation v) {
+        if (v.getSendCount() < config.getConfig(ConfigName.VALIDATION_SMS_SEND_MAX, Integer.class)) {
+            v.setSendCount(v.getSendCount() + 1);
+        } else {
+            if (Duration.between(OffsetDateTime.now(), v.getLastSendDate())
+                    .compareTo(config.getConfig(ConfigName.VALIDATION_SMS_SEND_BLOCK_PERIOD, Duration.class)) > 0) {
+                v.setSendCount(1);
+                v.setLastSendDate(OffsetDateTime.now());
+            } else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }
+        return v;
+    }
+
+    private Validation createValidation(ValidationPK key) {
+        Validation v = new Validation();
+        v.setId(key);
+        v.setSendCount(1);
+        v.setLastSendDate(OffsetDateTime.now());
+        return  v;
     }
 
     private User createUser(String username) {
