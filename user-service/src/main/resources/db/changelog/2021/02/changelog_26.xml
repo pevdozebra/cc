@@ -15,6 +15,7 @@
             IF (TG_OP = 'INSERT') THEN
             DELETE FROM validation_code WHERE expire_date &lt; delta;
             END IF;
+            RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
         </sql>
