@@ -111,7 +111,7 @@ public class AuthService implements IAuthService {
                 .findById(new ValidationPK(validationId, type))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (validation.getCodes().isEmpty()) {
-            log.info(String.format("Для пользователя %s не наден код валидации для типа %s",
+            log.info(String.format("Для пользователя %s не найден код валидации для типа %s",
                     validationId, type.getName()));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
