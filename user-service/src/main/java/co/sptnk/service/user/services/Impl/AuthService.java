@@ -97,43 +97,32 @@ public class AuthService implements IAuthService {
     @Override
     @Transactional
     public Tokens validate(String code, String validationId) {
-        Tokens tokens;
+        Tokens tokens = null;
         ValidationType type;
         User user = usersRepo.findUserByUsername(validationId)
+                .map(u -> {
+                    if (u.getDeleted() || u.getBlocked())
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                    return u;
+                })
                 .orElse(null);
-        type = user == null ? ValidationType.SIGN_UP_SMS : ValidationType.SIGN_IN_SMS;
-        if (user != null && (user.getDeleted() || user.getBlocked())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-        log.info(String.format("Проверка кода валидации для типа %s", type.getName()));
-        GeneratedCode gCode = new GeneratedCode(code);
+        log.info(String.format("Проверка кода валидации %s", code));
         Validation validation = validationRepo
-                .findById(new ValidationPK(validationId, type))
+                .findById(new ValidationPK(validationId, user == null ?
+                        ValidationType.SIGN_UP_SMS : ValidationType.SIGN_IN_SMS))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (validation.getCodes().isEmpty()) {
-            log.info(String.format("Для пользователя %s не найден код валидации для типа %s",
-                    validationId, type.getName()));
+            log.info(String.format("Для пользователя %s не найден код валидации %s",
+                    validationId, code));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         List<ValidationCode> codes = validation.getCodes().stream()
-                .filter(c -> c.getValue().equals(gCode.hash())).collect(Collectors.toList());
+                .filter(c -> c.getValue().equals(new GeneratedCode(code).hash())).collect(Collectors.toList());
         if (codes.isEmpty()) {
             log.info(String.format("Код валидации %s не найден", code));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        } else {
-            Boolean[] checked = new Boolean[]{false};
-            codes.forEach(value -> {
-                if (!value.getExpireDate().isBefore(OffsetDateTime.now())) {
-                    checked[0] = true;
-                }
-                validation.deleteCode(value);
-            });
-            if (!checked[0]) {
-                log.info(String.format("Код %s просрочен", code));
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-            }
         }
-        if (type == ValidationType.SIGN_UP_SMS) {
+        if (validation.getId().getType() == ValidationType.SIGN_UP_SMS) {
             try {
                 user = createUser(validationId);
             } catch (Exception e) {
@@ -141,13 +130,18 @@ public class AuthService implements IAuthService {
             }
         }
         validation.setSendCount(0);
-        AccessTokenResponse response = provider.getAccessTokenForUser(user.getId().toString());
-        tokens = Tokens.builder()
-                .id(user.getId())
-                .accessToken(response.getToken())
-                .refreshToken(response.getRefreshToken())
-                .isNew(type == ValidationType.SIGN_UP_SMS)
-                .build();
+        if (user != null && user.getId() != null) {
+            AccessTokenResponse response = provider.getAccessTokenForUser(user.getId().toString());
+            tokens = Tokens.builder()
+                    .id(user.getId())
+                    .accessToken(response.getToken())
+                    .refreshToken(response.getRefreshToken())
+                    .isNew(validation.getId().getType() == ValidationType.SIGN_UP_SMS)
+                    .build();
+        }
+        if (tokens == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         return tokens;
     }
 
