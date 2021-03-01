@@ -13,7 +13,7 @@
             BEGIN
             delta = NEW.issue_date - interval '24 hours';
             IF (TG_OP = 'INSERT') THEN
-            DELETE FROM validation_code WHERE expire_date < delta;
+            DELETE FROM validation_code WHERE expire_date &lt; delta;
             END IF;
             END;
             $$ LANGUAGE plpgsql;
