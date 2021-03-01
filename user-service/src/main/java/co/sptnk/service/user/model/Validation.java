@@ -15,8 +15,8 @@ import javax.persistence.JoinColumns;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -38,12 +38,12 @@ public class Validation {
     @Column(name = "first_send_date")
     private OffsetDateTime lastSendDate;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumns({
             @JoinColumn(name = "validation_id"),
             @JoinColumn(name = "validation_type")
     })
-    private Set<ValidationCode> codes = new HashSet<>();
+    private List<ValidationCode> codes = new ArrayList<>();
 
     public void addCode(ValidationCode code) {
         codes.add(code);

@@ -95,7 +95,6 @@ public class AuthService implements IAuthService {
         validationCode.setExpireDate(OffsetDateTime.now()
                 .plus(config.getConfig(ConfigName.VALIDATION_SMS_TIMEOUT, Duration.class)));
 
-        codeRepo.save(validationCode);
         validation.addCode(validationCode);
         validationRepo.save(validation);
         return code;
@@ -134,7 +133,6 @@ public class AuthService implements IAuthService {
                     checked[0] = true;
                 }
                 validation.deleteCode(value);
-                codeRepo.delete(value);
             });
             if (!checked[0]) {
                 log.info(String.format("Код %s просрочен", code));
