@@ -1,6 +1,9 @@
 package co.sptnk.service.user.services.Impl;
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
 import co.sptnk.service.user.common.KeycloakProvider;
+import co.sptnk.service.user.common.MessageProducer;
 import co.sptnk.service.user.common.PageableCreator;
 import co.sptnk.service.user.model.Interest;
 import co.sptnk.service.user.model.User;
@@ -47,6 +50,8 @@ public class UserService implements IUserService {
     private Environment environment;
     @Autowired
     private KeycloakProvider keycloakProvider;
+    @Autowired
+    private MessageProducer message;
 
 
     @Override
@@ -68,6 +73,11 @@ public class UserService implements IUserService {
         User exist = usersRepo.findUserByIdAndDeletedFalse(user.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(user, exist);
         updateUserInKeyclock(exist);
+        message.sendLogMessage(
+                EventCode.USER_EDIT_PROFILE,
+                EventType.INFO,
+                EventCode.USER_EDIT_PROFILE.getDescription() + "с id: " + exist.getId().toString()
+        );
         return exist;
     }
 
@@ -77,6 +87,11 @@ public class UserService implements IUserService {
         User user = usersRepo.findById(uuid).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         blockUserInKeyclock(user);
         user.setDeleted(true);
+        message.sendLogMessage(
+                EventCode.USER_BLOCK,
+                EventType.INFO,
+                EventCode.USER_BLOCK.getDescription() + "с id: " + uuid.toString()
+        );
     }
 
     @Override
@@ -132,6 +147,11 @@ public class UserService implements IUserService {
         User user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Set<Interest> interests = new HashSet<>(interestRepo.findByDeletedFalseAndIdIn(ids));
         user.getInterests().addAll(interests);
+        message.sendLogMessage(
+                EventCode.USER_EDIT_INTERESTS,
+                EventType.INFO,
+                "Добавление интересов пользователю с id: " + userId.toString()
+        );
         return user.getInterests();
     }
 
@@ -141,6 +161,11 @@ public class UserService implements IUserService {
         User user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Set<Interest> interests = new HashSet<>(interestRepo.findByDeletedFalseAndIdIn(ids));
         user.getInterests().removeAll(interests);
+        message.sendLogMessage(
+                EventCode.USER_EDIT_INTERESTS,
+                EventType.INFO,
+                "Удаление интересов пользователя с id: " + userId.toString()
+        );
         return user.getInterests();
     }
 

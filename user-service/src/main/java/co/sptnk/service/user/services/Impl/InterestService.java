@@ -1,6 +1,9 @@
 package co.sptnk.service.user.services.Impl;
 
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.user.common.MessageProducer;
 import co.sptnk.service.user.common.PageableCreator;
 import co.sptnk.service.user.model.Interest;
 import co.sptnk.service.user.repositories.InterestRepo;
@@ -28,6 +31,8 @@ public class InterestService implements IInterestService {
     private UsersRepo usersRepo;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private MessageProducer message;
 
     @Override
     public List<Interest> findAllByParent(Long id) {
@@ -41,7 +46,13 @@ public class InterestService implements IInterestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         interest.setDeleted(null);
-        return interestRepo.save(interest);
+        Interest newInterest = interestRepo.save(interest);
+        message.sendLogMessage(
+                EventCode.INTEREST_CREATE,
+                EventType.INFO,
+                EventCode.INTEREST_CREATE.getDescription(newInterest.getId())
+        );
+        return newInterest;
     }
 
     @Override
@@ -53,6 +64,11 @@ public class InterestService implements IInterestService {
         interest.setDeleted(null);
         Interest exist = interestRepo.findInterestByIdAndDeletedFalse(interest.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(interest, exist);
+        message.sendLogMessage(
+                EventCode.INTEREST_EDIT,
+                EventType.INFO,
+                EventCode.INTEREST_EDIT.getDescription(exist.getId())
+        );
         return exist;
     }
 
@@ -61,6 +77,11 @@ public class InterestService implements IInterestService {
     public void delete(Long id) {
        Interest interest = interestRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
        interest.setDeleted(true);
+        message.sendLogMessage(
+                EventCode.INTEREST_DELETE,
+                EventType.INFO,
+                EventCode.INTEREST_DELETE.getDescription(id)
+        );
     }
 
     @Override

@@ -1,5 +1,8 @@
 package co.sptnk.service.user.services.Impl;
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.user.common.MessageProducer;
 import co.sptnk.service.user.common.config.ConfigStore;
 import co.sptnk.service.user.model.ServiceConfiguration;
 import co.sptnk.service.user.repositories.ConfigRepo;
@@ -22,12 +25,15 @@ public class ConfigService implements IConfigService {
 
     private final ConfigStore configStore;
 
+    private final MessageProducer message;
+
     @Autowired
     private ModelMapper mapper;
 
-    public ConfigService(ConfigRepo repo, ConfigStore store) {
+    public ConfigService(ConfigRepo repo, ConfigStore store, MessageProducer message) {
         this.configRepo = repo;
         this.configStore = store;
+        this.message = message;
     }
 
     @Override
@@ -37,6 +43,12 @@ public class ConfigService implements IConfigService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
         mapper.map(conf, storedConfig);
         configStore.putConfig(conf.getId(), conf.getValueType(), conf.getValue());
+        message.sendLogMessage(
+                EventCode.USER_SERVICE_CONFIG_UPDATE,
+                EventType.INFO,
+                EventCode.USER_SERVICE_CONFIG_UPDATE.getDescription() +
+                        " Конфигурация с id: " + conf.getId()
+        );
         return storedConfig;
     }
 
@@ -51,5 +63,6 @@ public class ConfigService implements IConfigService {
         config.forEach(c -> {
             configStore.putConfig(c.getId(), c.getValueType(), c.getValue());
         });
+        log.info("Выполнена синхронизация конфигурации с базой данных");
     }
 }

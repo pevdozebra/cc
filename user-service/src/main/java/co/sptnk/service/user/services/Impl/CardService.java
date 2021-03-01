@@ -1,5 +1,8 @@
 package co.sptnk.service.user.services.Impl;
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.user.common.MessageProducer;
 import co.sptnk.service.user.common.PageableCreator;
 import co.sptnk.service.user.model.Card;
 import co.sptnk.service.user.repositories.CardsRepo;
@@ -27,6 +30,8 @@ public class CardService implements ICardService {
     private UsersRepo usersRepo;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private MessageProducer message;
 
     @Override
     public List<Card> getAllForUser(UUID userId)  {
@@ -39,7 +44,13 @@ public class CardService implements ICardService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         card.setDeleted(null);
-        return cardsRepo.save(card);
+        Card newCard = cardsRepo.save(card);
+        message.sendLogMessage(
+                EventCode.CARD_CREATE,
+                EventType.INFO,
+                EventCode.CARD_CREATE.getDescription(newCard.getId())
+        );
+        return newCard;
     }
 
     @Override
@@ -51,6 +62,11 @@ public class CardService implements ICardService {
         card.setDeleted(null);
         Card exist = cardsRepo.findCardByIdAndDeletedFalse(card.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(card, exist);
+        message.sendLogMessage(
+                EventCode.CARD_EDIT,
+                EventType.INFO,
+                EventCode.CARD_EDIT.getDescription(card.getId())
+        );
         return exist;
     }
 
@@ -59,6 +75,11 @@ public class CardService implements ICardService {
     public void delete(Long id) {
         Card card = cardsRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         card.setDeleted(true);
+        message.sendLogMessage(
+                EventCode.CARD_DELETE,
+                EventType.INFO,
+                EventCode.CARD_DELETE.getDescription(id)
+        );
     }
 
     @Override
