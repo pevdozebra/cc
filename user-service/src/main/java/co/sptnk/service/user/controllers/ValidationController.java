@@ -1,6 +1,5 @@
 package co.sptnk.service.user.controllers;
 
-import co.sptnk.service.user.model.dto.Tokens;
 import co.sptnk.service.user.services.Impl.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class ValidationController {
     }
 
     @GetMapping
-    public ResponseEntity<Tokens> validate(@RequestParam String code, @RequestParam String id) {
+    public ResponseEntity<Object> validate(@RequestParam String code, @RequestParam String id) {
         if (code.length() > 256) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }

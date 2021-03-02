@@ -31,9 +31,9 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.ws.rs.core.Response;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -72,12 +72,11 @@ public class AuthService implements IAuthService {
                 .orElse(null);
         ValidationPK key = new ValidationPK(auth.getPhone(), user == null ?
                 ValidationType.SIGN_UP_SMS : ValidationType.SIGN_IN_SMS);
-
         Validation validation = validationRepo
                 .findById(key)
                 .map(this::updateValidation)
                 .orElseGet(() -> createValidation(key));
-
+        validation.setUserId(user != null ? user.getId() : null);
         log.info(String.format("Отправлено %s кодов для %s", validation.getSendCount(), validation.getId().getId()));
         ValidationCode validationCode = new ValidationCode();
         GeneratedCode code = config.getConfig(ConfigName.VALIDATION_SMS_TEST_MODE, Boolean.class) ?
@@ -97,52 +96,48 @@ public class AuthService implements IAuthService {
     @Override
     @Transactional
     public Tokens validate(String code, String validationId) {
-        Tokens tokens = null;
-        ValidationType type;
+        ValidationType[] type = new ValidationType[]{ValidationType.SIGN_UP_SMS};
+        Boolean[] checked = new Boolean[]{false};
+        List<Validation> validation = validationRepo.findValidationById_IdAndCodes_Value(validationId,
+                new GeneratedCode(code).hash());
+        if (validation.isEmpty()) {
+            log.info(String.format("Код %s не найден", code));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        log.info(String.format("Проверка кода валидации %s", code));
+        validation.forEach(v -> {
+            List<ValidationCode> deleted = new ArrayList<>();
+            v.getCodes().forEach(c -> {
+                if (v.getUserId() != null) {
+                    type[0] = ValidationType.SIGN_IN_SMS;
+                }
+                if (c.getExpireDate().isAfter(OffsetDateTime.now())) {
+                    deleted.add(c);
+                    checked[0] = true;
+                    v.setSendCount(0);
+                }
+            });
+            v.getCodes().removeAll(deleted);
+        });
+        if (!checked[0]) {
+            log.info(String.format("Код %s просрочен", code));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         User user = usersRepo.findUserByUsername(validationId)
                 .map(u -> {
                     if (u.getDeleted() || u.getBlocked())
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
                     return u;
                 })
-                .orElse(null);
-        log.info(String.format("Проверка кода валидации %s", code));
-        Validation validation = validationRepo
-                .findById(new ValidationPK(validationId, user == null ?
-                        ValidationType.SIGN_UP_SMS : ValidationType.SIGN_IN_SMS))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (validation.getCodes().isEmpty()) {
-            log.info(String.format("Для пользователя %s не найден код валидации %s",
-                    validationId, code));
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        List<ValidationCode> codes = validation.getCodes().stream()
-                .filter(c -> c.getValue().equals(new GeneratedCode(code).hash())).collect(Collectors.toList());
-        if (codes.isEmpty()) {
-            log.info(String.format("Код валидации %s не найден", code));
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        if (validation.getId().getType() == ValidationType.SIGN_UP_SMS) {
-            try {
-                user = createUser(validationId);
-            } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-            }
-        }
-        validation.setSendCount(0);
-        if (user != null && user.getId() != null) {
-            AccessTokenResponse response = provider.getAccessTokenForUser(user.getId().toString());
-            tokens = Tokens.builder()
-                    .id(user.getId())
-                    .accessToken(response.getToken())
-                    .refreshToken(response.getRefreshToken())
-                    .isNew(validation.getId().getType() == ValidationType.SIGN_UP_SMS)
-                    .build();
-        }
-        if (tokens == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-        return tokens;
+                .orElseGet(() -> createUser(validationId));
+        AccessTokenResponse response = provider.getAccessTokenForUser(user.getId().toString());
+
+        return Tokens.builder()
+                .id(user.getId())
+                .accessToken(response.getToken())
+                .refreshToken(response.getRefreshToken())
+                .isNew(type[0] == ValidationType.SIGN_UP_SMS)
+                .build();
     }
 
     private Validation updateValidation(Validation v) {
