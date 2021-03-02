@@ -1,25 +1,27 @@
 package co.sptnk.service.user.services.Impl;
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
 import co.sptnk.service.user.common.KeycloakProvider;
+import co.sptnk.service.user.common.MessageProducer;
 import co.sptnk.service.user.common.PageableCreator;
-import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.Interest;
+import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.UserDetails;
 import co.sptnk.service.user.model.dto.UserSignUpData;
 import co.sptnk.service.user.repositories.InterestRepo;
 import co.sptnk.service.user.repositories.UsersRepo;
 import co.sptnk.service.user.services.IUserService;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +31,10 @@ import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -43,11 +45,13 @@ public class UserService implements IUserService {
     @Autowired
     private InterestRepo interestRepo;
     @Autowired
-    private Environment environment;
-    @Autowired
     private ModelMapper modelMapper;
     @Autowired
+    private Environment environment;
+    @Autowired
     private KeycloakProvider keycloakProvider;
+    @Autowired
+    private MessageProducer message;
 
 
     @Override
@@ -69,6 +73,11 @@ public class UserService implements IUserService {
         User exist = usersRepo.findUserByIdAndDeletedFalse(user.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(user, exist);
         updateUserInKeyclock(exist);
+        message.sendLogMessage(
+                EventCode.USER_EDIT_PROFILE,
+                EventType.INFO,
+                EventCode.USER_EDIT_PROFILE.getDescription() + "с id: " + exist.getId().toString()
+        );
         return exist;
     }
 
@@ -78,6 +87,11 @@ public class UserService implements IUserService {
         User user = usersRepo.findById(uuid).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         blockUserInKeyclock(user);
         user.setDeleted(true);
+        message.sendLogMessage(
+                EventCode.USER_BLOCK,
+                EventType.INFO,
+                EventCode.USER_BLOCK.getDescription() + "с id: " + uuid.toString()
+        );
     }
 
     @Override
@@ -133,6 +147,11 @@ public class UserService implements IUserService {
         User user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Set<Interest> interests = new HashSet<>(interestRepo.findByDeletedFalseAndIdIn(ids));
         user.getInterests().addAll(interests);
+        message.sendLogMessage(
+                EventCode.USER_EDIT_INTERESTS,
+                EventType.INFO,
+                "Добавление интересов пользователю с id: " + userId.toString()
+        );
         return user.getInterests();
     }
 
@@ -142,6 +161,11 @@ public class UserService implements IUserService {
         User user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Set<Interest> interests = new HashSet<>(interestRepo.findByDeletedFalseAndIdIn(ids));
         user.getInterests().removeAll(interests);
+        message.sendLogMessage(
+                EventCode.USER_EDIT_INTERESTS,
+                EventType.INFO,
+                "Удаление интересов пользователя с id: " + userId.toString()
+        );
         return user.getInterests();
     }
 

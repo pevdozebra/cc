@@ -1,0 +1,36 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
+
+    <changeSet id="13" author="tsydenov_ia">
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION delete_old_codes() RETURNS TRIGGER AS
+            $$
+            DECLARE
+            delta timestamptz;
+            BEGIN
+            delta = NEW.issue_date - interval '24 hours';
+            IF (TG_OP = 'INSERT') THEN
+            DELETE FROM validation_code WHERE expire_date &lt; delta;
+            END IF;
+            RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </sql>
+        <rollback>
+            DROP FUNCTION delete_old_codes()
+        </rollback>
+    </changeSet>
+    <changeSet id="14" author="tsydenov_ia">
+        <sql splitStatements="false">
+            CREATE TRIGGER clear_codes_t
+            AFTER INSERT ON validation_code FOR EACH ROW EXECUTE
+            PROCEDURE delete_old_codes();
+        </sql>
+        <rollback>
+            DROP TRIGGER clear_codes_t ON validation_code
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -1,5 +1,8 @@
 package co.sptnk.service.user.services.Impl;
 
+import co.sptnk.lib.common.eventlog.EventCode;
+import co.sptnk.lib.common.eventlog.EventType;
+import co.sptnk.service.user.common.MessageProducer;
 import co.sptnk.service.user.common.PageableCreator;
 import co.sptnk.service.user.model.PerformerRating;
 import co.sptnk.service.user.model.User;
@@ -31,6 +34,8 @@ public class PerformerRatingService implements IPerformerRatingService {
     private UsersRepo usersRepo;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private MessageProducer message;
 
     @Override
     public List<PerformerRating> findAllByPerformer(UUID userId) {
@@ -53,6 +58,12 @@ public class PerformerRatingService implements IPerformerRatingService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         performerRating.setDeleted(null);
+        message.sendLogMessage(
+                EventCode.RATING_CREATE,
+                EventType.INFO,
+                String.format("Добавлена оценка пользователя с id: %s пользователю с id: %s",
+                        rater.getId().toString(), rated.getId().toString())
+        );
         return performerRatingsRepo.save(performerRating);
     }
 
@@ -66,6 +77,11 @@ public class PerformerRatingService implements IPerformerRatingService {
         PerformerRating exist = performerRatingsRepo.findPerformerRatingByIdAndDeletedFalse(performerRating.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(performerRating, exist);
+        message.sendLogMessage(
+                EventCode.RATING_EDIT,
+                EventType.INFO,
+                EventCode.RATING_EDIT.getDescription(exist.getId())
+        );
         return exist;
     }
 
@@ -74,6 +90,11 @@ public class PerformerRatingService implements IPerformerRatingService {
     public void delete(Long id) {
         PerformerRating performerRating = performerRatingsRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         performerRating.setDeleted(true);
+        message.sendLogMessage(
+                EventCode.RATING_DELETE,
+                EventType.INFO,
+                EventCode.RATING_DELETE.getDescription(id)
+        );
     }
 
     @Override

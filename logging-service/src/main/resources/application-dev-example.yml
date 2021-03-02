@@ -1,3 +1,9 @@
+server:
+  port: 8083
+  gateway:
+    host: http://localhost
+    port: 8080
+
 logging:
   level:
     web: trace

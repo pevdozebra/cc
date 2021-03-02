@@ -2,7 +2,10 @@ package co.sptnk.service.user.controllers;
 
 import co.sptnk.lib.constant.AllowedLinksMethods;
 import co.sptnk.lib.controller.AbstractCrudHateoasController;
+import co.sptnk.service.user.common.GeneratedCode;
+import co.sptnk.service.user.model.dto.Auth;
 import co.sptnk.service.user.model.User;
+import co.sptnk.service.user.services.IAuthService;
 import co.sptnk.service.user.services.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
-
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +36,9 @@ public class UserController extends AbstractCrudHateoasController<User, UUID> {
 
     @Autowired
     private IUserService service;
+
+    @Autowired
+    private IAuthService authService;
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getOneById(@PathVariable("id") UUID uuid) {
@@ -89,6 +94,12 @@ public class UserController extends AbstractCrudHateoasController<User, UUID> {
     public ResponseEntity deleteInterests(@PathVariable("id") UUID userId, @RequestBody Set<Long> ids){
         return new ResponseEntity<>(service.deleteInterests(ids, userId), HttpStatus.NO_CONTENT);
     }
+
+    @PostMapping("/signin")
+    public ResponseEntity<GeneratedCode> signIn(@RequestBody Auth auth) {
+        return new ResponseEntity<>(authService.signIn(auth), HttpStatus.OK);
+    }
+
 
     @Override
     protected Class<? extends AbstractCrudHateoasController<User, UUID>> getSelfClass() {
