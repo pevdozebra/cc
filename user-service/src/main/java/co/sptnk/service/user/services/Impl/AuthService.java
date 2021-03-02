@@ -96,8 +96,8 @@ public class AuthService implements IAuthService {
     @Override
     @Transactional
     public Tokens validate(String code, String validationId) {
-        ValidationType[] type = new ValidationType[]{ValidationType.SIGN_UP_SMS};
-        Boolean[] checked = new Boolean[]{false};
+        boolean[] isNew = new boolean[]{true};
+        boolean[] checked = new boolean[]{false};
         List<Validation> validation = validationRepo.findValidationById_IdAndCodes_Value(validationId,
                 new GeneratedCode(code).hash());
         if (validation.isEmpty()) {
@@ -108,9 +108,6 @@ public class AuthService implements IAuthService {
         validation.forEach(v -> {
             List<ValidationCode> deleted = new ArrayList<>();
             v.getCodes().forEach(c -> {
-                if (v.getUserId() != null) {
-                    type[0] = ValidationType.SIGN_IN_SMS;
-                }
                 if (c.getExpireDate().isAfter(OffsetDateTime.now())) {
                     deleted.add(c);
                     checked[0] = true;
@@ -127,6 +124,7 @@ public class AuthService implements IAuthService {
                 .map(u -> {
                     if (u.getDeleted() || u.getBlocked())
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                    isNew[0] = false;
                     return u;
                 })
                 .orElseGet(() -> createUser(validationId));
@@ -136,7 +134,7 @@ public class AuthService implements IAuthService {
                 .id(user.getId())
                 .accessToken(response.getToken())
                 .refreshToken(response.getRefreshToken())
-                .isNew(type[0] == ValidationType.SIGN_UP_SMS)
+                .isNew(isNew[0])
                 .build();
     }
 
