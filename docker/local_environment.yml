@@ -1,0 +1,78 @@
+version: '3.7'
+services:
+    cc-postgresql:
+        env_file:
+            -   ./.env
+        container_name: cc-postgresql
+        image: postgres:12-alpine
+        volumes:
+            - ~/docker/volumes/telescope/postgres:/var/lib/postgresql/data/
+            - ./pg_init:/docker-entrypoint-initdb.d
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_USER: ${PG_USER}
+            POSTGRES_PASSWORD: ${PG_PASS}
+            POSTGRES_MULTIPLE_DATABASES: ${PG_DBS}
+        networks:
+            - cc-network
+#    cc-mongodb:
+#        env_file:
+#            - ./.env
+#        container_name: cc-mongodb
+#        image: mongo
+#        volumes:
+#            - ./mongo_init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+#            - ~/docker/volumes/telescope/mongodb:/data/db
+#        ports:
+#            - '27017-27019:27017-27019'
+#        environment:
+#            MONGO_INITDB_DATABASE: ${MONGO_DB}
+#            MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+#            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+#        networks:
+#            - cc-network
+    cc-rabbitmq:
+        env_file:
+            - ./.env
+        container_name: cc-rabbitmq
+        image: rabbitmq:3-management-alpine
+        volumes:
+            - ~/docker/volumes/telescope/rabbitmq/data/:/var/lib/rabbitmq/
+            - ~/docker/volumes/telescope/rabbitmq/logs/:/var/log/rabbitmq/
+            - ./rmq_init/rabbitmq.config:/etc/rabbitmq/rabbitmq.conf
+            - ./rmq_init/definitions.json:/etc/rabbitmq/definitions.json
+        ports:
+            - 5672:5672
+            - 15672:15672
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RMQ_USER}
+            RABBITMQ_DEFAULT_PASS: ${RMQ_PASS}
+        networks:
+            - cc-network
+    cc-keycloak:
+        env_file:
+            - ./.env
+        container_name: cc-keycloak
+        image: jboss/keycloak
+        volumes:
+            - ${KC_REALM_IMPORT_FILE}:/tmp/example-realm.json
+            - ${KC_PROPERTIES_FILE}:/opt/jboss/keycloak/standalone/configuration/profile.properties
+        ports:
+            - 8090:8080
+        environment:
+            KEYCLOAK_USER: ${KC_USER}
+            KEYCLOAK_PASSWORD: ${KC_PASS}
+            KEYCLOAK_IMPORT: /tmp/example-realm.json
+            DB_VENDOR: postgres
+            DB_ADDR: cc-postgresql
+            DB_PORT: 5432
+            DB_DATABASE: keycloak
+            DB_USER: ${PG_USER}
+            DB_PASSWORD: ${PG_PASS}
+        networks:
+            - cc-network
+        depends_on:
+            -   cc-postgresql
+networks:
+    cc-network:

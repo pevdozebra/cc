@@ -19,4 +19,4 @@ target/
 application-dev.properties
 application-dev.yml
 dev.properties
-/docker
+/docker/.env
