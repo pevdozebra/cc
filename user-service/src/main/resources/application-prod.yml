@@ -1,7 +1,13 @@
 server:
   port: 8081
+  gateway:
+    host: http://localhost
+    port: 8080
+
 
 spring:
+  application:
+    name: '@name@'
   datasource:
     url: jdbc:postgresql://localhost:5432/users
     username: sa
@@ -10,3 +16,10 @@ spring:
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+
+keycloak:
+  auth-server-url: http://localhost:8080/auth
+  realm: telescope
+  resource: telescope-admin
+  credentials:
+    secret: 8771d6e8-0e14-4161-83a2-b7d1b5777be8

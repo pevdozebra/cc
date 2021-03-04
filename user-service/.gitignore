@@ -1,4 +1,3 @@
-HELP.md
 # Eclipse
 .classpath
 .project
@@ -15,3 +14,9 @@ HELP.md
 # Maven
 log/
 target/
+
+# Project
+application-dev.properties
+application-dev.yml
+dev.properties
+/docker

@@ -1,15 +1,18 @@
 server:
   port: 8083
+  gateway:
+    host: http://localhost
+    port: 8080
+
 spring:
-  data:
-    mongodb:
-      authentication-database: admin
-      username: sa
-      password: sa
-      database: logging
-      port: 27017
-      host: localhost
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+  datasource:
+    platform: postgres
+    username: sa
+    password: sa
+    url: jdbc:postgresql://localhost:5432/logging
+    driver-class-name: org.postgresql.Driver
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: mqsa
+    password: sa
