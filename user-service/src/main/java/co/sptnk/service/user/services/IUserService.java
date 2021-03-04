@@ -2,9 +2,9 @@ package co.sptnk.service.user.services;
 
 import co.sptnk.lib.service.AbstractCrudService;
 import co.sptnk.service.user.model.Interest;
+import co.sptnk.service.user.model.Role;
 import co.sptnk.service.user.model.User;
-import co.sptnk.service.user.model.dto.UserSignUpData;
-import org.keycloak.representations.AccessTokenResponse;
+
 
 import java.util.List;
 import java.util.Set;
@@ -33,4 +33,20 @@ public interface IUserService extends AbstractCrudService<User, UUID> {
      * @return - итоговый список всех интересов пользователя после удаления
      */
     Set<Interest> deleteInterests(Set<Long> ids, UUID userId);
+
+    /**
+     * Добавление ролей для пользователя
+     * @param roles - список c именами добавляемых ролей
+     * @param userId - Id пользователя
+     * @return - итоговый список всех ролей пользователя после добавления
+     */
+    Set<Role> addRoles(Set<String> roles, UUID userId);
+
+    /**
+     * Удаление ролей у пользователя
+     * @param roles - список c именами удаляемых ролей
+     * @param userId - Id пользователя
+     * @return - итоговый список всех ролей пользователя после удаления
+     */
+    Set<Role> deleteRoles(Set<String> roles, UUID userId);
 }

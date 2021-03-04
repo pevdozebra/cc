@@ -5,6 +5,7 @@ import co.sptnk.service.user.common.KeycloakProvider;
 import co.sptnk.service.user.common.ValidationType;
 import co.sptnk.service.user.common.config.ConfigName;
 import co.sptnk.service.user.common.config.ConfigStore;
+import co.sptnk.service.user.model.Role;
 import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.Validation;
 import co.sptnk.service.user.model.ValidationCode;
@@ -33,6 +34,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import java.util.UUID;
 
 @Slf4j
@@ -168,6 +170,7 @@ public class AuthService implements IAuthService {
         user.setDeleted(false);
         UserRepresentation representation = mapper.map(user, UserRepresentation.class);
         representation.setEnabled(!user.getBlocked());
+        representation.setRealmRoles(Collections.singletonList(Role.CUSTOMER));
         Response response = keyCloak.users().create(representation);
         String userId = CreatedResponseUtil.getCreatedId(response);
         user.setId(UUID.fromString(userId));

@@ -1,0 +1,25 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
+
+    <changeSet id="3" author="Sidorenko Sergey">
+        <sql>
+            CREATE TABLE public.user_role
+            (
+            id bigserial NOT NULL,
+            user_id uuid,
+            name text COLLATE pg_catalog."default" NOT NULL,
+            CONSTRAINT user_role_pkey PRIMARY KEY (id),
+            CONSTRAINT fk_user_role_relations_user FOREIGN KEY (user_id)
+            REFERENCES public.users (id) MATCH SIMPLE
+            ON UPDATE RESTRICT
+            ON DELETE CASCADE
+            );
+        </sql>
+        <rollback>
+            DROP TABLE user_role;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

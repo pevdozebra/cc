@@ -15,6 +15,12 @@ spring:
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/auth/realms/telescope
+
 
 keycloak:
   auth-server-url: http://localhost:8080/auth
