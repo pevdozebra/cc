@@ -1,0 +1,21 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
+
+    <changeSet id="17" author="tsydenov_ia">
+        <sql splitStatements="false">
+            ALTER TABLE card ALTER COLUMN bind_date TYPE timestamptz;
+            ALTER TABLE performer_rating ALTER COLUMN rating_timestamp TYPE timestamptz;
+            ALTER TABLE performer_verification ALTER COLUMN create_date TYPE timestamptz;
+            ALTER TABLE performer_verification ALTER COLUMN decision_date TYPE timestamptz;
+        </sql>
+        <rollback>
+            ALTER TABLE card ALTER COLUMN bind_date TYPE timestamp;
+            ALTER TABLE performer_rating ALTER COLUMN rating_timestamp TYPE timestamp;
+            ALTER TABLE performer_verification ALTER COLUMN create_date TYPE timestamp;
+            ALTER TABLE performer_verification ALTER COLUMN decision_date TYPE timestamp;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
