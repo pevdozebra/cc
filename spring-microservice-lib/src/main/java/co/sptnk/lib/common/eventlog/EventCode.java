@@ -6,6 +6,7 @@ public enum EventCode {
     USER_REGISTRATION("Регистрация пользователя"),
     USER_EDIT_PROFILE("Редактирование профиля пользователя"),
     USER_EDIT_INTERESTS("Редактирование интересов пользователя"),
+    USER_EDIT_ROLES("Редактирование ролей пользователя"),
     USER_AUTHORISATION("Авторизация пользователя"),
     USER_BLOCK("Блокировка пользователя"),
     USER_UNBLOCK("Разблокировка пользователя"),

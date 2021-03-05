@@ -6,6 +6,7 @@ import co.sptnk.service.user.common.KeycloakProvider;
 import co.sptnk.service.user.common.MessageProducer;
 import co.sptnk.service.user.common.PageableCreator;
 import co.sptnk.service.user.model.Interest;
+import co.sptnk.service.user.model.Role;
 import co.sptnk.service.user.model.User;
 import co.sptnk.service.user.model.UserDetails;
 import co.sptnk.service.user.model.dto.UserSignUpData;
@@ -16,26 +17,29 @@ import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
@@ -56,10 +60,6 @@ public class UserService implements IUserService {
 
     @Override
     public User add(User user) {
-//        if (user.getId() != null) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-//        }
-//        return usersRepo.save(user);
         return null;
     }
 
@@ -72,7 +72,7 @@ public class UserService implements IUserService {
         user.setDeleted(null);
         User exist = usersRepo.findUserByIdAndDeletedFalse(user.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         modelMapper.map(user, exist);
-        updateUserInKeyclock(exist);
+        updateUserInKeyclock(exist, false);
         message.sendLogMessage(
                 EventCode.USER_EDIT_PROFILE,
                 EventType.INFO,
@@ -95,13 +95,18 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public User getOneById(UUID uuid) {
         User user = usersRepo.findUserByIdAndDeletedFalse(uuid).orElse(null);
         if (user == null) {
             User deletedUser = usersRepo.findById(uuid).orElse(null);
-            user = getUserFromKeyclock(uuid);
+            RealmResource realmResource = keycloakProvider.get().realm(environment.getProperty("keycloak.realm"));
+            UserResource userResource = realmResource.users().get(uuid.toString());
+            user = getUserFromKeyclock(userResource);
             if (user != null && !user.getBlocked() && deletedUser == null) {
                 usersRepo.save(user);
+                usersRepo.flush();
+                user.setRoles(getUserRoleFromKeyclock(userResource, user));
             } else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             }
@@ -113,27 +118,12 @@ public class UserService implements IUserService {
     public List<User> getAll(Map<String, String> params) {
         Page<User> page;
         try {
-            page = usersRepo.findAll(getExample(params), PageableCreator.getPageable(params));
+            page = usersRepo.findAll(getSpecification(params), PageableCreator.getPageable(params));
         }
         catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         return new ArrayList<>(page.getContent());
-    }
-
-    private Example<User> getExample(Map<String, String> params){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        User user = new User();
-        user.setId(params.get("id") != null ? UUID.fromString(params.get("id")):null);
-        user.setFirstName(params.get("firstname"));
-        user.setLastName(params.get("lastname"));
-        user.setUsername(params.get("username"));
-        user.setBirthDate(params.get("birthDate") != null ? LocalDate.parse(params.get("birthDate"), formatter):null);
-        user.setEmail(params.get("email"));
-        user.setBlocked(params.get("blocked") != null ? Boolean.parseBoolean(params.get("blocked")): null);
-        user.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): null);
-        return Example.of(user);
     }
 
     @Override
@@ -167,6 +157,43 @@ public class UserService implements IUserService {
                 "Удаление интересов пользователя с id: " + userId.toString()
         );
         return user.getInterests();
+    }
+
+    @Override
+    @Transactional
+    public Set<Role> addRoles(Set<String> roles, UUID userId) {
+        User user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Set<Role> givenRoles = roles.stream().map(r->new Role(null, user, r)).collect(Collectors.toSet());
+        if (user.getRoles() != null) {
+            user.getRoles().addAll(givenRoles);
+        }
+        else {
+            user.setRoles(givenRoles);
+        }
+        updateUserInKeyclock(user, true);
+        message.sendLogMessage(
+                EventCode.USER_EDIT_ROLES,
+                EventType.INFO,
+                "Добавление ролей пользователя с id: " + userId.toString()
+        );
+        return user.getRoles();
+    }
+
+    @Override
+    @Transactional
+    public Set<Role> deleteRoles(Set<String> roles, UUID userId) {
+        User user = usersRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Set<Role> givenRoles = user.getRolesByName(roles);
+        if (user.getRoles() != null) {
+            user.getRoles().removeAll(givenRoles);
+            updateUserInKeyclock(user, true);
+            message.sendLogMessage(
+                    EventCode.USER_EDIT_ROLES,
+                    EventType.INFO,
+                    "Добавление ролей пользователя с id: " + userId.toString()
+            );
+        }
+        return user.getRoles();
     }
 
 
@@ -206,36 +233,45 @@ public class UserService implements IUserService {
             userRepresentation = updateUserRepresentationFromUser(userRepresentation, user);
             Response response = realmResource.users().create(userRepresentation);
             userId = CreatedResponseUtil.getCreatedId(response);
-
-//                RoleRepresentation roleRepresentation = realmResource.roles()
-//                        .get("role").toRepresentation();
-//
-//                userResource.roles().realmLevel()
-//                        .add(Arrays.asList(roleRepresentation));
-
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         return userId;
     }
 
-    private User getUserFromKeyclock(UUID id){
-        RealmResource realmResource = keycloakProvider.get().realm(environment.getProperty("keycloak.realm"));
-        UserResource userResource = realmResource.users().get(id.toString());
+    private User getUserFromKeyclock(UserResource userResource){
         User user = null;
         if (userResource != null) {
-            UserRepresentation userRepresentation = userResource.toRepresentation();
-            user = new User(userRepresentation);
+            user = new User(userResource);
         }
         return user;
     }
 
+    private Set<Role> getUserRoleFromKeyclock(UserResource userResource, User user){
+        Set<Role> roles = new HashSet<>();
+        if (userResource != null) {
+            roles = userResource.roles().realmLevel().listAll()
+                    .stream().map(r-> new Role(null, user, r.getName())).collect(Collectors.toSet());
+        }
+        return roles;
+    }
 
-    private void updateUserInKeyclock(User user){
+
+    private void updateUserInKeyclock(User user, Boolean updateRoles){
         RealmResource realmResource = keycloakProvider.get().realm(environment.getProperty("keycloak.realm"));
         UserResource userResource = realmResource.users().get(user.getId().toString());
         UserRepresentation userRepresentation = updateUserRepresentationFromUser(userResource.toRepresentation(), user);
         userResource.update(userRepresentation);
+        if (updateRoles) {updateUserRoleInKeyclock(user, realmResource, userResource);}
+    }
+    private void updateUserRoleInKeyclock(User user, RealmResource realmResource, UserResource userResource){
+        if (user.getRoles() != null) {
+            Set<String> givenRoles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
+            List<RoleRepresentation> roleRepresentationList = realmResource.roles().list()
+                    .stream().filter(r->givenRoles.contains(r.getName())).collect(Collectors.toList());
+            userResource.roles().realmLevel().remove(realmResource.roles().list());
+            userResource.roles().realmLevel().add(roleRepresentationList);
+        }
     }
 
     private void blockUserInKeyclock(User user) {
@@ -255,5 +291,55 @@ public class UserService implements IUserService {
             userRepresentation.setEnabled(user.getBlocked() == null || !user.getBlocked());
         }
         return userRepresentation;
+    }
+
+    public Specification<User> getSpecification(Map<String, String> params) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return new Specification<User>() {
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> cq, CriteriaBuilder cb) {
+                List<Predicate> predicates = new ArrayList<>();
+                if (params.get("id") != null) {
+                    predicates.add(cb.equal(root.get("id"), UUID.fromString(params.get("id"))));
+                }
+                if (params.get("firstname") != null) {
+                    predicates.add(cb.equal(root.get("firstName"), params.get("firstname")));
+                }
+                if (params.get("lastname") != null) {
+                    predicates.add(cb.equal(root.get("lastName"), params.get("lastname")));
+                }
+                if (params.get("username") != null) {
+                    predicates.add(cb.equal(root.get("username"), params.get("username")));
+                }
+                if (params.get("email") != null) {
+                    predicates.add(cb.equal(root.get("email"), params.get("email")));
+                }
+                if (params.get("birthDateFrom") != null) {
+                    predicates.add(cb.greaterThan(root.get("birthDate"), LocalDate.parse(params.get("birthDateFrom"), formatter)));
+                }
+                if (params.get("birthDateTo") != null) {
+                    predicates.add(cb.lessThan(root.get("birthDate"), LocalDate.parse(params.get("birthDateTo"), formatter)));
+                }
+                if (params.containsKey("interests")) {
+                    Join<User, Interest> joinUserInterest = root.join("interests", JoinType.LEFT);
+                    Set<Long> givenInterests = Arrays.stream(params.get("interests").split(","))
+                            .map(Long::parseLong)
+                            .collect(Collectors.toSet());
+                    List<Interest> interestList = new ArrayList<>(interestRepo.findByDeletedFalseAndIdIn(givenInterests));
+                    predicates.add(joinUserInterest.in(interestList));
+                }
+                if (params.containsKey("roles")) {
+                    Join<User, Role> joinUserRole = root.join("roles", JoinType.LEFT);
+                    List<String> roleList = Arrays.asList(params.get("roles").split(","));
+                    predicates.add(joinUserRole.get("name").in(roleList));
+                }
+                if (params.get("blocked") != null) {
+                    predicates.add(cb.equal(root.get("deleted"), Boolean.parseBoolean(params.get("blocked"))));
+                }
+                if (params.get("deleted") != null) {
+                    predicates.add(cb.equal(root.get("deleted"), Boolean.parseBoolean(params.get("deleted"))));
+                }
+                return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
     }
 }
