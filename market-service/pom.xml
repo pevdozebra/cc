@@ -12,6 +12,7 @@
 
     <name>market-service</name>
     <groupId>co.sptnk.service</groupId>
+    <version>0.0.1-SNAPSHOT</version>
     <artifactId>market-service</artifactId>
 
     <properties>
@@ -167,6 +168,7 @@
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>debug</profile.logging>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
         <profile>
@@ -178,6 +180,7 @@
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>info</profile.logging>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
     </profiles>

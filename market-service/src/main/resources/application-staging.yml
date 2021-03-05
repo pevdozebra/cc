@@ -5,6 +5,8 @@ server:
     port: 8080
 
 logging:
+  file:
+    name: /opt/cc/log/market.log
   level:
     web: debug
 

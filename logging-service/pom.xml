@@ -160,8 +160,10 @@
                 <spring.profiles.active>staging</spring.profiles.active>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>debug</profile.logging>
+                <skipLiquibaseRun>true</skipLiquibaseRun>
                 <profile.propertyFile>src/main/resources/db/staging.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
         <profile>
@@ -170,8 +172,10 @@
                 <spring.profiles.active>prod</spring.profiles.active>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>info</profile.logging>
+                <skipLiquibaseRun>true</skipLiquibaseRun>
                 <profile.propertyFile>src/main/resources/db/prod.properties</profile.propertyFile>
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
     </profiles>

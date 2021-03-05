@@ -1,1 +1,3 @@
-
+logging:
+    file:
+        name: /opt/cc/log/registry.log
