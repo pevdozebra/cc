@@ -18,7 +18,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 
@@ -60,7 +60,7 @@ public class EventLog {
      * Дата события
      */
     @Column(name = "event_date")
-    private LocalDateTime eventDate;
+    private OffsetDateTime eventDate;
 
     /**
      * Тип клиента

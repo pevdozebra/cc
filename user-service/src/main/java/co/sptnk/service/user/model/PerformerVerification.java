@@ -7,18 +7,18 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.FetchType;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Getter
@@ -55,13 +55,13 @@ public class PerformerVerification extends RepresentationModel<PerformerVerifica
      * Дата заполнения
      */
     @Column(name = "create_date")
-    private LocalDateTime createDate;
+    private OffsetDateTime createDate;
 
     /**
      * Дата решения
      */
     @Column(name = "decision_date")
-    private LocalDateTime decisionDate;
+    private OffsetDateTime decisionDate;
 
     /**
      * 	Результат решения

@@ -7,17 +7,17 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.ManyToOne;
-import javax.persistence.FetchType;
-import javax.persistence.Table;
 import javax.persistence.Id;
-import javax.persistence.Column;
 import javax.persistence.JoinColumn;
-import java.time.LocalDateTime;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import java.time.OffsetDateTime;
 
 
 @Entity
@@ -74,7 +74,7 @@ public class PerformerRating extends RepresentationModel<PerformerRating> {
      * Дата оценки
      */
     @Column(name = "rating_timestamp")
-    private LocalDateTime date;
+    private OffsetDateTime date;
 
     /**
      * Флаг удаления записи (фактическое удаление не происходит)

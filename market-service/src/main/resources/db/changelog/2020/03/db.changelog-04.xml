@@ -1,0 +1,27 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
+
+    <changeSet id="15" author="tsydenov_ia">
+        <sql>
+            ALTER TABLE orders ALTER COLUMN order_date TYPE timestamptz;
+            ALTER TABLE orders ALTER COLUMN perform_date TYPE timestamptz;
+            ALTER TABLE orders ALTER COLUMN status_update TYPE timestamptz;
+            ALTER TABLE payments ALTER COLUMN pay_date TYPE timestamptz;
+            ALTER TABLE payments ALTER COLUMN process_date TYPE timestamptz;
+            ALTER TABLE products ALTER COLUMN start_time TYPE timetz;
+            ALTER TABLE products ALTER COLUMN end_time TYPE timetz;
+        </sql>
+        <rollback>
+            ALTER TABLE orders ALTER COLUMN order_date TYPE timestamp;
+            ALTER TABLE orders ALTER COLUMN perform_date TYPE timestamp;
+            ALTER TABLE orders ALTER COLUMN status_update TYPE timestamp;
+            ALTER TABLE payments ALTER COLUMN pay_date TYPE timestamp;
+            ALTER TABLE payments ALTER COLUMN process_date TYPE timestamp;
+            ALTER TABLE products ALTER COLUMN start_time TYPE time;
+            ALTER TABLE products ALTER COLUMN end_time TYPE time;
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

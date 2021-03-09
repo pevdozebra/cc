@@ -7,9 +7,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Version;
 import java.math.BigDecimal;
-import java.time.LocalTime;
+import java.time.OffsetTime;
 import java.util.UUID;
 
 @Entity
@@ -68,13 +79,13 @@ public class Product {
      * Услуга доступна с
      */
     @Column(name = "start_time")
-    private LocalTime startTime;
+    private OffsetTime startTime;
 
     /**
      * Услуга доступна до
      */
     @Column(name = "end_time")
-    private LocalTime endTime;
+    private OffsetTime endTime;
 
     /**
      * Статус (DRAFT, ACTIVE, ARCHIVED)
