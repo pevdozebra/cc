@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "name": "mqsa",
+      "password_hash": "u5+CrrLX5968CDi2goxsjrxfODKdhEwlFHwa0hR9zP8XTKkg",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "mqsa",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "parameters": [],
+  "policies": [],
+  "queues": [],
+  "exchanges": [],
+  "bindings": []
+}

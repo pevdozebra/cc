@@ -1,11 +1,13 @@
 package co.sptnk.service.user.model;
 
 import co.sptnk.service.user.model.dto.UserSignUpData;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -18,11 +20,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import java.time.LocalDate;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -90,7 +94,13 @@ public class User extends RepresentationModel<User> {
             inverseJoinColumns=@JoinColumn(name="interest_id"))
     private Set<Interest> interests;
 
-    public User(UserRepresentation userRepresentation) {
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name ="user_id")
+    @JsonManagedReference
+    private Set<Role> roles;
+
+    public User(UserResource userResource) {
+        UserRepresentation userRepresentation = userResource.toRepresentation();
         this.id =  UUID.fromString(userRepresentation.getId());
         this.firstName = userRepresentation.getFirstName();
         this.lastName = userRepresentation.getLastName();
@@ -134,4 +144,7 @@ public class User extends RepresentationModel<User> {
         return this.getId().equals(entity.getId());
     }
 
+    public Set<Role> getRolesByName(Set<String> givenRoles) {
+        return this.getRoles().stream().filter(r->givenRoles.contains(r.getName())).collect(Collectors.toSet());
+    }
 }

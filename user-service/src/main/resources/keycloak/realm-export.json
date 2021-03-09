@@ -4,7 +4,7 @@
   "notBefore": 0,
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,
-  "accessTokenLifespan": 300,
+  "accessTokenLifespan": 3600,
   "accessTokenLifespanForImplicitFlow": 900,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
@@ -43,9 +43,41 @@
   "roles": {
     "realm": [
       {
+        "id": "be116a6a-e90e-4241-8700-877d5fdebf39",
+        "name": "admin",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "telescope",
+        "attributes": {}
+      },
+      {
+        "id": "d89deacb-40d6-4735-b1c5-9e250c335999",
+        "name": "performer",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "telescope",
+        "attributes": {}
+      },
+      {
         "id": "a15fb46d-7c12-4317-a41f-6fbbf275df1d",
         "name": "offline_access",
         "description": "${role_offline-access}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "telescope",
+        "attributes": {}
+      },
+      {
+        "id": "f1566366-7c4f-4ff6-8297-268f0511fefa",
+        "name": "manager",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "telescope",
+        "attributes": {}
+      },
+      {
+        "id": "29a8dd32-f69b-4428-9db6-742348727aeb",
+        "name": "customer",
         "composite": false,
         "clientRole": false,
         "containerId": "telescope",
@@ -371,10 +403,6 @@
     }
   },
   "groups": [],
-  "defaultRoles": [
-    "offline_access",
-    "uma_authorization"
-  ],
   "requiredCredentials": [
     "password"
   ],
@@ -445,6 +473,12 @@
       "clientScope": "offline_access",
       "roles": [
         "offline_access"
+      ]
+    },
+    {
+      "clientScope": "phone",
+      "roles": [
+        "admin"
       ]
     }
   ],
@@ -802,6 +836,34 @@
           {
             "id": "d0b65546-bea4-439d-a1c5-cc9d377e5988",
             "name": "manage-group-membership"
+          },
+          {
+            "id": "5d71aff5-94bc-4b5f-8e71-483910bce343",
+            "name": "map-role"
+          },
+          {
+            "id": "e17a749a-2ae7-4a52-9c4f-31d2e6786d4c",
+            "name": "map-role-client-scope"
+          },
+          {
+            "id": "dcc9abfb-8184-47db-90fb-f65965549298",
+            "name": "map-role-composite"
+          },
+          {
+            "id": "a545c327-cd4e-4a81-b423-5b68eb4334c2",
+            "name": "map-roles-client-scope"
+          },
+          {
+            "id": "7a2861e8-9aa9-4f27-b4e9-5259bb055d21",
+            "name": "map-roles-composite"
+          },
+          {
+            "id": "0583a498-95d7-490f-bafa-fa8f6d17d1e2",
+            "name": "configure"
+          },
+          {
+            "id": "084dd58b-cb82-4c6a-8730-55d7e04457dd",
+            "name": "token-exchange"
           }
         ],
         "decisionStrategy": "UNANIMOUS"
@@ -2261,7 +2323,12 @@
   "resetCredentialsFlow": "reset credentials",
   "clientAuthenticationFlow": "clients",
   "dockerAuthenticationFlow": "docker auth",
-  "attributes": {},
+  "attributes": {
+    "clientOfflineSessionMaxLifespan": "0",
+    "clientSessionIdleTimeout": "0",
+    "clientSessionMaxLifespan": "0",
+    "clientOfflineSessionIdleTimeout": "0"
+  },
   "keycloakVersion": "12.0.2",
   "userManagedAccessAllowed": false
 }

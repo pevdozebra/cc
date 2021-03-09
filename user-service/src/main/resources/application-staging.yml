@@ -4,6 +4,7 @@ server:
     host: http://localhost
     port: 8080
 
+
 spring:
   application:
     name: '@name@'
@@ -22,3 +23,7 @@ keycloak:
   resource: telescope-admin
   credentials:
     secret: 8771d6e8-0e14-4161-83a2-b7d1b5777be8
+
+logging:
+  file:
+    name: /opt/cc/log/user.log

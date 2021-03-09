@@ -12,6 +12,7 @@
 
     <name>market-service</name>
     <groupId>co.sptnk.service</groupId>
+    <version>0.0.1-SNAPSHOT</version>
     <artifactId>market-service</artifactId>
 
     <properties>
@@ -97,39 +98,39 @@
     </dependencyManagement>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>2.4.1</version>
-                    <executions>
-                        <execution>
-                            <phase>install</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.liquibase</groupId>
-                    <artifactId>liquibase-maven-plugin</artifactId>
-                    <version>${liquibase.version}</version>
-                    <configuration>
-                        <propertyFile>${profile.propertyFile}</propertyFile>
-                        <changeLogFile>${profile.changeLogFile}</changeLogFile>
-                        <verbose>${profile.verbose}</verbose>
-                        <logging>${profile.logging}</logging>
-                        <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.postgresql</groupId>
-                            <artifactId>postgresql</artifactId>
-                            <version>${postgresql.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>co.sptnk.service.market.MarketServiceApplication</mainClass>
+                </configuration>
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>install</phase>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>${liquibase.version}</version>
+                <configuration>
+                    <propertyFile>${profile.propertyFile}</propertyFile>
+                    <changeLogFile>${profile.changeLogFile}</changeLogFile>
+                    <verbose>${profile.verbose}</verbose>
+                    <logging>${profile.logging}</logging>
+                    <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
@@ -167,6 +168,7 @@
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>debug</profile.logging>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
         <profile>
@@ -178,6 +180,7 @@
                 <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>info</profile.logging>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
     </profiles>

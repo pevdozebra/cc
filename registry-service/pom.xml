@@ -52,6 +52,7 @@
                 <spring.profiles.active>staging</spring.profiles.active>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>debug</profile.logging>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
         <profile>
@@ -60,8 +61,21 @@
                 <spring.profiles.active>prod</spring.profiles.active>
                 <profile.verbose>false</profile.verbose>
                 <profile.logging>info</profile.logging>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>co.sptnk.service.registry.RegistryServiceApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
