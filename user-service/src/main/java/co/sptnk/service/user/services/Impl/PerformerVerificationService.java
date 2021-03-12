@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +91,8 @@ public class PerformerVerificationService implements IPerformerVerificationServi
         performerVerification.setId(params.get("id") != null ? Long.parseLong(params.get("id")):null);
         performerVerification.setPerformer(params.get("performerId") != null ? usersRepo.getOne(UUID.fromString(params.get("performerId"))):null);
         performerVerification.setVerifier(params.get("verifierId") != null ? usersRepo.getOne(UUID.fromString(params.get("verifierId"))):null);
-        performerVerification.setCreateDate(params.get("createDate") != null ? LocalDateTime.parse(params.get("createDate"), formatter):null);
-        performerVerification.setDecisionDate(params.get("decisionDate") != null ? LocalDateTime.parse(params.get("decisionDate"), formatter):null);
+        performerVerification.setCreateDate(params.get("createDate") != null ? OffsetDateTime.parse(params.get("createDate"), formatter):null);
+        performerVerification.setDecisionDate(params.get("decisionDate") != null ? OffsetDateTime.parse(params.get("decisionDate"), formatter):null);
         performerVerification.setSuccessDecision(params.get("successDecision") != null ? Boolean.parseBoolean(params.get("successDecision")): null);
         performerVerification.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): null);
         return Example.of(performerVerification);

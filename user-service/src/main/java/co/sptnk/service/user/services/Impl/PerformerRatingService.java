@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +131,7 @@ public class PerformerRatingService implements IPerformerRatingService {
         performerRating.setRater(params.get("raterId") != null ? usersRepo.getOne(UUID.fromString(params.get("raterId"))):null);
         performerRating.setReasonId(params.get("reasonId") != null ? Long.parseLong(params.get("reasonId")):null);
         performerRating.setRating(params.get("rating") != null ? Integer.parseInt(params.get("rating")):null);
-        performerRating.setDate(params.get("date") != null ? LocalDateTime.parse(params.get("date"), formatter):null);
+        performerRating.setDate(params.get("date") != null ? OffsetDateTime.parse(params.get("date"), formatter):null);
         performerRating.setDeleted(params.get("deleted") != null ? Boolean.parseBoolean(params.get("deleted")): null);
         return Example.of(performerRating);
     }

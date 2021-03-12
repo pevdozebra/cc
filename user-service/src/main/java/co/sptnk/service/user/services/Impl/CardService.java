@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -111,7 +112,7 @@ public class CardService implements ICardService {
         Card card = new Card();
         card.setId(params.get("id") != null ? Long.parseLong(params.get("id")):null);
         card.setUser(params.get("userId") != null ? usersRepo.getOne(UUID.fromString(params.get("userId"))):null);
-        card.setBindDate(params.get("bindDate") != null ? LocalDateTime.parse(params.get("bindDate"), formatter):null);
+        card.setBindDate(params.get("bindDate") != null ? OffsetDateTime.parse(params.get("bindDate"), formatter):null);
         card.setMaskedNumber(params.get("maskedNumber"));
         card.setAquireUrl(params.get("aquireUrl"));
         card.setArchived(params.get("archived") != null ? Boolean.parseBoolean(params.get("archived")): null);
