@@ -144,6 +144,16 @@
             </properties>
         </profile>
         <profile>
+            <id>docker</id>
+            <properties>
+                <spring.profiles.active>docker</spring.profiles.active>
+                <profile.verbose>true</profile.verbose>
+                <profile.logging>debug</profile.logging>
+                <skipLiquibaseRun>true</skipLiquibaseRun>
+                <profile.propertyFile>src/main/resources/db/dev.properties</profile.propertyFile>
+                <profile.changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</profile.changeLogFile>
+            </properties>
+        </profile>        <profile>
             <id>nocloud</id>
             <properties>
                 <spring.profiles.active>nocloud</spring.profiles.active>

@@ -162,6 +162,17 @@
             </properties>
         </profile>
         <profile>
+            <id>docker</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+                <skipLiquibaseRun>true</skipLiquibaseRun>
+                <profile.propertyFile>src/main/resources/db/dev.properties</profile.propertyFile>
+                <profile.changeLogFile>src/main/resources/db/changelog/changelog-master.yml</profile.changeLogFile>
+                <profile.verbose>true</profile.verbose>
+                <profile.logging>debug</profile.logging>
+            </properties>
+        </profile>
+        <profile>
             <id>staging</id>
             <properties>
                 <profile.propertyFile>src/main/resources/db/staging.properties</profile.propertyFile>

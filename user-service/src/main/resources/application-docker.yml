@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgresql:5432/users
+    username: sa
+    password: sa
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+
+keycloak:
+  auth-server-url: http://keycloak:8080/auth
+  realm: celebrity-chat
+  resource: keycloak-admin
+  public-client: true
+  credentials:
+    secret: bff71573-18d2-4c98-84b2-ac3d7cc28752
+
+client-secret: bff71573-18d2-4c98-84b2-ac3d7cc28752
+
+eureka:
+  instance:
+    hostname: user-service
+    prefer-ip-address: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://registry-service:8761/eureka/

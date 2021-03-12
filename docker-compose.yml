@@ -1,0 +1,92 @@
+registry-service:
+  image: celebrity-chat/registry-service
+  hostname: registry-service
+  ports:
+    - 8761:8761
+
+gateway-service:
+  image: celebrity-chat/gateway-service
+  ports:
+    - 8080:8080
+  links:
+    - registry-service
+
+logging-service:
+  image: celebrity-chat/logging-service
+  ports:
+    - 8083:8083
+  links:
+    - registry-service
+    - rabbitmq
+    - postgresql
+
+market-service:
+  image: celebrity-chat/market-service
+  ports:
+    - 8084:8084
+  links:
+    - registry-service
+    - postgresql
+
+user-service:
+  image: celebrity-chat/user-service
+  ports:
+    - 8085:8085
+  links:
+    - registry-service
+    - postgresql
+    - keycloak
+
+rabbitmq:
+  env_file:
+    - ./docker/.env
+  container_name: rabbitmq
+  hostname: rabbitmq
+  image: rabbitmq:3-management-alpine
+  volumes:
+    - ./docker/rmq_init/rabbitmq.config:/etc/rabbitmq/rabbitmq.conf
+    - ./docker/rmq_init/definitions.json:/etc/rabbitmq/definitions.json
+  ports:
+    - 5672:5672
+    - 15672:15672
+  environment:
+    RABBITMQ_DEFAULT_USER: ${RMQ_USER}
+    RABBITMQ_DEFAULT_PASS: ${RMQ_PASS}
+
+postgresql:
+  env_file:
+    - ./docker/.env
+  container_name: postgresql
+  hostname: postgresql
+  image: postgres:12-alpine
+  volumes:
+    - ~/docker/volumes/telescope/postgres:/var/lib/postgresql/data/
+    - ./pg_init:/docker-entrypoint-initdb.d
+  ports:
+    - 5432:5432
+  environment:
+    POSTGRES_USER: ${PG_USER}
+    POSTGRES_PASSWORD: ${PG_PASS}
+    POSTGRES_MULTIPLE_DATABASES: ${PG_DBS}
+
+keycloak:
+  env_file:
+    - ./.env
+  container_name: keycloak
+  hostname: keycloak
+  image: jboss/keycloak
+  volumes:
+    - ${KC_REALM_IMPORT_FILE}:/tmp/example-realm.json
+    - ${KC_PROPERTIES_FILE}:/opt/jboss/keycloak/standalone/configuration/profile.properties
+  ports:
+    - 8090:8080
+  environment:
+    KEYCLOAK_USER: ${KC_USER}
+    KEYCLOAK_PASSWORD: ${KC_PASS}
+    KEYCLOAK_IMPORT: /tmp/example-realm.json
+#    DB_VENDOR: postgres
+#    DB_ADDR: postgresql
+#    DB_PORT: 5432
+#    DB_DATABASE: keycloak
+#    DB_USER: ${PG_USER}
+#    DB_PASSWORD: ${PG_PASS}

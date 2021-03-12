@@ -1,0 +1,21 @@
+logging:
+  level:
+    web: trace
+
+spring:
+  datasource:
+    platform: postgres
+    username: sa
+    password: sa
+    url: jdbc:postgresql://postgresql:5432/markets
+    driver-class-name: org.postgresql.Driver
+
+eureka:
+  instance:
+    hostname: market-service
+    prefer-ip-address: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://registry-service:8761/eureka/

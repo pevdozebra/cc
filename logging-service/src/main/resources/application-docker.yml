@@ -1,0 +1,32 @@
+server:
+  port: 8083
+  gateway:
+    host: http://localhost
+    port: 8080
+
+logging:
+  level:
+    web: trace
+
+spring:
+  datasource:
+    platform: postgres
+    username: sa
+    password: sa
+    url: jdbc:postgresql://postgresql:5432/logging
+    driver-class-name: org.postgresql.Driver
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: mqsa
+    password: sa
+
+eureka:
+  instance:
+    hostname: logging-service
+    prefer-ip-address: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://registry-service:8761/eureka/
